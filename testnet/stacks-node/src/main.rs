@@ -12,6 +12,7 @@ extern crate slog;
 
 pub use stacks_common::util;
 use stacks_common::util::hash::hex_bytes;
+use subcommand::StacksNodeSubcommand;
 
 pub mod monitoring;
 
@@ -30,8 +31,11 @@ pub mod run_loop;
 pub mod syncctl;
 pub mod tenure;
 
+mod subcommand;
+
 use std::collections::HashMap;
-use std::{env, panic, process};
+use std::str::FromStr;
+use std::{panic, process};
 
 use backtrace::Backtrace;
 use pico_args::Arguments;
@@ -288,9 +292,17 @@ fn main() {
     }));
 
     let mut args = Arguments::from_env();
-    let subcommand = args.subcommand().unwrap().unwrap_or_default();
 
-    warn_deprecated_subcommands(subcommand.as_str());
+    let subcommand =
+        StacksNodeSubcommand::from_str(&args.subcommand().unwrap().unwrap_or_default())
+            .unwrap_or(StacksNodeSubcommand::ShowHelp);
+
+    if subcommand == StacksNodeSubcommand::ShowHelp {
+        print_help();
+        return;
+    }
+
+    warn_deprecated_subcommands(subcommand.clone());
 
     info!("{}", version());
 
@@ -305,24 +317,24 @@ fn main() {
         );
     }
 
-    let config_file = match subcommand.as_str() {
-        "mocknet" => {
+    let config_file = match subcommand {
+        StacksNodeSubcommand::StartMocknet => {
             args.finish();
             ConfigFile::mocknet()
         }
-        "regtest" | "helium" => {
+        StacksNodeSubcommand::StartRegtest | StacksNodeSubcommand::StartHelium => {
             args.finish();
             ConfigFile::regtest()
         }
-        "testnet" => {
+        StacksNodeSubcommand::StartTestnet => {
             args.finish();
             ConfigFile::xenon()
         }
-        "mainnet" => {
+        StacksNodeSubcommand::StartMainnet => {
             args.finish();
             ConfigFile::mainnet()
         }
-        "check-config" => {
+        StacksNodeSubcommand::ValidateConfig => {
             let config_path: String = args.value_from_str("--config").unwrap();
             args.finish();
             info!("Loading config at path {}", config_path);
@@ -347,7 +359,7 @@ fn main() {
                 }
             };
         }
-        "start" => {
+        StacksNodeSubcommand::Start => {
             let config_path: String = args.value_from_str("--config").unwrap();
             args.finish();
             info!("Loading config at path {}", config_path);
@@ -359,11 +371,11 @@ fn main() {
                 }
             }
         }
-        "version" => {
+        StacksNodeSubcommand::ShowVersion => {
             println!("{}", &version());
             return;
         }
-        "key-for-seed" => {
+        StacksNodeSubcommand::ShowKeyForSeed => {
             let seed = {
                 let config_path: Option<String> = args.opt_value_from_str("--config").unwrap();
                 if let Some(config_path) = config_path {
@@ -394,7 +406,7 @@ fn main() {
             );
             return;
         }
-        "pick-best-tip" => {
+        StacksNodeSubcommand::ShowBestTip => {
             let config_path: String = args.value_from_str("--config").unwrap();
             let at_stacks_height: Option<u64> =
                 args.opt_value_from_str("--at-stacks-height").unwrap();
@@ -404,7 +416,7 @@ fn main() {
             println!("Best tip is {:?}", &best_tip);
             process::exit(0);
         }
-        "get-spend-amount" => {
+        StacksNodeSubcommand::ShowMinerSpendAmount => {
             let config_path: String = args.value_from_str("--config").unwrap();
             let at_burnchain_height: Option<u64> =
                 args.opt_value_from_str("--at-bitcoin-height").unwrap();
@@ -463,59 +475,78 @@ fn version() -> String {
 }
 
 fn print_help() {
-    let argv: Vec<_> = env::args().collect();
-
     eprintln!(
         "\
-{} <SUBCOMMAND>
-Run a stacks-node.
+{}
 
-USAGE:
-stacks-node <SUBCOMMAND>
+Usage:  stacks-node [subcommand]
 
-SUBCOMMANDS:
+Subcommands:
 
-mainnet\t\tStart a node that will join and stream blocks from the public mainnet.
+  mainnet
+      Start a node for public mainnet.
 
-mocknet\t\tStart a node based on a fast local setup emulating a burnchain. Ideal for smart contract development. 
+  mocknet
+      Start a node for local development using Bitcoin mocknet as burnchain. Recommended for
+      smart contract development.
 
-regtest\t\tStart a node based on a local setup relying on a local instance of bitcoind.
-\t\tThe following bitcoin.conf is expected:
-\t\t  chain=regtest
-\t\t  disablewallet=0
-\t\t  txindex=1
-\t\t  server=1
-\t\t  rpcuser=user
-\t\t  rpcpassword=pass
+  regtest
+      Start a node for local development relying on a local bitcoind instance. The bitcoind
+      instance should use the following bitcoin.conf:
 
-testnet\t\tStart a node that will join and stream blocks from the public testnet, relying on Bitcoin Testnet.
+        chain=regtest
+        disablewallet=0
+        txindex=1
+        server=1
+        rpcuser=user
+        rpcpassword=pass
 
-start\t\tStart a node with a config of your own. Can be used for joining a network, starting new chain, etc.
-\t\tArguments:
-\t\t  --config: path of the config (such as https://github.com/blockstack/stacks-blockchain/blob/master/testnet/stacks-node/conf/testnet-follower-conf.toml).
-\t\tExample:
-\t\t  stacks-node start --config /path/to/config.toml
+  testnet
+      Start a node for public testnet using Bitcoin testnet as burnchain.
 
-check-config\t\tValidates the config file without starting up the node. Uses same arguments as start subcommand.
+  start
+      Start a node with a config of your own. Can be used for joining a network, starting new 
+      chain, etc.
 
-version\t\tDisplay information about the current version and our release cycle.
+      Arguments:
 
-key-for-seed\tOutput the associated secret key for a burnchain signer created with a given seed.
-\t\tCan be passed a config file for the seed via the `--config <file>` option *or* by supplying the hex seed on
-\t\tthe command line directly.
+        --config
+            The path to the config file (such as https://github.com/stacks-network/stacks-core/testnet/stacks-node/conf/local-follower-conf.toml).
 
-help\t\tDisplay this help.
+      Example:
 
-OPTIONAL ARGUMENTS:
+        stacks-node start --config /path/to/config.toml
 
-\t\t--mine-at-height=<height>: optional argument for a miner to not attempt mining until Stacks block has sync'ed to <height>
+  check-config
+      Validates a config file. 
 
-", argv[0]);
+      Arguments:
+
+        --config
+            The path to the config file.
+
+  version
+      Display information about the current version and release cycle.
+
+  key-for-seed
+      Output the associated secret key for a burnchain signer created with a given seed. Can be
+      passed a config file for the seed via the `--config <file>` option or by supplying the hex
+      seed directly.
+
+  help
+      Display this help.
+
+Options:
+
+  --mine-at-height=<height>
+      Optional argument for a miner to not attempt mining until Stacks block has sync'ed to <height>
+
+", version());
 }
 
 /// Prints a warning if the subcommand has been deprecated.
-fn warn_deprecated_subcommands(subcommand: &str) {
-    if subcommand == "helium" {
+fn warn_deprecated_subcommands(subcommand: StacksNodeSubcommand) {
+    if subcommand == StacksNodeSubcommand::StartHelium {
         warn!("Subcommand 'helium' is deprecated and will be removed in future versions. Use 'stacks-node regtest' to use a local Bitcoin node (regtest)");
     }
 }

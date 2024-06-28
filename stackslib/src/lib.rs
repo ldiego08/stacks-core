@@ -82,19 +82,22 @@ const BUILD_TYPE: &'static str = "debug";
 const BUILD_TYPE: &'static str = "release";
 
 pub fn version_string(pkg_name: &str, pkg_version: &str) -> String {
-    let git_branch = GIT_BRANCH
-        .map(|x| format!("{}", x))
-        .unwrap_or("".to_string());
-    let git_commit = GIT_COMMIT.unwrap_or("");
-    let git_tree_clean = GIT_TREE_CLEAN.unwrap_or("");
+    let git_branch = GIT_BRANCH.map(|x| format!("{}", x));
+    let git_version;
+
+    if let (Some(git_branch), Some(git_commit), Some(git_tree_clean)) =
+        (git_branch, GIT_COMMIT, GIT_TREE_CLEAN)
+    {
+        git_version = format!("{}:{}{}, ", git_branch, git_commit, git_tree_clean);
+    } else {
+        git_version = "".to_string();
+    }
 
     format!(
-        "{} {} ({}:{}{}, {} build, {} [{}])",
+        "{} version v{} ({}{} build, {} [{}])",
         pkg_name,
         pkg_version,
-        &git_branch,
-        git_commit,
-        git_tree_clean,
+        git_version,
         BUILD_TYPE,
         std::env::consts::OS,
         std::env::consts::ARCH
