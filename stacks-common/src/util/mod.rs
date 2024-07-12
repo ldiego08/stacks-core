@@ -27,6 +27,8 @@ pub mod secp256k1;
 pub mod uint;
 pub mod vrf;
 
+pub mod log_2;
+
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{error, fmt, thread, time};

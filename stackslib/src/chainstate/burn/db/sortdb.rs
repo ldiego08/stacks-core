@@ -89,6 +89,8 @@ use crate::util_lib::db::{
 
 const LOG_SOURCE: &str = "sortition-db";
 
+use_logging!(LOG_SOURCE);
+
 const BLOCK_HEIGHT_MAX: u64 = ((1 as u64) << 63) - 1;
 
 pub const REWARD_WINDOW_START: u64 = 144 * 15;
