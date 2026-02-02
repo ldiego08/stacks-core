@@ -79,7 +79,7 @@ use stacks::core::{
     PEER_VERSION_EPOCH_1_0, PEER_VERSION_EPOCH_2_0, PEER_VERSION_EPOCH_2_05,
     PEER_VERSION_EPOCH_2_1, PEER_VERSION_EPOCH_2_2, PEER_VERSION_EPOCH_2_3, PEER_VERSION_EPOCH_2_4,
     PEER_VERSION_EPOCH_2_5, PEER_VERSION_EPOCH_3_0, PEER_VERSION_EPOCH_3_1, PEER_VERSION_EPOCH_3_2,
-    PEER_VERSION_TESTNET,
+    PEER_VERSION_EPOCH_3_3, PEER_VERSION_TESTNET,
 };
 use stacks::libstackerdb::{SlotMetadata, StackerDBChunkData};
 use stacks::net::api::callreadonly::CallReadOnlyRequestBody;
@@ -230,7 +230,7 @@ lazy_static! {
             start_height: 252,
             end_height: STACKS_EPOCH_MAX,
             block_limit: HELIUM_BLOCK_LIMIT_20,
-            network_epoch: PEER_VERSION_EPOCH_3_2
+            network_epoch: PEER_VERSION_EPOCH_3_3
         },
     ];
 }
@@ -11406,7 +11406,7 @@ fn reload_miner_config() {
     let reward_amount = burn_block
         .reward_recipients
         .iter()
-        .map(|r| r.get("amt").unwrap().as_u64().unwrap())
+        .map(|r| r.amt)
         .sum::<u64>();
 
     let burn_amount = burn_block.burn_amount;
@@ -11431,7 +11431,7 @@ fn reload_miner_config() {
     let reward_amount = burn_block
         .reward_recipients
         .iter()
-        .map(|r| r.get("amt").unwrap().as_u64().unwrap())
+        .map(|r| r.amt)
         .sum::<u64>();
 
     let burn_amount = burn_block.burn_amount;
