@@ -10,6 +10,7 @@ and this project adheres to the versioning scheme outlined in the [README.md](RE
 ### Added
 
 - Setup for epoch 3.4 and Clarity version 5. Epoch 3.4 is currently set to activate at Bitcoin height 3,400,000 (very far in the future) until an activation height is selected. Clarity will activate with epoch 3.4.
+- Increased allowed stack depth from 64 to 128, effective in epoch 3.4
 
 ## [3.3.0.0.4]
 
