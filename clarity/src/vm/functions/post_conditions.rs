@@ -508,24 +508,6 @@ fn check_allowances(
         }
     }
 
-    // Check combined STX burns and movements. If the total exceeds any allowance,
-    // emit an error that makes this transaction invalid.
-    let total_stx_change = amount_moved
-        .unwrap_or(0)
-        .checked_add(amount_burned.unwrap_or(0))
-        .ok_or(VmInternalError::Expect(
-            "STX movement and burn overflowed u128".into(),
-        ))?;
-    if total_stx_change > 0 {
-        for (_, allowance) in &stx_allowances {
-            if total_stx_change > *allowance {
-                return Err(VmExecutionError::Internal(VmInternalError::Expect(
-                    "Total STX movement and burn exceeds allowance".into(),
-                )));
-            }
-        }
-    }
-
     // Check FT movements
     if let Some(ft_moved) = assets.get_all_fungible_tokens(owner) {
         for (asset, amount_moved) in ft_moved {
@@ -596,6 +578,26 @@ fn check_allowances(
                 if stx_stacked > *allowance {
                     record_violation(*index as u128);
                     break;
+                }
+            }
+        }
+    }
+
+    if earliest_violation.is_none() {
+        // Check combined STX burns and movements. If the total exceeds any allowance,
+        // emit an error that makes this transaction invalid.
+        let total_stx_change = amount_moved
+            .unwrap_or(0)
+            .checked_add(amount_burned.unwrap_or(0))
+            .ok_or(VmInternalError::Expect(
+                "STX movement and burn overflowed u128".into(),
+            ))?;
+        if total_stx_change > 0 {
+            for (_, allowance) in &stx_allowances {
+                if total_stx_change > *allowance {
+                    return Err(VmExecutionError::Internal(VmInternalError::Expect(
+                        "Total STX movement and burn exceeds allowance".into(),
+                    )));
                 }
             }
         }
