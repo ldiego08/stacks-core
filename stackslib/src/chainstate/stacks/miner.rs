@@ -22,7 +22,6 @@ use std::sync::{Arc, Mutex};
 use std::thread::ThreadId;
 use std::time::Instant;
 
-use clarity::vm::ast::errors::ParseErrorKind;
 use clarity::vm::database::BurnStateDB;
 use clarity::vm::errors::VmExecutionError;
 use serde::Deserialize;
@@ -651,7 +650,7 @@ impl TransactionResult {
         epoch_id: StacksEpochId,
     ) -> (bool, Error) {
         let error = match error {
-            Error::ClarityError(e) => match handle_clarity_runtime_error(e) {
+            Error::ClarityError(e) => match handle_clarity_runtime_error(e, epoch_id) {
                 ClarityRuntimeTxError::Rejectable(e) => {
                     // this transaction would invalidate the whole block, so don't re-consider it
                     info!("Problematic transaction would invalidate the block, so dropping from mempool"; "txid" => %tx.txid(), "error" => %e);
@@ -661,13 +660,9 @@ impl TransactionResult {
                 ClarityRuntimeTxError::Acceptable { error, .. } => {
                     if let ClarityError::Parse(ref parse_err) = error {
                         info!("Parse error: {}", parse_err; "txid" => %tx.txid());
-                        match *parse_err.err {
-                            ParseErrorKind::ExpressionStackDepthTooDeep
-                            | ParseErrorKind::VaryExpressionStackDepthTooDeep => {
-                                info!("Problematic transaction failed AST depth check"; "txid" => %tx.txid());
-                                return (true, Error::ClarityError(error));
-                            }
-                            _ => {}
+                        if parse_err.rejectable_in_epoch(epoch_id) {
+                            info!("Problematic transaction failed parse checks"; "txid" => %tx.txid());
+                            return (true, Error::ClarityError(error));
                         }
                     }
                     Error::ClarityError(error)

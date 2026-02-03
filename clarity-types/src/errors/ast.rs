@@ -15,6 +15,8 @@
 
 use std::{error, fmt};
 
+use stacks_common::types::StacksEpochId;
+
 use crate::MAX_CALL_STACK_DEPTH;
 use crate::diagnostic::{DiagnosableError, Diagnostic, Level};
 use crate::errors::{CostErrors, LexerError};
@@ -202,13 +204,13 @@ impl ParseError {
         }
     }
 
-    pub fn rejectable(&self) -> bool {
-        matches!(
-            *self.err,
-            ParseErrorKind::InterpreterFailure
-                | ParseErrorKind::ExpressionStackDepthTooDeep
-                | ParseErrorKind::VaryExpressionStackDepthTooDeep
-        )
+    pub fn rejectable_in_epoch(&self, epoch: StacksEpochId) -> bool {
+        match *self.err {
+            ParseErrorKind::InterpreterFailure => true,
+            ParseErrorKind::ExpressionStackDepthTooDeep
+            | ParseErrorKind::VaryExpressionStackDepthTooDeep => epoch.rejects_parse_depth_errors(),
+            _ => false,
+        }
     }
 
     pub fn has_pre_expression(&self) -> bool {

@@ -370,7 +370,10 @@ pub enum ClarityRuntimeTxError {
     Rejectable(ClarityError),
 }
 
-pub fn handle_clarity_runtime_error(error: ClarityError) -> ClarityRuntimeTxError {
+pub fn handle_clarity_runtime_error(
+    error: ClarityError,
+    epoch: StacksEpochId,
+) -> ClarityRuntimeTxError {
     match error {
         // runtime errors are okay
         ClarityError::Interpreter(VmExecutionError::Runtime(_, _)) => {
@@ -386,7 +389,7 @@ pub fn handle_clarity_runtime_error(error: ClarityError) -> ClarityRuntimeTxErro
             }
         }
         ClarityError::Interpreter(VmExecutionError::RuntimeCheck(runtime_check_err)) => {
-            if runtime_check_err.rejectable() {
+            if runtime_check_err.rejectable_in_epoch(epoch) {
                 ClarityRuntimeTxError::Rejectable(ClarityError::Interpreter(
                     VmExecutionError::RuntimeCheck(runtime_check_err),
                 ))
@@ -1132,7 +1135,7 @@ impl StacksChainState {
                               "cost" => ?total_cost);
                         (return_value, asset_map, events, None)
                     }
-                    Err(e) => match handle_clarity_runtime_error(e) {
+                    Err(e) => match handle_clarity_runtime_error(e, clarity_tx.get_epoch()) {
                         ClarityRuntimeTxError::Acceptable { error, err_type } => {
                             info!("Contract-call processed with {}", err_type;
                                       "txid" => %tx.txid(),
@@ -1285,13 +1288,13 @@ impl StacksChainState {
                             }
                             other_error => {
                                 if let ClarityError::Parse(err) = &other_error {
-                                    if err.rejectable() {
+                                    if err.rejectable_in_epoch(clarity_tx.get_epoch()) {
                                         info!("Transaction {} is problematic and should have prevented this block from being relayed", tx.txid());
                                         return Err(Error::ClarityError(other_error));
                                     }
                                 }
                                 if let ClarityError::StaticCheck(err) = &other_error {
-                                    if err.err.rejectable() {
+                                    if err.err.rejectable_in_epoch(clarity_tx.get_epoch()) {
                                         info!("Transaction {} is problematic and should have prevented this block from being relayed", tx.txid());
                                         return Err(Error::ClarityError(other_error));
                                     }
@@ -1359,7 +1362,7 @@ impl StacksChainState {
                             .expect("FATAL: failed to store contract analysis");
                         x
                     }
-                    Err(e) => match handle_clarity_runtime_error(e) {
+                    Err(e) => match handle_clarity_runtime_error(e, clarity_tx.get_epoch()) {
                         ClarityRuntimeTxError::Acceptable { error, err_type } => {
                             info!("Smart-contract processed with {}", err_type;
                                       "txid" => %tx.txid(),

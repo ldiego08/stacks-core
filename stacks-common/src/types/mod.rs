@@ -613,6 +613,22 @@ impl StacksEpochId {
         self < &StacksEpochId::Epoch25
     }
 
+    /// Whether `from-consensus-buff` treats unexpected serialization as `none` or causes
+    /// an error that makes the transaction un-includable in a block.
+    pub fn treats_unexpected_serialization_as_none(&self) -> bool {
+        self >= &StacksEpochId::Epoch34
+    }
+
+    /// Whether or not this epoch rejects `SupertypeTooLarge` errors.
+    pub fn rejects_supertype_too_large(&self) -> bool {
+        self < &StacksEpochId::Epoch34
+    }
+
+    /// Whether or not this epoch rejects parse-depth errors.
+    pub fn rejects_parse_depth_errors(&self) -> bool {
+        self < &StacksEpochId::Epoch34
+    }
+
     /// What is the sortition mining commitment window for this epoch?
     pub fn mining_commitment_window(&self) -> u8 {
         MINING_COMMITMENT_WINDOW

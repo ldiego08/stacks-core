@@ -15,6 +15,8 @@
 
 use std::{error, fmt};
 
+use stacks_common::types::StacksEpochId;
+
 use crate::diagnostic::{DiagnosableError, Diagnostic};
 use crate::errors::{ClarityTypeError, CostErrors};
 use crate::execution_cost::ExecutionCost;
@@ -858,22 +860,24 @@ pub struct StaticCheckError {
 }
 
 impl RuntimeCheckErrorKind {
-    /// This check indicates that the transaction should be rejected.
-    pub fn rejectable(&self) -> bool {
-        matches!(
-            self,
-            RuntimeCheckErrorKind::SupertypeTooLarge | RuntimeCheckErrorKind::ExpectsRejectable(_)
-        )
+    /// This check indicates that the transaction should be rejected in the given epoch.
+    pub fn rejectable_in_epoch(&self, epoch: StacksEpochId) -> bool {
+        match self {
+            RuntimeCheckErrorKind::SupertypeTooLarge => epoch.rejects_supertype_too_large(),
+            RuntimeCheckErrorKind::ExpectsRejectable(_) => true,
+            _ => false,
+        }
     }
 }
 
 impl StaticCheckErrorKind {
-    /// This check indicates that the transaction should be rejected.
-    pub fn rejectable(&self) -> bool {
-        matches!(
-            self,
-            StaticCheckErrorKind::SupertypeTooLarge | StaticCheckErrorKind::ExpectsRejectable(_)
-        )
+    /// This check indicates that the transaction should be rejected in the given epoch.
+    pub fn rejectable_in_epoch(&self, epoch: StacksEpochId) -> bool {
+        match self {
+            StaticCheckErrorKind::SupertypeTooLarge => epoch.rejects_supertype_too_large(),
+            StaticCheckErrorKind::ExpectsRejectable(_) => true,
+            _ => false,
+        }
     }
 }
 
