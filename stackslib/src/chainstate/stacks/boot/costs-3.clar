@@ -614,7 +614,7 @@
     })
 
 (define-read-only (cost_slice (n uint))
-    (runtime u448))
+    (runtime (linear n u1 u448)))
 
 (define-read-only (cost_to_consensus_buff (n uint))
     (runtime (linear n u1 u233)))

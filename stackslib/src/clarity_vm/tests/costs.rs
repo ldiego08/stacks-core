@@ -2013,3 +2013,35 @@ fn test_cost_change() {
 
     assert_eq!(result_33_large, result_33_small);
 }
+
+#[test]
+fn test_slice_cost_scales_with_size() {
+    let use_mainnet = false;
+
+    let cost_small = with_owned_env(StacksEpochId::Epoch30, use_mainnet, |mut owned_env| {
+        setup_cost_tracked_test(use_mainnet, ClarityVersion::Clarity2, &mut owned_env);
+        test_program_cost(
+            "(slice? 0x0001020304050607080910 u0 u5)", // 5 byte slice
+            ClarityVersion::Clarity2,
+            &mut owned_env,
+            0,
+        )
+    });
+
+    let cost_large = with_owned_env(StacksEpochId::Epoch30, use_mainnet, |mut owned_env| {
+        setup_cost_tracked_test(use_mainnet, ClarityVersion::Clarity2, &mut owned_env);
+        test_program_cost(
+            "(slice? 0x0001020304050607080910 u0 u10)", // 10 byte slice
+            ClarityVersion::Clarity2,
+            &mut owned_env,
+            0,
+        )
+    });
+
+    assert!(
+        cost_large.runtime > cost_small.runtime,
+        "Larger slice should cost more: large={}, small={}",
+        cost_large.runtime,
+        cost_small.runtime
+    );
+}

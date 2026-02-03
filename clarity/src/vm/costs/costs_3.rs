@@ -715,7 +715,7 @@ impl CostValues for Costs3 {
     }
 
     fn cost_slice(n: u64) -> Result<ExecutionCost, VmExecutionError> {
-        Ok(ExecutionCost::runtime(448))
+        Ok(ExecutionCost::runtime(linear(n, 1, 448)))
     }
 
     fn cost_to_consensus_buff(n: u64) -> Result<ExecutionCost, VmExecutionError> {
