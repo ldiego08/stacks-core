@@ -68,9 +68,7 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_memory_balance_exceeded_cdeploy,
             runtime_check_error_memory_balance_exceeded_ccall
         ]),
-        CostComputationFailed(_) => Tested(vec![
-            empty_consensus_buff,
-        ]),
+        CostComputationFailed(_) => Unreachable_ExpectLike,
         ExecutionTimeExpired => Unreachable_Functionally(
             "All consensus-critical code paths (block validation and transaction processing)
              pass `None` for max_execution_time to StacksChainState::process_transaction,
@@ -1327,22 +1325,6 @@ fn invalid_characters_detected_invalid_utf8() {
                 ;; (0x0e = string-utf8 type, 0x00000002 = length 2, then invalid UTF-8)
                 (from-consensus-buff? (string-utf8 2) 0x0e00000002fffe))
         ",
-        exclude_clarity_versions: &[ClarityVersion::Clarity1], // Clarity1 does not support from-consensus-buff?
-    );
-}
-
-/// Error (pre Clarity 5): [`CostErrors::CostComputationFailed`]
-/// Caused by: passing an empty buffer to `from-consensus-buff?`
-/// Outcome: block accepted.
-/// After Clarity 5: Contract call executes successfully and returns `(ok none)`
-#[test]
-fn empty_consensus_buff() {
-    contract_call_consensus_test!(
-        contract_name: "check-error-kind",
-        contract_code: "(define-public (deserialize-bool (b (buff 2))) (ok (from-consensus-buff? bool b)))",
-        function_name: "deserialize-bool",
-        function_args: &[ClarityValue::buff_from([].into()).expect("failed to build buffer")],
-        deploy_epochs: StacksEpochId::since(clarity::types::StacksEpochId::Epoch21),
         exclude_clarity_versions: &[ClarityVersion::Clarity1], // Clarity1 does not support from-consensus-buff?
     );
 }

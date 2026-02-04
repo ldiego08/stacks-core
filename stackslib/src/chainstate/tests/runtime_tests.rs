@@ -552,10 +552,13 @@ fn arithmetic_pow_neg_ccall() {
         function_args: &[],
     );
 }
-/// Error: [`RuntimeError::Arithmetic`]
+
+/// Error: [`RuntimeError::Arithmetic`] (before epoch 3.4)
 /// Caused by: calling nlogn with n = 0
 /// Outcome: block accepted at deploy time.
-/// Note: Returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`] which wrapps the underlying [`RuntimeError::Arithmetic`] error.
+/// Note: Before epoch 3.4, this returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`]
+///       which wraps the underlying [`RuntimeError::Arithmetic`] error. After 3.4, this executes
+///       successfully (`none` is stored in the constant).
 #[test]
 fn arithmetic_zero_n_log_n_cdeploy() {
     contract_deploy_consensus_test!(
@@ -566,10 +569,12 @@ fn arithmetic_zero_n_log_n_cdeploy() {
     );
 }
 
-/// Error: [`RuntimeError::Arithmetic`]
+/// Error: [`RuntimeError::Arithmetic`] (before epoch 3.4)
 /// Caused by: calling nlogn with n = 0
 /// Outcome: block accepted at call time.
-/// Note: Returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`] which wrapps the underlying [`RuntimeError::Arithmetic`] error.
+/// Note: Before epoch 3.4, this returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`]
+///       which wraps the underlying [`RuntimeError::Arithmetic`] error. After 3.4, this executes
+///       successfully and returns `none`.
 #[test]
 fn arithmetic_zero_n_log_n_ccall() {
     contract_call_consensus_test!(
