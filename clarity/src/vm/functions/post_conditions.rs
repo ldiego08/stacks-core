@@ -17,6 +17,7 @@ use std::collections::HashMap;
 
 use clarity_types::ClarityName;
 use clarity_types::types::{AssetIdentifier, PrincipalData, StandardPrincipalData};
+use stacks_common::types::StacksEpochId;
 
 use crate::vm::analysis::type_checker::v2_1::natives::post_conditions::MAX_ALLOWANCES;
 use crate::vm::contexts::AssetMap;
@@ -273,6 +274,7 @@ pub fn special_restrict_assets(
 
     // Create a new evaluation context, so that we can rollback if the
     // post-conditions are violated
+    let epoch = *env.epoch();
     env.global_context.begin();
 
     // Evaluate the body expressions inside a closure so `?` only exits the closure
@@ -291,7 +293,7 @@ pub fn special_restrict_assets(
     // If the allowances are violated:
     // - Rollback the context
     // - Return an error with the index of the violated allowance
-    match check_allowances(&asset_owner, allowances, asset_maps) {
+    match check_allowances(&asset_owner, allowances, asset_maps, epoch) {
         Ok(None) => {}
         Ok(Some(violation_index)) => {
             env.global_context.roll_back()?;
@@ -365,6 +367,7 @@ pub fn special_as_contract(
         memory_use += cost_constants::AS_CONTRACT_MEMORY;
 
         let contract_principal: PrincipalData = env.contract_context.contract_identifier.clone().into();
+        let epoch = *env.epoch();
         let mut nested_env = env.nest_as_principal(contract_principal.clone());
 
         // Create a new evaluation context, so that we can rollback if the
@@ -386,7 +389,12 @@ pub fn special_as_contract(
         // If the allowances are violated:
         // - Rollback the context
         // - Return an error with the index of the violated allowance
-        match check_allowances(&contract_principal, allowances, asset_maps) {
+        match check_allowances(
+            &contract_principal,
+            allowances,
+            asset_maps,
+            epoch,
+        ) {
             Ok(None) => {}
             Ok(Some(violation_index)) => {
                 nested_env.global_context.roll_back()?;
@@ -426,6 +434,7 @@ fn check_allowances(
     owner: &PrincipalData,
     allowances: Vec<Allowance>,
     assets: &AssetMap,
+    epoch: StacksEpochId,
 ) -> Result<Option<u128>, VmExecutionError> {
     let mut earliest_violation: Option<u128> = None;
     let mut record_violation = |candidate: u128| {
@@ -476,31 +485,53 @@ fn check_allowances(
         }
     }
 
-    // Check STX movements
+    // Check STX movements and burns
     let amount_moved = assets.get_stx(owner);
-    if let Some(stx_moved) = amount_moved {
+    let amount_burned = assets.get_stx_burned(owner);
+    let total_stx_change = amount_moved
+        .unwrap_or(0)
+        .checked_add(amount_burned.unwrap_or(0))
+        .ok_or(VmInternalError::Expect(
+            "STX movement and burn overflowed u128".into(),
+        ))?;
+
+    // If this epoch doesn't support the combined check, we handle STX movement and
+    // burn separately below
+    if !epoch.handles_with_stx_combined_check() {
+        if let Some(stx_moved) = amount_moved {
+            if stx_allowances.is_empty() {
+                // If there are no allowances for STX, any movement is a violation
+                record_violation(MAX_ALLOWANCES as u128);
+            } else {
+                for (index, allowance) in &stx_allowances {
+                    if stx_moved > *allowance {
+                        record_violation(*index as u128);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if let Some(stx_burned) = amount_burned {
+            if stx_allowances.is_empty() {
+                // If there are no allowances for STX, any burn is a violation
+                record_violation(MAX_ALLOWANCES as u128);
+            } else {
+                for (index, allowance) in &stx_allowances {
+                    if stx_burned > *allowance {
+                        record_violation(*index as u128);
+                        break;
+                    }
+                }
+            }
+        }
+    } else if total_stx_change > 0 {
         if stx_allowances.is_empty() {
             // If there are no allowances for STX, any movement is a violation
             record_violation(MAX_ALLOWANCES as u128);
         } else {
             for (index, allowance) in &stx_allowances {
-                if stx_moved > *allowance {
-                    record_violation(*index as u128);
-                    break;
-                }
-            }
-        }
-    }
-
-    // Check STX burns
-    let amount_burned = assets.get_stx_burned(owner);
-    if let Some(stx_burned) = amount_burned {
-        if stx_allowances.is_empty() {
-            // If there are no allowances for STX, any burn is a violation
-            record_violation(MAX_ALLOWANCES as u128);
-        } else {
-            for (index, allowance) in &stx_allowances {
-                if stx_burned > *allowance {
+                if total_stx_change > *allowance {
                     record_violation(*index as u128);
                     break;
                 }
@@ -583,15 +614,12 @@ fn check_allowances(
         }
     }
 
-    if earliest_violation.is_none() {
-        // Check combined STX burns and movements. If the total exceeds any allowance,
-        // emit an error that makes this transaction invalid.
-        let total_stx_change = amount_moved
-            .unwrap_or(0)
-            .checked_add(amount_burned.unwrap_or(0))
-            .ok_or(VmInternalError::Expect(
-                "STX movement and burn overflowed u128".into(),
-            ))?;
+    // Check combined STX movements and burns in epochs that don't support the combined check
+    // This happens after all other checks to ensure that we only need to reach this rejectable
+    // error if there are no other errors already reached.
+    if !epoch.handles_with_stx_combined_check() && earliest_violation.is_none() {
+        // If the total STX moved exceeds any allowance, emit an error that
+        // makes this transaction invalid.
         if total_stx_change > 0 {
             for (_, allowance) in &stx_allowances {
                 if total_stx_change > *allowance {
