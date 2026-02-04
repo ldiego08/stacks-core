@@ -659,7 +659,7 @@ fn bad_define_maps() {
         RuntimeCheckErrorKind::UnknownTypeName("contents".to_string()).into(),
         RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(3, 4).into(),
-        RuntimeCheckErrorKind::InvalidTypeDescription.into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Invalid type description".to_string()).into(),
     ];
 
     for (test, expected_err) in tests.iter().zip(expected.into_iter()) {

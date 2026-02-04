@@ -106,10 +106,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_value_error_cdeploy,
             runtime_check_error_kind_type_value_error_ccall
         ]),
-        InvalidTypeDescription => Unreachable_Functionally(
-            "Every invalid type literal is parsed both by the analyzer and by the runtime.
-             Both paths invoke the same TypeSignature::parse_* helpers, so analysis
-             always fails before initialization can trigger it."),
         UnknownTypeName(_) => Unreachable_Functionally(
             "Static analysis catches invalid types via `TypeSignature::parse_atom_type`."),
         UnionTypeError(_, _) => Unreachable_Functionally(

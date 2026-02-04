@@ -623,8 +623,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `Box<TypeSignature>` wraps the expected type, and the `Box<Value>` wraps the invalid value.
     TypeValueError(Box<TypeSignature>, Box<Value>),
 
-    /// Type description is invalid or malformed, preventing proper type-checking.
-    InvalidTypeDescription,
     /// Referenced type name does not exist or is undefined.
     /// The `String` wraps the non-existent type name.
     UnknownTypeName(String),
@@ -995,7 +993,6 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             ClarityTypeError::TypeMismatch(expected, found) => Self::TypeError(expected, found),
             ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
             ClarityTypeError::SupertypeTooLarge => Self::SupertypeTooLarge,
-            ClarityTypeError::InvalidTypeDescription => Self::InvalidTypeDescription,
             ClarityTypeError::ListTypeMismatch => Self::ListTypesMustMatch,
             ClarityTypeError::InvalidAsciiCharacter(_) => Self::InvalidCharactersDetected,
             ClarityTypeError::InvalidUtf8Encoding => Self::InvalidUTF8Encoding,
@@ -1009,6 +1006,7 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             | ClarityTypeError::QualifiedContractMissingDot
             | ClarityTypeError::InvalidPrincipalEncoding(_)
             | ClarityTypeError::InvalidPrincipalLength(_)
+            | ClarityTypeError::InvalidTypeDescription
             | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
                 "Unexpected error type during runtime analysis: {err}"
             )),
@@ -1266,7 +1264,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::DefineTraitBadSignature
             }
             CommonCheckErrorKind::InvalidTypeDescription => {
-                RuntimeCheckErrorKind::InvalidTypeDescription
+                RuntimeCheckErrorKind::ExpectsAcceptable("Invalid type description".to_string())
             }
             CommonCheckErrorKind::BadSyntaxBinding(e) => RuntimeCheckErrorKind::BadSyntaxBinding(e),
             CommonCheckErrorKind::ValueOutOfBounds => RuntimeCheckErrorKind::ValueOutOfBounds,
