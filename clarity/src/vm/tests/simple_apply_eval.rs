@@ -1484,8 +1484,16 @@ fn test_option_destructs() {
         Ok(Value::Int(9)),
         Ok(Value::Int(2)),
         Ok(Value::Int(8)),
-        Err(RuntimeCheckErrorKind::BadMatchInput(Box::new(TypeSignature::IntType)).into()),
-        Err(RuntimeCheckErrorKind::BadMatchInput(Box::new(TypeSignature::IntType)).into()),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Bad match input: {}",
+            TypeSignature::IntType
+        ))
+        .into()),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Bad match input: {}",
+            TypeSignature::IntType
+        ))
+        .into()),
         Err(
             VmExecutionError::EarlyReturn(EarlyReturnError::UnwrapFailed(Box::new(
                 Value::error(Value::UInt(1)).unwrap(),

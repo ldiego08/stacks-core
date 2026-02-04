@@ -610,9 +610,6 @@ pub enum RuntimeCheckErrorKind {
     /// Invalid syntax in a `response` match expression.
     /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
     BadMatchResponseSyntax(Box<RuntimeCheckErrorKind>),
-    /// Input to a `match` expression does not conform to the expected type (e.g., `Option` or `Response`).
-    /// The `Box<TypeSignature>` wraps the actual type of the provided input.
-    BadMatchInput(Box<TypeSignature>),
 
     // List typing errors
     /// List elements have mismatched types, violating type consistency.

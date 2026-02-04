@@ -228,9 +228,11 @@ pub fn special_match(
     match input {
         Value::Response(data) => special_match_resp(data, &args[1..], env, context),
         Value::Optional(data) => special_match_opt(data, &args[1..], env, context),
-        _ => Err(
-            RuntimeCheckErrorKind::BadMatchInput(Box::new(TypeSignature::type_of(&input)?)).into(),
-        ),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Bad match input: {}",
+            TypeSignature::type_of(&input)?
+        ))
+        .into()),
     }
 }
 
