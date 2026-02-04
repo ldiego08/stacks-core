@@ -624,9 +624,6 @@ pub enum RuntimeCheckErrorKind {
     TypeValueError(Box<TypeSignature>, Box<Value>),
 
     // Union type mismatch
-    /// Type does not belong to the expected union of types during analysis.
-    /// The `Vec<TypeSignature>` represents the expected types, and the `Box<TypeSignature>` wraps the actual type.
-    UnionTypeError(Vec<TypeSignature>, Box<TypeSignature>),
     /// Value does not belong to the expected union of types during type-checking.
     /// The `Vec<TypeSignature>` represents the expected types, and the `Box<Value>` wraps the invalid value.
     UnionTypeValueError(Vec<TypeSignature>, Box<Value>),

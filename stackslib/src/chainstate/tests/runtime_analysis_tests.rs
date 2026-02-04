@@ -106,12 +106,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_value_error_cdeploy,
             runtime_check_error_kind_type_value_error_ccall
         ]),
-        UnionTypeError(_, _) => Unreachable_Functionally(
-            "The analyzer enforces that every call to `bit-shift-left` / `bit-shift-right`
-             supplies an argument whose type is exactly `int` or `uint` (see
-             `NativeFunctions::BitwiseLShift|BitwiseRShift` using
-             `FunctionArgSignature::Union(IntType, UIntType)` and the
-             `TypeSignature::admits_type` checks in `type_checker::check_function_arg_signature`)"),
         UnionTypeValueError(_, _) => Tested(vec![
             runtime_check_error_kind_union_type_value_error_cdeploy,
             runtime_check_error_kind_union_type_value_error_ccall
