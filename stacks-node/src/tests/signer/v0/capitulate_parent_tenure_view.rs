@@ -163,7 +163,7 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     let tx = submit_tx(&http_origin, &transfer_tx);
     info!("Submitted tx {tx} in to mine block N+1");
 
-    let block_n_1 = wait_for_block_proposal(30, info_before.stacks_tip_height + 1, &miner_pk)
+    let block_n_1 = wait_for_block_proposal_block(30, info_before.stacks_tip_height + 1, &miner_pk)
         .expect("Timed out waiting for block N+1 to be proposed");
 
     wait_for_block_rejections_from_signers(
@@ -449,7 +449,7 @@ fn minority_signers_capitulate_to_supermajority_consensus() {
     );
     let tx = submit_tx(&http_origin, &transfer_tx);
     info!("Submitted tx {tx} in to mine block N+1");
-    let block_n_1 = wait_for_block_proposal(30, info_before.stacks_tip_height + 1, &miner_pk)
+    let block_n_1 = wait_for_block_proposal_block(30, info_before.stacks_tip_height + 1, &miner_pk)
         .expect("Timed out waiting for block N+1 to be proposed");
 
     wait_for_block_rejections_from_signers(
