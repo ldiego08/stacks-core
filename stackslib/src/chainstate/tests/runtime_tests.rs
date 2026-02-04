@@ -31,8 +31,8 @@ use crate::chainstate::stacks::boot::test::{
     make_signer_key_signature,
 };
 use crate::chainstate::tests::consensus::{
-    contract_call_consensus_test, contract_deploy_consensus_test, ConsensusTest,
-    ContractConsensusTest, TestBlock, EPOCHS_TO_TEST, SK_1,
+    clarity_versions_for_epoch, contract_call_consensus_test, contract_deploy_consensus_test,
+    ConsensusTest, ConsensusUtils, ContractConsensusTest, TestBlock, EPOCHS_TO_TEST, SK_1,
 };
 use crate::core::test_util::to_addr;
 use crate::util_lib::signed_structured_data::pox4::Pox4SignatureTopic;
@@ -633,7 +633,7 @@ fn stack_depth_too_deep_call_chain_cdeploy() {
 /// Outcome: block accepted, execution rejected when function is called
 #[test]
 fn stack_depth_too_deep_call_chain_ccall() {
-    // Build `limit + 1` private functions: foo-0 → foo-limit
+    // Build `limit + 1` private functions: foo-0 → foo-limit.
     // The public entrypoint calls foo-limit to exceed the runtime stack depth.
     fn build_contract(limit: usize) -> String {
         let mut defs = Vec::with_capacity(limit + 3);
@@ -648,25 +648,50 @@ fn stack_depth_too_deep_call_chain_ccall() {
         defs.join("\n")
     }
 
-    let mut result = Vec::new();
-    for epoch in EPOCHS_TO_TEST {
+    let mut epoch_blocks = HashMap::new();
+    let mut nonce = 0;
+    let deploy_epochs = StacksEpochId::since(StacksEpochId::Epoch20);
+    let mut contract_names = Vec::new();
+
+    for epoch in deploy_epochs {
         let contract_code = build_contract(max_call_stack_depth_for_epoch(*epoch));
-        let each_result = ContractConsensusTest::new(
-            function_name!(),
-            vec![],
-            &[*epoch],
-            &[*epoch],
-            "context-depth",
-            &contract_code,
-            "trigger",
-            &[],
-            &[],
-            &[],
-        )
-        .run();
-        result.extend(each_result);
+        let epoch_name = format!("Epoch{}", epoch.to_string().replace('.', "_"));
+        let clarity_versions = clarity_versions_for_epoch(*epoch);
+        let mut blocks = Vec::with_capacity(clarity_versions.len());
+
+        for version in clarity_versions {
+            let version_tag = version.to_string().replace(' ', "");
+            let name = format!("context-depth-{epoch_name}-{version_tag}");
+            contract_names.push(name.clone());
+            let clarity_version = if *epoch < StacksEpochId::Epoch21 {
+                None
+            } else {
+                Some(*version)
+            };
+            blocks.push(TestBlock {
+                transactions: vec![ConsensusUtils::new_deploy_tx(
+                    nonce,
+                    &name,
+                    &contract_code,
+                    clarity_version,
+                )],
+            });
+            nonce += 1;
+        }
+
+        if EPOCHS_TO_TEST.contains(epoch) {
+            for name in &contract_names {
+                blocks.push(TestBlock {
+                    transactions: vec![ConsensusUtils::new_call_tx(nonce, name, "trigger")],
+                });
+                nonce += 1;
+            }
+        }
+
+        epoch_blocks.insert(*epoch, blocks);
     }
 
+    let result = ConsensusTest::new(function_name!(), vec![], epoch_blocks).run();
     insta::assert_ron_snapshot!(result);
 }
 
