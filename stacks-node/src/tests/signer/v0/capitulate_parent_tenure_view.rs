@@ -29,7 +29,7 @@ use stacks_signer::v0::SpawnedSigner;
 use tracing_subscriber::{fmt, EnvFilter};
 
 use super::{SignerTest, *};
-use crate::nakamoto_node::stackerdb_listener::TEST_STALL_BLOCK_NOTIFICATION;
+use crate::nakamoto_node::miner::TEST_BLOCK_ANNOUNCE_STALL;
 use crate::tests::nakamoto_integrations::wait_for;
 use crate::tests::neon_integrations::{get_chain_info, submit_tx, test_observer};
 
@@ -60,7 +60,7 @@ use crate::tests::neon_integrations::{get_chain_info, submit_tx, test_observer};
 /// - 50% of signers pre-commit to block N+1, while the other 50% reject it.
 /// - After the timeout period, all signers see the parent tenure last block as block N.
 /// - All signers accept block N+1' as valid.
-fn split_view_50_50_capitulate_to_nodes_tip() {
+fn deadlock_50_50_split_capitulates_to_node_tip() {
     if env::var("BITCOIND_TEST") != Ok("1".into()) {
         return;
     }
@@ -190,8 +190,6 @@ fn split_view_50_50_capitulate_to_nodes_tip() {
         "parent_tenure_last_block_height_n" => info_before.stacks_tip_height,
         "parent_tenure_last_block_height_n_1" => info_before.stacks_tip_height + 1,
     );
-    TEST_SKIP_BLOCK_ANNOUNCEMENT.set(false);
-    TEST_SKIP_BLOCK_BROADCAST.set(false);
 
     let block_id_n = StacksBlockId::new(
         &info_before.stacks_tip_consensus_hash,
@@ -265,6 +263,8 @@ fn split_view_50_50_capitulate_to_nodes_tip() {
     })
     .expect("Signers did not update state machine with split view of parent tenure last block");
 
+    TEST_SKIP_BLOCK_ANNOUNCEMENT.set(false);
+    TEST_SKIP_BLOCK_BROADCAST.set(false);
     // capitulate_viewpoint has TWO guards that must both be satisfied:
     // 1. last_capitulate_miner_view must be older than capitulate_miner_view_timeout
     // 2. time_since_last_approved (since block N was signed) must be >= capitulate_miner_view_timeout
@@ -351,7 +351,7 @@ fn split_view_50_50_capitulate_to_nodes_tip() {
 /// - 80% of signers pre-commit/sign block N+1, while the other 20% reject it.
 /// - After the timeout period, all signers see the parent tenure last block as block N+1.
 /// - All signers accept block N+2 as valid.
-fn minority_20_percent_capitulates_to_supermajority_view() {
+fn minority_signers_capitulate_to_supermajority_consensus() {
     if env::var("BITCOIND_TEST") != Ok("1".into()) {
         return;
     }
@@ -441,7 +441,7 @@ fn minority_20_percent_capitulates_to_supermajority_view() {
     TEST_SIGNERS_IGNORE_PRE_COMMITS.set(rejecting_signers.clone());
     TEST_SIGNERS_IGNORE_BLOCK_ANNOUNCEMENT.set(rejecting_signers.clone());
     TEST_SKIP_BLOCK_BROADCAST.set(true);
-    TEST_STALL_BLOCK_NOTIFICATION.set(true);
+    TEST_BLOCK_ANNOUNCE_STALL.set(true);
     test_observer::clear();
 
     // submit a tx so that the miner will mine a stacks block N+1
@@ -553,9 +553,10 @@ fn minority_20_percent_capitulates_to_supermajority_view() {
         Ok(found_updates_n.len() + found_updates_n_1.len() == signer_addresses.len())
     })
     .expect("Signers did not update state machine with split view of parent tenure last block");
+
     TEST_SIGNERS_IGNORE_BLOCK_ANNOUNCEMENT.set(vec![]);
     TEST_SKIP_BLOCK_BROADCAST.set(false);
-    TEST_STALL_BLOCK_NOTIFICATION.set(false);
+    TEST_BLOCK_ANNOUNCE_STALL.set(false);
 
     // capitulate_viewpoint has TWO guards that must both be satisfied:
     // 1. last_capitulate_miner_view must be older than capitulate_miner_view_timeout
@@ -609,7 +610,6 @@ fn minority_20_percent_capitulates_to_supermajority_view() {
     .expect("Originally approving signers did not update state machine to capitulated parent tenure last block N+1");
 
     info!("------------------------- Waiting for block N+2 approval from capitulated signer -------------------------");
-
     let transfer_tx = make_stacks_transfer_serialized(
         &sender_sk,
         sender_nonce,
