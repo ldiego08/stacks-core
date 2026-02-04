@@ -31,17 +31,17 @@ use self::expression_identifier::ExpressionIdentifier;
 #[cfg(not(feature = "devtools"))]
 use self::parser::v1::parse as parse_v1;
 use self::parser::v2::parse as parse_v2;
-use self::stack_depth_checker::{StackDepthChecker, VaryStackDepthChecker};
+use self::stack_depth_checker::{StackDepthChecker, StackDepthLimits, VaryStackDepthChecker};
 use self::sugar_expander::SugarExpander;
 use self::traits_resolver::TraitsResolver;
 use self::types::BuildASTPass;
 pub use self::types::ContractAST;
+use crate::vm::ClarityVersion;
 use crate::vm::costs::cost_functions::ClarityCostFunction;
 use crate::vm::costs::{CostTracker, runtime_cost};
 use crate::vm::diagnostic::{Diagnostic, Level};
 use crate::vm::representations::PreSymbolicExpression;
 use crate::vm::types::QualifiedContractIdentifier;
-use crate::vm::{ClarityVersion, max_call_stack_depth_for_epoch};
 
 /// Legacy function
 #[cfg(any(test, feature = "testing"))]
@@ -61,18 +61,18 @@ fn parse_in_epoch(
     source_code: &str,
     epoch_id: StacksEpochId,
 ) -> ParseResult<Vec<PreSymbolicExpression>> {
-    let max_call_stack_depth = max_call_stack_depth_for_epoch(epoch_id);
+    let depth_limits = StackDepthLimits::for_epoch(epoch_id);
     #[cfg(feature = "devtools")]
     {
-        parse_v2(source_code, max_call_stack_depth)
+        parse_v2(source_code, depth_limits)
     }
 
     #[cfg(not(feature = "devtools"))]
     {
         if epoch_id >= StacksEpochId::Epoch21 {
-            parse_v2(source_code, max_call_stack_depth)
+            parse_v2(source_code, depth_limits)
         } else {
-            parse_v1(source_code, max_call_stack_depth)
+            parse_v1(source_code, depth_limits)
         }
     }
 }
@@ -135,26 +135,26 @@ fn inner_build_ast<T: CostTracker>(
         _ => None,
     };
 
-    let max_call_stack_depth = max_call_stack_depth_for_epoch(epoch);
+    let depth_limits = StackDepthLimits::for_epoch(epoch);
 
     #[cfg(feature = "devtools")]
     let (pre_expressions, mut diagnostics, mut success) = if error_early {
-        let exprs = parse_v2(source_code, max_call_stack_depth)?;
+        let exprs = parse_v2(source_code, depth_limits)?;
         (exprs, Vec::new(), true)
     } else {
-        parser::v2::parse_collect_diagnostics(source_code, max_call_stack_depth)
+        parser::v2::parse_collect_diagnostics(source_code, depth_limits)
     };
 
     #[cfg(not(feature = "devtools"))]
     let (pre_expressions, mut diagnostics, mut success) = if epoch >= StacksEpochId::Epoch21 {
         if error_early {
-            let exprs = parse_v2(source_code, max_call_stack_depth)?;
+            let exprs = parse_v2(source_code, depth_limits)?;
             (exprs, Vec::new(), true)
         } else {
-            parser::v2::parse_collect_diagnostics(source_code, max_call_stack_depth)
+            parser::v2::parse_collect_diagnostics(source_code, depth_limits)
         }
     } else {
-        let parse_result = parse_v1(source_code, max_call_stack_depth);
+        let parse_result = parse_v1(source_code, depth_limits);
         match parse_result {
             Ok(pre_expressions) => (pre_expressions, vec![], true),
             Err(error) if error_early => return Err(error),
@@ -265,7 +265,7 @@ mod test {
 
     use crate::vm::ast::build_ast;
     use crate::vm::ast::errors::ParseErrorKind;
-    use crate::vm::ast::stack_depth_checker::{AST_CALL_STACK_DEPTH_BUFFER, max_nesting_depth};
+    use crate::vm::ast::stack_depth_checker::StackDepthLimits;
     use crate::vm::costs::{LimitedCostTracker, *};
     use crate::vm::representations::depth_traverse;
     use crate::vm::types::QualifiedContractIdentifier;
@@ -323,7 +323,7 @@ mod test {
     fn test_cost_tracking_deep_contracts_2_05() {
         let clarity_version = ClarityVersion::Clarity1;
         let stack_limit =
-            max_nesting_depth(max_call_stack_depth_for_epoch(StacksEpochId::Epoch2_05)) as usize;
+            StackDepthLimits::for_epoch(StacksEpochId::Epoch2_05).max_nesting_depth() as usize + 1;
         let exceeds_stack_depth_tuple = format!(
             "{}u1 {}",
             "{ a : ".repeat(stack_limit + 1),
@@ -384,8 +384,9 @@ mod test {
     #[test]
     fn test_cost_tracking_deep_contracts_2_1() {
         for clarity_version in &[ClarityVersion::Clarity1, ClarityVersion::Clarity2] {
-            let stack_limit =
-                max_nesting_depth(max_call_stack_depth_for_epoch(StacksEpochId::Epoch21)) as usize;
+            let stack_limit = StackDepthLimits::for_epoch(StacksEpochId::Epoch21)
+                .max_nesting_depth() as usize
+                + 1;
             let exceeds_stack_depth_tuple = format!(
                 "{}u1 {}",
                 "{ a : ".repeat(stack_limit + 1),
@@ -575,8 +576,8 @@ mod test {
     fn test_build_ast_error_vary_stack_too_deep() {
         // This contract passes the parse v2 max nesting depth but fails the [`VaryStackDepthChecker`].
         let contract = {
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::latest());
-            let count = AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) - 1;
+            let count =
+                StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth() - 1;
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{{ a: {body_start}u1 {body_end} }}")

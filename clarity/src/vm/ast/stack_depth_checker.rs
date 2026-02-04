@@ -25,24 +25,57 @@ use crate::vm::{ClarityVersion, max_call_stack_depth_for_epoch};
 //    AST depth, without impacting the stack depth).
 pub const AST_CALL_STACK_DEPTH_BUFFER: u64 = 5;
 
-pub fn max_nesting_depth(max_call_stack_depth: usize) -> u64 {
-    AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) + 1
+/// Bundles related stack depth limits for parsing and AST checks.
+#[derive(Clone, Copy, Debug)]
+pub struct StackDepthLimits {
+    max_call_stack_depth: usize,
+    max_nesting_depth: u64,
+}
+
+impl StackDepthLimits {
+    pub fn new(max_call_stack_depth: usize) -> Self {
+        let max_nesting_depth =
+            AST_CALL_STACK_DEPTH_BUFFER.saturating_add(max_call_stack_depth as u64);
+        Self {
+            max_call_stack_depth,
+            max_nesting_depth,
+        }
+    }
+
+    pub fn no_limit() -> Self {
+        Self {
+            max_call_stack_depth: usize::MAX,
+            max_nesting_depth: u64::MAX,
+        }
+    }
+
+    pub fn for_epoch(epoch: stacks_common::types::StacksEpochId) -> Self {
+        Self::new(max_call_stack_depth_for_epoch(epoch))
+    }
+
+    pub fn max_call_stack_depth(&self) -> usize {
+        self.max_call_stack_depth
+    }
+
+    pub fn max_nesting_depth(&self) -> u64 {
+        self.max_nesting_depth
+    }
 }
 
 fn check(
     args: &[PreSymbolicExpression],
     depth: u64,
-    max_call_stack_depth: usize,
+    depth_limits: StackDepthLimits,
 ) -> ParseResult<()> {
-    if depth >= (AST_CALL_STACK_DEPTH_BUFFER + max_call_stack_depth as u64) {
+    if depth >= depth_limits.max_nesting_depth() {
         return Err(ParseErrorKind::ExpressionStackDepthTooDeep {
-            max_depth: max_call_stack_depth,
+            max_depth: depth_limits.max_call_stack_depth(),
         }
         .into());
     }
     for expression in args.iter() {
         match expression.pre_expr {
-            List(ref exprs) => check(exprs, depth + 1, max_call_stack_depth),
+            List(ref exprs) => check(exprs, depth + 1, depth_limits),
             _ => {
                 // Other symbolic expressions don't have depth
                 //  impacts.
@@ -61,26 +94,26 @@ impl BuildASTPass for StackDepthChecker {
         _version: ClarityVersion,
         epoch: stacks_common::types::StacksEpochId,
     ) -> ParseResult<()> {
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(epoch);
-        check(&contract_ast.pre_expressions, 0, max_call_stack_depth)
+        let depth_limits = StackDepthLimits::for_epoch(epoch);
+        check(&contract_ast.pre_expressions, 0, depth_limits)
     }
 }
 
 fn check_vary(
     args: &[PreSymbolicExpression],
     depth: u64,
-    max_call_stack_depth: usize,
+    depth_limits: StackDepthLimits,
 ) -> ParseResult<()> {
-    if depth >= (AST_CALL_STACK_DEPTH_BUFFER + max_call_stack_depth as u64) {
+    if depth >= depth_limits.max_nesting_depth() {
         return Err(ParseErrorKind::VaryExpressionStackDepthTooDeep {
-            max_depth: max_call_stack_depth,
+            max_depth: depth_limits.max_call_stack_depth(),
         }
         .into());
     }
     for expression in args.iter() {
         match expression.pre_expr {
-            List(ref exprs) => check_vary(exprs, depth + 1, max_call_stack_depth),
-            Tuple(ref exprs) => check_vary(exprs, depth + 1, max_call_stack_depth),
+            List(ref exprs) => check_vary(exprs, depth + 1, depth_limits),
+            Tuple(ref exprs) => check_vary(exprs, depth + 1, depth_limits),
             _ => {
                 // Other symbolic expressions don't have depth
                 //  impacts.
@@ -99,7 +132,7 @@ impl BuildASTPass for VaryStackDepthChecker {
         _version: ClarityVersion,
         epoch: stacks_common::types::StacksEpochId,
     ) -> ParseResult<()> {
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(epoch);
-        check_vary(&contract_ast.pre_expressions, 0, max_call_stack_depth)
+        let depth_limits = StackDepthLimits::for_epoch(epoch);
+        check_vary(&contract_ast.pre_expressions, 0, depth_limits)
     }
 }

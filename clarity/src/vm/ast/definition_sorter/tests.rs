@@ -20,14 +20,15 @@ use rstest::rstest;
 use rstest_reuse::{self, *};
 use stacks_common::types::StacksEpochId;
 
+use crate::vm::ClarityVersion;
 use crate::vm::analysis::type_checker::v2_1::tests::mem_type_check as run_analysis_helper;
 use crate::vm::ast::definition_sorter::DefinitionSorter;
 use crate::vm::ast::errors::{ParseErrorKind, ParseResult};
 use crate::vm::ast::expression_identifier::ExpressionIdentifier;
 use crate::vm::ast::parser;
+use crate::vm::ast::stack_depth_checker::StackDepthLimits;
 use crate::vm::ast::types::ContractAST;
 use crate::vm::types::QualifiedContractIdentifier;
-use crate::vm::{ClarityVersion, max_call_stack_depth_for_epoch};
 
 #[template]
 #[rstest]
@@ -39,7 +40,7 @@ fn run_scoped_parsing_helper(contract: &str, version: ClarityVersion) -> ParseRe
     let contract_identifier = QualifiedContractIdentifier::transient();
     let pre_expressions = parser::v1::parse(
         contract,
-        max_call_stack_depth_for_epoch(StacksEpochId::Epoch2_05),
+        StackDepthLimits::for_epoch(StacksEpochId::Epoch2_05),
     )?;
     let mut contract_ast = ContractAST::new(contract_identifier, pre_expressions);
     ExpressionIdentifier::run_pre_expression_pass(&mut contract_ast, version)?;

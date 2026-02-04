@@ -18,9 +18,8 @@
 use std::collections::HashMap;
 
 use clarity::vm::ast::errors::ParseErrorKind;
-use clarity::vm::ast::parser::v2::{max_nesting_depth, MAX_CONTRACT_NAME_LEN, MAX_STRING_LEN};
-use clarity::vm::ast::stack_depth_checker::AST_CALL_STACK_DEPTH_BUFFER;
-use clarity::vm::max_call_stack_depth_for_epoch;
+use clarity::vm::ast::parser::v2::{MAX_CONTRACT_NAME_LEN, MAX_STRING_LEN};
+use clarity::vm::ast::stack_depth_checker::StackDepthLimits;
 use clarity::vm::types::MAX_VALUE_SIZE;
 use stacks_common::types::StacksEpochId;
 
@@ -225,8 +224,8 @@ fn test_stack_depth_too_deep_case_1_tuple_only_parsing() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open brace '{' have a stack count of 2.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::Epoch33);
-            let count = max_nesting_depth(max_call_stack_depth) / 2 + 1;
+            let depth = StackDepthLimits::for_epoch(StacksEpochId::Epoch33).max_nesting_depth();
+            let count = depth.div_ceil(2) + 1;
             let body_start = "{ a : ".repeat(count as usize);
             let body_end = "} ".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -243,8 +242,7 @@ fn test_stack_depth_too_deep_case_2_list_only_parsing() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open parenthesis '(' have a stack count of 1.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::Epoch33);
-            let count = max_nesting_depth(max_call_stack_depth);
+            let count = StackDepthLimits::for_epoch(StacksEpochId::Epoch33).max_nesting_depth() + 1;
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -261,8 +259,7 @@ fn test_stack_depth_too_deep_case_3_list_only_checker() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open parenthesis '(' have a stack count of 1.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::Epoch33);
-            let count = AST_CALL_STACK_DEPTH_BUFFER + max_call_stack_depth as u64;
+            let count = StackDepthLimits::for_epoch(StacksEpochId::Epoch33).max_nesting_depth();
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -278,8 +275,7 @@ fn test_vary_stack_depth_too_deep_checker() {
     contract_deploy_consensus_test!(
         contract_name: "my-contract",
         contract_code: &{
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::Epoch33);
-            let count = AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) - 1;
+            let count = StackDepthLimits::for_epoch(StacksEpochId::Epoch33).max_nesting_depth() - 1;
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{{ a: {body_start}u1 {body_end} }}")
@@ -296,8 +292,8 @@ fn test_stack_depth_too_deep_case_1_tuple_only_parsing_latest_limit() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open brace '{' have a stack count of 2.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::latest());
-            let count = max_nesting_depth(max_call_stack_depth) / 2 + 1;
+            let depth = StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth();
+            let count = depth.div_ceil(2) + 1;
             let body_start = "{ a : ".repeat(count as usize);
             let body_end = "} ".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -314,8 +310,7 @@ fn test_stack_depth_too_deep_case_2_list_only_parsing_latest_limit() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open parenthesis '(' have a stack count of 1.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::latest());
-            let count = max_nesting_depth(max_call_stack_depth);
+            let count = StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth() + 1;
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -332,8 +327,7 @@ fn test_stack_depth_too_deep_case_3_list_only_checker_latest_limit() {
         contract_name: "my-contract",
         contract_code: &{
             // In parse v2, open parenthesis '(' have a stack count of 1.
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::latest());
-            let count = AST_CALL_STACK_DEPTH_BUFFER + max_call_stack_depth as u64;
+            let count = StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth();
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{body_start}u1 {body_end}")
@@ -349,8 +343,7 @@ fn test_vary_stack_depth_too_deep_checker_latest_limit() {
     contract_deploy_consensus_test!(
         contract_name: "my-contract",
         contract_code: &{
-            let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::latest());
-            let count = AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) - 1;
+            let count = StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth() - 1;
             let body_start = "(list ".repeat(count as usize);
             let body_end = ")".repeat(count as usize);
             format!("{{ a: {body_start}u1 {body_end} }}")

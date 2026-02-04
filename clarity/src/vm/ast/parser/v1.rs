@@ -19,7 +19,7 @@ use regex::{Captures, Regex};
 use stacks_common::util::hash::hex_bytes;
 
 use crate::vm::ast::errors::{ParseError, ParseErrorKind, ParseResult};
-use crate::vm::ast::stack_depth_checker::{AST_CALL_STACK_DEPTH_BUFFER, max_nesting_depth};
+use crate::vm::ast::stack_depth_checker::StackDepthLimits;
 use crate::vm::representations::{
     ClarityName, ContractName, MAX_STRING_LEN, PreSymbolicExpression,
 };
@@ -184,10 +184,12 @@ lazy_static! {
     ];
 }
 
-/// Lex the contract, permitting nesting of lists and tuples up to `max_nesting`.
-fn inner_lex(input: &str, max_nesting: u64) -> ParseResult<Vec<(LexItem, u32, u32)>> {
+/// Lex the contract, permitting nesting of lists and tuples up to
+/// `depth_limits.max_nesting_depth()`.
+fn inner_lex(input: &str, depth_limits: StackDepthLimits) -> ParseResult<Vec<(LexItem, u32, u32)>> {
     let mut context = LexContext::ExpectNothing;
-    let max_call_stack_depth = max_nesting.saturating_sub(AST_CALL_STACK_DEPTH_BUFFER + 1) as usize;
+    let max_nesting = depth_limits.max_nesting_depth();
+    let max_call_stack_depth = depth_limits.max_call_stack_depth();
 
     let mut line_indices = get_lines_at(input);
     let mut next_line_break = line_indices.pop();
@@ -260,7 +262,7 @@ fn inner_lex(input: &str, max_nesting: u64) -> ParseResult<Vec<(LexItem, u32, u3
                     TokenType::LParens => {
                         context = LexContext::ExpectNothing;
                         nesting_depth += 1;
-                        if nesting_depth > max_nesting {
+                        if nesting_depth >= max_nesting {
                             return Err(ParseError::new(
                                 ParseErrorKind::VaryExpressionStackDepthTooDeep {
                                     max_depth: max_call_stack_depth,
@@ -291,7 +293,7 @@ fn inner_lex(input: &str, max_nesting: u64) -> ParseResult<Vec<(LexItem, u32, u3
                     TokenType::LCurly => {
                         context = LexContext::ExpectNothing;
                         nesting_depth += 1;
-                        if nesting_depth > max_nesting {
+                        if nesting_depth >= max_nesting {
                             return Err(ParseError::new(
                                 ParseErrorKind::VaryExpressionStackDepthTooDeep {
                                     max_depth: max_call_stack_depth,
@@ -459,10 +461,6 @@ fn inner_lex(input: &str, max_nesting: u64) -> ParseResult<Vec<(LexItem, u32, u3
             input[munch_index..].to_string(),
         )))
     }
-}
-
-pub fn lex(input: &str, max_call_stack_depth: usize) -> ParseResult<Vec<(LexItem, u32, u32)>> {
-    inner_lex(input, max_nesting_depth(max_call_stack_depth))
 }
 
 fn unescape_ascii_chars(escaped_str: String, allow_unicode_escape: bool) -> ParseResult<String> {
@@ -720,13 +718,16 @@ pub fn parse_lexed(input: Vec<(LexItem, u32, u32)>) -> ParseResult<Vec<PreSymbol
     }
 }
 
-pub fn parse(input: &str, max_call_stack_depth: usize) -> ParseResult<Vec<PreSymbolicExpression>> {
-    let lexed = inner_lex(input, max_nesting_depth(max_call_stack_depth))?;
+pub fn parse(
+    input: &str,
+    depth_limits: StackDepthLimits,
+) -> ParseResult<Vec<PreSymbolicExpression>> {
+    let lexed = inner_lex(input, depth_limits)?;
     parse_lexed(lexed)
 }
 
 pub fn parse_no_stack_limit(input: &str) -> ParseResult<Vec<PreSymbolicExpression>> {
-    let lexed = inner_lex(input, u64::MAX)?;
+    let lexed = inner_lex(input, StackDepthLimits::no_limit())?;
     parse_lexed(lexed)
 }
 
@@ -735,16 +736,12 @@ mod test {
     use stacks_common::types::StacksEpochId;
 
     use crate::vm::ast::errors::{ParseErrorKind, ParseResult};
-    use crate::vm::ast::stack_depth_checker::max_nesting_depth;
-    use crate::vm::max_call_stack_depth_for_epoch;
+    use crate::vm::ast::stack_depth_checker::StackDepthLimits;
     use crate::vm::representations::{PreSymbolicExpression, PreSymbolicExpressionType};
     use crate::vm::types::{CharType, PrincipalData, SequenceData, Value};
 
     fn parse(input: &str) -> ParseResult<Vec<PreSymbolicExpression>> {
-        super::parse(
-            input,
-            max_call_stack_depth_for_epoch(StacksEpochId::Epoch2_05),
-        )
+        super::parse(input, StackDepthLimits::for_epoch(StacksEpochId::Epoch2_05))
     }
 
     fn make_atom(
@@ -1021,7 +1018,7 @@ mod test {
 
     #[test]
     fn test_parse_failures() {
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(StacksEpochId::Epoch2_05);
+        let depth_limits = StackDepthLimits::for_epoch(StacksEpochId::Epoch2_05);
         let too_much_closure = "(let ((x 1) (y 2))))";
         let not_enough_closure = "(let ((x 1) (y 2))";
         let middle_hash = "(let ((x 1) (y#not 2)) x)";
@@ -1062,7 +1059,7 @@ mod test {
         let string_with_multiple_slashes = r#"
         "hello\\\"world"
         "#;
-        let stack_limit = max_nesting_depth(max_call_stack_depth) as usize;
+        let stack_limit = depth_limits.max_nesting_depth() as usize;
         let exceeds_stack_depth_tuple = format!(
             "{}u1 {}",
             "{ a : ".repeat(stack_limit + 1),
