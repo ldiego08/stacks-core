@@ -141,9 +141,12 @@ fn handle_define_function(
         .split_first()
         .ok_or(RuntimeCheckErrorKind::DefineFunctionBadSignature)?;
 
-    let function_name = function_symbol
-        .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+    let function_name =
+        function_symbol
+            .match_atom()
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Expected name".to_string(),
+            ))?;
 
     check_legal_define(function_name, env.contract_context)?;
 

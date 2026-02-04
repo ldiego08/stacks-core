@@ -1238,11 +1238,13 @@ fn test_construct_bad_list(#[case] version: ClarityVersion, #[case] epoch: Stack
 #[test]
 fn test_eval_func_arg_panic() {
     let test1 = "(fold (lambda (x y) (* x y)) (list 1 2 3 4) 1)";
-    let e: ClarityEvalError = RuntimeCheckErrorKind::ExpectedName.into();
+    let e: ClarityEvalError =
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()).into();
     assert_eq!(e, execute(test1).unwrap_err());
 
     let test2 = "(map (lambda (x) (* x x)) (list 1 2 3 4))";
-    let e: ClarityEvalError = RuntimeCheckErrorKind::ExpectedName.into();
+    let e: ClarityEvalError =
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()).into();
     assert_eq!(e, execute(test2).unwrap_err());
 
     let test3 = "(map square (list 1 2 3 4) 2)";

@@ -71,7 +71,9 @@ pub fn special_contract_call(
 
     let function_name = args[1]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
     let rest_args_slice = &args[2..];
     let rest_args_len = rest_args_slice.len();
     let mut rest_args = Vec::with_capacity(rest_args_len);
@@ -240,7 +242,9 @@ pub fn special_fetch_variable_v200(
 
     let var_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -271,7 +275,9 @@ pub fn special_fetch_variable_v205(
 
     let var_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -310,7 +316,9 @@ pub fn special_set_variable_v200(
 
     let var_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -350,7 +358,9 @@ pub fn special_set_variable_v205(
 
     let var_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -385,7 +395,9 @@ pub fn special_fetch_entry_v200(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let key = eval(&args[1], env, context)?;
 
@@ -420,7 +432,9 @@ pub fn special_fetch_entry_v205(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let key = eval(&args[1], env, context)?;
 
@@ -498,7 +512,9 @@ pub fn special_set_entry_v200(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -543,7 +559,9 @@ pub fn special_set_entry_v205(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -588,7 +606,9 @@ pub fn special_insert_entry_v200(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -634,7 +654,9 @@ pub fn special_insert_entry_v205(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -677,7 +699,9 @@ pub fn special_delete_entry_v200(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 
@@ -719,7 +743,9 @@ pub fn special_delete_entry_v205(
 
     let map_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let contract = &env.contract_context.contract_identifier;
 

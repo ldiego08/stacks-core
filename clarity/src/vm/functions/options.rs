@@ -163,7 +163,7 @@ fn special_match_opt(
         .match_atom()
         .ok_or_else(|| {
             RuntimeCheckErrorKind::BadMatchOptionSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectedName,
+                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
             ))
         })?
         .clone();
@@ -192,7 +192,7 @@ fn special_match_resp(
         .match_atom()
         .ok_or_else(|| {
             RuntimeCheckErrorKind::BadMatchResponseSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectedName,
+                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
             ))
         })?
         .clone();
@@ -201,7 +201,7 @@ fn special_match_resp(
         .match_atom()
         .ok_or_else(|| {
             RuntimeCheckErrorKind::BadMatchResponseSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectedName,
+                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
             ))
         })?
         .clone();

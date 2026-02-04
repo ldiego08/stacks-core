@@ -51,7 +51,9 @@ pub fn tuple_get(
 
     let arg_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::ExpectedName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Expected name".to_string(),
+        ))?;
 
     let value = eval(&args[1], env, context)?;
 

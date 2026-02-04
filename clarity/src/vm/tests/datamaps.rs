@@ -657,7 +657,7 @@ fn bad_define_maps() {
         RuntimeCheckErrorKind::BadSyntaxBinding(SyntaxBindingError::tuple_cons_invalid_length(0))
             .into(),
         RuntimeCheckErrorKind::UnknownTypeName("contents".to_string()).into(),
-        RuntimeCheckErrorKind::ExpectedName.into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(3, 4).into(),
         RuntimeCheckErrorKind::InvalidTypeDescription.into(),
     ];
@@ -687,7 +687,7 @@ fn bad_tuples() {
             TupleTypeSignature::try_from(vec![("name".into(), TypeSignature::IntType)]).unwrap(),
         ),
         RuntimeCheckErrorKind::IncorrectArgumentCount(2, 3),
-        RuntimeCheckErrorKind::ExpectedName,
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
     ];
 
     for (test, expected_err) in tests.iter().zip(expected.into_iter()) {

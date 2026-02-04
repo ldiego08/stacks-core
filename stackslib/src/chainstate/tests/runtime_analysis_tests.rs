@@ -83,10 +83,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_signature_too_deep_cdeploy,
             runtime_check_error_kind_type_signature_too_deep_ccall
         ]),
-        ExpectedName => Unreachable_Functionally(
-            "Every place in the runtime where ExpectedName is raised comes from a direct
-            call to SymbolicExpression::match_atom() on the original AST node and the type
-            checker runs the same structure check during analysis."),
         SupertypeTooLarge => Unreachable_Functionally(
             "least_supertype checks already run in analysis, and runtime values are
              sanitized to their declared signatures, so the VM never sees a pair of

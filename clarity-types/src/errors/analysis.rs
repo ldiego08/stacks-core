@@ -594,8 +594,6 @@ pub enum RuntimeCheckErrorKind {
     ValueOutOfBounds,
     /// Type signature nesting depth exceeds the allowed limit during analysis.
     TypeSignatureTooDeep,
-    /// Expected a name (e.g., variable, function) but found an invalid or missing token.
-    ExpectedName,
     /// Supertype (e.g., trait or union) exceeds the maximum allowed size or complexity.
     SupertypeTooLarge,
 
@@ -1239,7 +1237,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             CommonCheckErrorKind::TooManyFunctionParameters(found, allowed) => {
                 RuntimeCheckErrorKind::TooManyFunctionParameters(found, allowed)
             }
-            CommonCheckErrorKind::ExpectedName => RuntimeCheckErrorKind::ExpectedName,
+            CommonCheckErrorKind::ExpectedName => {
+                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string())
+            }
             CommonCheckErrorKind::DefineFunctionBadSignature => {
                 RuntimeCheckErrorKind::DefineFunctionBadSignature
             }
