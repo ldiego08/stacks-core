@@ -78,7 +78,7 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     let send_fee = 180;
     let nmb_txs = 4;
 
-    let capitulate_miner_view_timeout = Duration::from_secs(15);
+    let capitulate_miner_view_timeout = Duration::from_secs(20);
     let recipient = PrincipalData::from(StacksAddress::burn_address(false));
     let signer_test: SignerTest<SpawnedSigner> = SignerTest::new_with_config_modifications(
         num_signers,
@@ -86,6 +86,7 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
         |config| {
             config.capitulate_miner_view_timeout = capitulate_miner_view_timeout;
             config.tenure_last_block_proposal_timeout = capitulate_miner_view_timeout;
+            config.block_proposal_timeout = Duration::from_secs(u64::MAX); // Don't time out the miner
         },
         |config| {
             config.miner.block_commit_delay = Duration::from_secs(0);
@@ -147,9 +148,6 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     info!("------------------------- Mine Nakamoto Block N+1 -------------------------");
     TEST_REJECT_ALL_BLOCK_PROPOSAL.set(rejecting_signers.clone());
     TEST_SIGNERS_IGNORE_BLOCK_RESPONSES.set(approving_signers.clone());
-    TEST_SKIP_BLOCK_ANNOUNCEMENT.set(true);
-    TEST_IGNORE_SIGNERS.set(true);
-    TEST_SKIP_BLOCK_BROADCAST.set(true);
     test_observer::clear();
 
     // submit a tx so that the miner will mine a stacks block N+1
@@ -176,9 +174,6 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     .expect("Rejecting signers did not reject block N+1");
 
     info!("------------------------- Start Next Tenure -------------------------");
-    TEST_REJECT_ALL_BLOCK_PROPOSAL.set(Vec::new());
-    TEST_IGNORE_SIGNERS.set(false);
-    TEST_SIGNERS_IGNORE_BLOCK_RESPONSES.set(vec![]);
     test_observer::clear();
     signer_test.mine_bitcoin_block();
     let now = std::time::Instant::now();
@@ -263,8 +258,6 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     })
     .expect("Signers did not update state machine with split view of parent tenure last block");
 
-    TEST_SKIP_BLOCK_ANNOUNCEMENT.set(false);
-    TEST_SKIP_BLOCK_BROADCAST.set(false);
     // capitulate_viewpoint has TWO guards that must both be satisfied:
     // 1. last_capitulate_miner_view must be older than capitulate_miner_view_timeout
     // 2. time_since_last_approved (since block N was signed) must be >= capitulate_miner_view_timeout
@@ -300,16 +293,14 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
                 continue;
             }
 
-            let Some((address, _)) = signer_addresses
+            let Some(address) = approving_signer_addrs
                 .iter()
-                .find(|(addr, _)| chunk.verify(addr).unwrap_or(false))
+                .find(|addr| chunk.verify(addr).unwrap_or(false))
             else {
                 continue;
             };
             if parent_tenure_last_block == &block_id_n {
-                approving_signer_addrs.iter().find(|a| *a == address).map(|a| {
-                    found_updates_n.insert(a.clone());
-                });
+                found_updates_n.insert(address.clone());
             }
         }
         Ok(found_updates_n.len() == approving_signer_addrs.len())
@@ -317,6 +308,8 @@ fn deadlock_50_50_split_capitulates_to_node_tip() {
     .expect("Originally approving signers did not update state machine to capitulated parent tenure last block N");
 
     info!("------------------------- Waiting for block N+1' approval from capitulated signer -------------------------");
+    TEST_REJECT_ALL_BLOCK_PROPOSAL.set(Vec::new());
+    TEST_SIGNERS_IGNORE_BLOCK_RESPONSES.set(vec![]);
     let block_n_1_prime =
         wait_for_block_pushed_by_miner_key(30, info_before.stacks_tip_height + 1, &miner_pk)
             .expect("Failed to mine block N+1' after signers capitulated");
