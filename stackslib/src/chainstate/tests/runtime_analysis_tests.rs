@@ -110,9 +110,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_union_type_value_error_cdeploy,
             runtime_check_error_kind_union_type_value_error_ccall
         ]),
-        ExpectedResponseValue(_) => Unreachable_Functionally(
-            "Response helpers are validated by `check_special_is_response` and `inner_unwrap_err`
-            during static analysis, preventing a non-response from reaching the runtime handlers"),
         ExpectedOptionalOrResponseValue(_) => Unreachable_Functionally(
             "The mixed helpers (`match`, `try!`, `unwrap!`, `unwrap-err!`) ultimately
              delegate to `check_special_match` and `inner_unwrap` in the analyzer, which enforces

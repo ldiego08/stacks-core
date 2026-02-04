@@ -54,7 +54,12 @@ fn inner_unwrap_err(to_unwrap: Value) -> Result<Option<Value>, VmExecutionError>
                 None
             }
         }
-        _ => return Err(RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(to_unwrap)).into()),
+        _ => {
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected response value: {to_unwrap}"
+            ))
+            .into());
+        }
     };
 
     Ok(result)
@@ -252,8 +257,8 @@ fn is_some(input: Value) -> Result<bool, RuntimeCheckErrorKind> {
 fn is_okay(input: Value) -> Result<bool, RuntimeCheckErrorKind> {
     match input {
         Value::Response(data) => Ok(data.committed),
-        _ => Err(RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(
-            input,
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected response value: {input}"
         ))),
     }
 }

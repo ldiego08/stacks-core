@@ -628,9 +628,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `Vec<TypeSignature>` represents the expected types, and the `Box<Value>` wraps the invalid value.
     UnionTypeValueError(Vec<TypeSignature>, Box<Value>),
 
-    /// Expected a response value but found a different value.
-    /// The `Box<Value>` wraps the actual value provided.
-    ExpectedResponseValue(Box<Value>),
     /// Expected an optional or response value but found a different value.
     /// The `Box<Value>` wraps the actual value provided.
     ExpectedOptionalOrResponseValue(Box<Value>),

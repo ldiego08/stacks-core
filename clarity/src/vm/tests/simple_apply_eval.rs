@@ -1254,9 +1254,17 @@ fn test_options_errors() {
         ))
         .into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
-        RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(Value::Bool(true))).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected response value: {}",
+            Value::Bool(true)
+        ))
+        .into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
-        RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(Value::Bool(true))).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected response value: {}",
+            Value::Bool(true)
+        ))
+        .into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::ExpectsAcceptable(format!(
             "Expected option value: {}",
@@ -1477,8 +1485,9 @@ fn test_option_destructs() {
     let expectations: &[Result<Value, ClarityEvalError>] = &[
         Ok(Value::Int(1)),
         Ok(Value::Int(1)),
-        Err(RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(
-            Value::some(Value::Int(2)).unwrap(),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected response value: {}",
+            Value::some(Value::Int(2)).unwrap()
         ))
         .into()),
         Ok(Value::Int(3)),

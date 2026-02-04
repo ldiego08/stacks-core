@@ -137,7 +137,10 @@ fn test_unwrap_ret() {
         execute(test2).unwrap_err(),
     );
     assert_eq_err(
-        RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(Value::Int(1))),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected response value: {}",
+            Value::Int(1)
+        )),
         execute(test3).unwrap_err(),
     );
     assert_eq!(Ok(Some(Value::Int(1))), execute(test4));
