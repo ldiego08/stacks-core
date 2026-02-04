@@ -106,8 +106,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_value_error_cdeploy,
             runtime_check_error_kind_type_value_error_ccall
         ]),
-        UnknownTypeName(_) => Unreachable_Functionally(
-            "Static analysis catches invalid types via `TypeSignature::parse_atom_type`."),
         UnionTypeError(_, _) => Unreachable_Functionally(
             "The analyzer enforces that every call to `bit-shift-left` / `bit-shift-right`
              supplies an argument whose type is exactly `int` or `uint` (see

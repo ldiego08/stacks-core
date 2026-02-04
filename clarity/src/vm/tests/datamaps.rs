@@ -656,7 +656,7 @@ fn bad_define_maps() {
     let expected: Vec<ClarityEvalError> = vec![
         RuntimeCheckErrorKind::BadSyntaxBinding(SyntaxBindingError::tuple_cons_invalid_length(0))
             .into(),
-        RuntimeCheckErrorKind::UnknownTypeName("contents".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Unknown type name: contents".to_string()).into(),
         RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(3, 4).into(),
         RuntimeCheckErrorKind::ExpectsAcceptable("Invalid type description".to_string()).into(),

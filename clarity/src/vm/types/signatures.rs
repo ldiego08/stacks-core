@@ -720,7 +720,10 @@ mod test {
                 ExpectsAcceptable("Invalid type description".into()),
             ),
             ("(list 4294967296 int)", ValueTooLarge),
-            ("(list 50 bazel)", UnknownTypeName("bazel".into())),
+            (
+                "(list 50 bazel)",
+                ExpectsAcceptable("Unknown type name: bazel".into()),
+            ),
             (
                 "(buff)",
                 ExpectsAcceptable("Invalid type description".into()),
@@ -734,10 +737,22 @@ mod test {
                 "(response int)",
                 ExpectsAcceptable("Invalid type description".into()),
             ),
-            ("(optional bazel)", UnknownTypeName("bazel".into())),
-            ("(response bazel int)", UnknownTypeName("bazel".into())),
-            ("(response int bazel)", UnknownTypeName("bazel".into())),
-            ("bazel", UnknownTypeName("bazel".into())),
+            (
+                "(optional bazel)",
+                ExpectsAcceptable("Unknown type name: bazel".into()),
+            ),
+            (
+                "(response bazel int)",
+                ExpectsAcceptable("Unknown type name: bazel".into()),
+            ),
+            (
+                "(response int bazel)",
+                ExpectsAcceptable("Unknown type name: bazel".into()),
+            ),
+            (
+                "bazel",
+                ExpectsAcceptable("Unknown type name: bazel".into()),
+            ),
             ("()", ExpectsAcceptable("Invalid type description".into())),
             (
                 "(1234)",

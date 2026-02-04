@@ -623,10 +623,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `Box<TypeSignature>` wraps the expected type, and the `Box<Value>` wraps the invalid value.
     TypeValueError(Box<TypeSignature>, Box<Value>),
 
-    /// Referenced type name does not exist or is undefined.
-    /// The `String` wraps the non-existent type name.
-    UnknownTypeName(String),
-
     // Union type mismatch
     /// Type does not belong to the expected union of types during analysis.
     /// The `Vec<TypeSignature>` represents the expected types, and the `Box<TypeSignature>` wraps the actual type.
@@ -1275,7 +1271,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::NameAlreadyUsed(name)
             }
             CommonCheckErrorKind::UnknownTypeName(name) => {
-                RuntimeCheckErrorKind::UnknownTypeName(name)
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!("Unknown type name: {name}"))
             }
         }
     }
