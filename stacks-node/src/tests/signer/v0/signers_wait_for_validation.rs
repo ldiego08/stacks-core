@@ -47,7 +47,7 @@ use crate::tests::signer::v0::{
 /// 3. 4 signers on miner 1 issue pre-commits, pushing threshold over 70%
 /// 4. The single signer on miner 2 receives all pre-commits but its validation is stalled
 /// 5. Verify the single signer does NOT issue a signature until validation completes
-/// 6. Resume validation and confirm the block is either accepted or properly rejected
+/// 6. Resume validation and confirm the block is accepted
 ///
 /// Test Assertion:
 /// The signer waits for its own validation before issuing a signature, preventing

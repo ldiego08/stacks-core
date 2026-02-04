@@ -53,7 +53,7 @@ use crate::net::http::{
 use crate::net::httpcore::RPCRequestHandler;
 use crate::net::{Error as NetError, StacksNodeState};
 
-// Test flag to stall block validation per endpoint with a matching passphrase
+/// Test flag to stall block validation per endpoint with a matching passphrase
 #[cfg(any(test, feature = "testing"))]
 pub static TEST_VALIDATE_STALL: LazyLock<TestFlag<Vec<Option<String>>>> =
     LazyLock::new(TestFlag::default);
