@@ -1248,18 +1248,30 @@ fn test_options_errors() {
 
     let expectations: &[ClarityEvalError] = &[
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
-        RuntimeCheckErrorKind::ExpectedOptionalValue(Box::new(Value::Bool(true))).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected option value: {}",
+            Value::Bool(true)
+        ))
+        .into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(Value::Bool(true))).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::ExpectedResponseValue(Box::new(Value::Bool(true))).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
-        RuntimeCheckErrorKind::ExpectedOptionalValue(Box::new(Value::Bool(true))).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected option value: {}",
+            Value::Bool(true)
+        ))
+        .into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(2, 3).into(),
-        RuntimeCheckErrorKind::ExpectedOptionalValue(Box::new(Value::Bool(true))).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected option value: {}",
+            Value::Bool(true)
+        ))
+        .into(),
         RuntimeCheckErrorKind::ExpectedTuple(Box::new(TypeSignature::IntType)).into(),
         RuntimeCheckErrorKind::ExpectedTuple(Box::new(TypeSignature::IntType)).into(),
     ];

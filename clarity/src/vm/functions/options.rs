@@ -243,8 +243,8 @@ pub fn native_some(input: Value) -> Result<Value, VmExecutionError> {
 fn is_some(input: Value) -> Result<bool, RuntimeCheckErrorKind> {
     match input {
         Value::Optional(ref data) => Ok(data.data.is_some()),
-        _ => Err(RuntimeCheckErrorKind::ExpectedOptionalValue(Box::new(
-            input,
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected option value: {input}"
         ))),
     }
 }
@@ -288,6 +288,9 @@ pub fn native_default_to(default: Value, input: Value) -> Result<Value, VmExecut
             Some(data) => Ok(*data),
             None => Ok(default),
         },
-        _ => Err(RuntimeCheckErrorKind::ExpectedOptionalValue(Box::new(input)).into()),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected option value: {input}"
+        ))
+        .into()),
     }
 }

@@ -110,12 +110,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_union_type_value_error_cdeploy,
             runtime_check_error_kind_union_type_value_error_ccall
         ]),
-        ExpectedOptionalValue(_) => Unreachable_Functionally(
-            "Every optional primitive (`is-some`, `default-to`, `unwrap!`, etc.)
-             has a dedicated analysis hook (`check_special_is_optional`,
-             `check_special_default_to`, `inner_unwrap`, …) that enforces the optional
-             type before a contract can be published, so the runtime never sees a plain
-             `Value` arrive at `native_default_to` / `is_some`."),
         ExpectedResponseValue(_) => Unreachable_Functionally(
             "Response helpers are validated by `check_special_is_response` and `inner_unwrap_err`
             during static analysis, preventing a non-response from reaching the runtime handlers"),
