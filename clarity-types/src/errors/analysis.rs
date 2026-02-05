@@ -637,9 +637,6 @@ pub enum RuntimeCheckErrorKind {
     CouldNotDetermineType,
 
     // Assets
-    /// Referenced non-fungible token (NFT) does not exist.
-    /// The `String` wraps the non-existent token name.
-    NoSuchNFT(String),
     /// Referenced fungible token (FT) does not exist.
     /// The `String` wraps the non-existent token name.
     NoSuchFT(String),

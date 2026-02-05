@@ -402,11 +402,9 @@ pub fn special_mint_asset_v200(
     let asset = eval(&args[1], env, context)?;
     let to = eval(&args[2], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     runtime_cost(
@@ -482,11 +480,9 @@ pub fn special_mint_asset_v205(
     let asset = eval(&args[1], env, context)?;
     let to = eval(&args[2], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     let asset_size = asset
@@ -560,11 +556,9 @@ pub fn special_transfer_asset_v200(
     let from = eval(&args[2], env, context)?;
     let to = eval(&args[3], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     runtime_cost(
@@ -659,11 +653,9 @@ pub fn special_transfer_asset_v205(
     let from = eval(&args[2], env, context)?;
     let to = eval(&args[3], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     let asset_size = asset
@@ -900,11 +892,9 @@ pub fn special_get_owner_v200(
 
     let asset = eval(&args[1], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     runtime_cost(
@@ -952,11 +942,9 @@ pub fn special_get_owner_v205(
 
     let asset = eval(&args[1], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     let asset_size = asset
@@ -1097,11 +1085,9 @@ pub fn special_burn_asset_v200(
     let asset = eval(&args[1], env, context)?;
     let sender = eval(&args[2], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     runtime_cost(
@@ -1191,11 +1177,9 @@ pub fn special_burn_asset_v205(
     let asset = eval(&args[1], env, context)?;
     let sender = eval(&args[2], env, context)?;
 
-    let nft_metadata = env
-        .contract_context
-        .meta_nft
-        .get(asset_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchNFT(asset_name.to_string()))?;
+    let nft_metadata = env.contract_context.meta_nft.get(asset_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {asset_name}")),
+    )?;
     let expected_asset_type = &nft_metadata.key_type;
 
     let asset_size = asset

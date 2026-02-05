@@ -2068,8 +2068,9 @@ impl ClarityDatabase<'_> {
     ) -> Result<NonFungibleTokenMetadata, VmExecutionError> {
         let key = ClarityDatabase::make_metadata_key(StoreType::NonFungibleTokenMeta, token_name);
 
-        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?
-            .ok_or(RuntimeCheckErrorKind::NoSuchNFT(token_name.to_string()).into())
+        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?.ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such NFT: {token_name}")).into(),
+        )
     }
 
     pub fn checked_increase_token_supply(
