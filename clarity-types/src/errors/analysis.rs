@@ -637,9 +637,6 @@ pub enum RuntimeCheckErrorKind {
     CouldNotDetermineType,
 
     // Tuples
-    /// Expected a tuple type but found a different type.
-    /// The `Box<TypeSignature>` wraps the actual type provided.
-    ExpectedTuple(Box<TypeSignature>),
     /// Referenced tuple field does not exist in the tuple type.
     /// The `String` wraps the requested field name, and the `TupleTypeSignature` wraps the tuple’s type.
     NoSuchTupleField(String, TupleTypeSignature),

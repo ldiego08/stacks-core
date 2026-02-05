@@ -1280,8 +1280,16 @@ fn test_options_errors() {
             Value::Bool(true)
         ))
         .into(),
-        RuntimeCheckErrorKind::ExpectedTuple(Box::new(TypeSignature::IntType)).into(),
-        RuntimeCheckErrorKind::ExpectedTuple(Box::new(TypeSignature::IntType)).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected tuple: {}",
+            TypeSignature::IntType
+        ))
+        .into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected tuple: {}",
+            TypeSignature::IntType
+        ))
+        .into(),
     ];
 
     for (program, expectation) in tests.iter().zip(expectations.iter()) {
