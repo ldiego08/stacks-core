@@ -333,7 +333,6 @@ fn build_common_opts(cli: &Cli) -> CommonOpts {
 }
 
 #[cfg_attr(test, mutants::skip)]
-#[allow(clippy::indexing_slicing)]
 fn main() {
     let cli = Cli::parse();
     let common_opts = build_common_opts(&cli);
@@ -1544,7 +1543,6 @@ pub fn dump_consts() {
 }
 
 #[cfg_attr(test, mutants::skip)]
-#[allow(clippy::indexing_slicing)]
 pub fn tip_mine(working_dir: &str, event_log: &str, mine_tip_height: u64, max_txns: u64) {
     let burnchain_path = format!("{}/mainnet/burnchain", working_dir);
     let sort_db_path = format!("{}/mainnet/burnchain/sortition", working_dir);
