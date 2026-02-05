@@ -23,7 +23,7 @@ use crate::vm::{ClarityVersion, max_call_stack_depth_for_epoch};
 // allow  the AST to get deeper than the max call stack depth,
 //    but not much deeper (things like tuples would increase the
 //    AST depth, without impacting the stack depth).
-pub const AST_CALL_STACK_DEPTH_BUFFER: u64 = 5;
+const AST_CALL_STACK_DEPTH_BUFFER: u64 = 5;
 
 /// Bundles related stack depth limits for parsing and AST checks.
 #[derive(Clone, Copy, Debug)]

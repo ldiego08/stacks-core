@@ -17,7 +17,7 @@
 use std::collections::HashMap;
 
 use clarity::util::get_epoch_time_secs;
-use clarity::vm::ast::stack_depth_checker::AST_CALL_STACK_DEPTH_BUFFER;
+use clarity::vm::ast::stack_depth_checker::StackDepthLimits;
 use clarity::vm::clarity::{ClarityConnection, TransactionConnection};
 use clarity::vm::contexts::OwnedEnvironment;
 use clarity::vm::database::HeadersDB;
@@ -29,7 +29,7 @@ use clarity::vm::types::{
     Value,
 };
 use clarity::vm::version::ClarityVersion;
-use clarity::vm::{ast, max_call_stack_depth_for_epoch, ContractContext};
+use clarity::vm::{ast, ContractContext};
 #[cfg(test)]
 use rstest::rstest;
 #[cfg(test)]
@@ -1182,10 +1182,6 @@ fn test_deep_tuples() {
             block.set_epoch(StacksEpochId::Epoch2_05);
         }
 
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(block.get_epoch());
-        let stack_limit =
-            (AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) + 1) as usize;
-
         let meets_stack_depth_tuple = format!("{}u1 {}", "{ a : ".repeat(31), "} ".repeat(31));
         let exceeds_stack_depth_tuple = format!("{}u1 {}", "{ a : ".repeat(32), "} ".repeat(32));
 
@@ -1260,9 +1256,8 @@ fn test_deep_tuples_ast_precheck() {
             block.set_epoch(StacksEpochId::Epoch2_05);
         }
 
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(block.get_epoch());
         let stack_limit =
-            (AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) + 1) as usize;
+            StackDepthLimits::for_epoch(block.get_epoch()).max_nesting_depth() as usize;
 
         // absurdly deep tuple depth
         let exceeds_stack_depth_tuple = format!(
@@ -1329,9 +1324,6 @@ fn test_deep_type_nesting() {
             block.set_epoch(StacksEpochId::Epoch2_05);
         }
 
-        let max_call_stack_depth = max_call_stack_depth_for_epoch(block.get_epoch());
-        let stack_limit =
-            (AST_CALL_STACK_DEPTH_BUFFER + (max_call_stack_depth as u64) + 1) as usize;
         let mut parts = vec!["(a0 { a0 : u1 })".to_string()];
         for i in 1..1024 {
             parts.push(format!("(a{} {{ a{} : (print a{}) }})", i, i, i - 1));
