@@ -947,7 +947,9 @@ pub fn special_get_burn_block_info(
         .ok_or(RuntimeCheckErrorKind::GetBlockInfoExpectPropertyName)?;
 
     let block_info_prop = BurnBlockInfoProperty::lookup_by_name(property_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchBurnBlockInfoProperty(property_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "No such burn block info property: {property_name}"
+        )),
     )?;
 
     // Handle the block-height input arg clause.

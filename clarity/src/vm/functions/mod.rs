@@ -1250,8 +1250,8 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::NoSuchBurnBlockInfoProperty(
-                "not-a-valid-burn-prop".to_string()
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "No such burn block info property: not-a-valid-burn-prop".to_string()
             ))
         );
     }

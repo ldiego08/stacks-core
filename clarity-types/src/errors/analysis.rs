@@ -656,9 +656,6 @@ pub enum RuntimeCheckErrorKind {
     ContractCallExpectName,
 
     // get-block-info? errors
-    /// Referenced burn block info property does not exist.
-    /// The `String` wraps the non-existent property name.
-    NoSuchBurnBlockInfoProperty(String),
     /// Referenced Stacks block info property does not exist.
     /// The `String` wraps the non-existent property name.
     NoSuchStacksBlockInfoProperty(String),

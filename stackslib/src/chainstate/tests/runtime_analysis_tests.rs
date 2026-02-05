@@ -123,10 +123,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_contract_call_expect_name_cdeploy,
             runtime_check_error_kind_contract_call_expect_name_ccall
         ]),
-        NoSuchBurnBlockInfoProperty(_) => Unreachable_Functionally(
-            "Burn block info property names are validated during static analysis; \
-             unknown properties are rejected at deploy time.",
-        ),
         NoSuchStacksBlockInfoProperty(_) => Unreachable_Functionally(
             "Stacks block info property names are validated during static analysis; \
              unknown properties are rejected at deploy time.",
