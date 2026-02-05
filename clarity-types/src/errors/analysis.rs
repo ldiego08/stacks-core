@@ -636,10 +636,6 @@ pub enum RuntimeCheckErrorKind {
     /// Could not determine the type of an expression during analysis.
     CouldNotDetermineType,
 
-    // Tuples
-    /// Empty tuple is not allowed in Clarity.
-    EmptyTuplesNotAllowed,
-
     // Variables
     /// Referenced data variable does not exist in scope.
     /// The `String` wraps the non-existent variable name.
@@ -937,7 +933,6 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             ClarityTypeError::DuplicateTupleField(name) => Self::NameAlreadyUsed(name),
             ClarityTypeError::TypeMismatchValue(ty, value) => Self::TypeValueError(ty, value),
             ClarityTypeError::TypeMismatch(expected, found) => Self::TypeError(expected, found),
-            ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
             ClarityTypeError::SupertypeTooLarge => Self::SupertypeTooLarge,
             ClarityTypeError::ListTypeMismatch => Self::ListTypesMustMatch,
             ClarityTypeError::InvalidAsciiCharacter(_) => Self::InvalidCharactersDetected,
@@ -954,6 +949,7 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             | ClarityTypeError::InvalidPrincipalLength(_)
             | ClarityTypeError::InvalidTypeDescription
             | ClarityTypeError::NoSuchTupleField(_, _)
+            | ClarityTypeError::EmptyTuplesNotAllowed
             | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
                 "Unexpected error type during runtime analysis: {err}"
             )),
@@ -1218,7 +1214,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             CommonCheckErrorKind::BadSyntaxBinding(e) => RuntimeCheckErrorKind::BadSyntaxBinding(e),
             CommonCheckErrorKind::ValueOutOfBounds => RuntimeCheckErrorKind::ValueOutOfBounds,
             CommonCheckErrorKind::EmptyTuplesNotAllowed => {
-                RuntimeCheckErrorKind::EmptyTuplesNotAllowed
+                RuntimeCheckErrorKind::ExpectsAcceptable("Empty tuples not allowed".to_string())
             }
             CommonCheckErrorKind::NameAlreadyUsed(name) => {
                 RuntimeCheckErrorKind::NameAlreadyUsed(name)

@@ -714,7 +714,10 @@ mod test {
     #[apply(test_clarity_versions)]
     fn test_construction(#[case] version: ClarityVersion, #[case] epoch: StacksEpochId) {
         let bad_type_descriptions = [
-            ("(tuple)", EmptyTuplesNotAllowed),
+            (
+                "(tuple)",
+                ExpectsAcceptable("Empty tuples not allowed".to_string()),
+            ),
             (
                 "(list int int)",
                 ExpectsAcceptable("Invalid type description".into()),
