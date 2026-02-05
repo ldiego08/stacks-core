@@ -115,10 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        BadMintFTArguments => Unreachable_Functionally(
-            "`check_special_mint_token` requires a `(uint, principal)`
-             argument tuple for fungible minting before deployment, so the runtime
-             never raises `BadMintFTArguments`"),
         BadBurnFTArguments => Unreachable_Functionally(
             "`check_special_burn_token` enforces `(uint, principal)`
              during static analysis, making the runtime variant unobservable."),

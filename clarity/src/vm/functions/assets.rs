@@ -380,7 +380,7 @@ pub fn special_mint_token(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadMintFTArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad mint FT args".to_string()).into())
     }
 }
 
