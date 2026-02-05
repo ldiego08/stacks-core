@@ -636,10 +636,6 @@ pub enum RuntimeCheckErrorKind {
     /// Could not determine the type of an expression during analysis.
     CouldNotDetermineType,
 
-    // Transfer and asset operation errors
-    /// Invalid arguments provided to a fungible token burn function.
-    BadBurnFTArguments,
-
     // Tuples
     /// Expected a tuple type but found a different type.
     /// The `Box<TypeSignature>` wraps the actual type provided.

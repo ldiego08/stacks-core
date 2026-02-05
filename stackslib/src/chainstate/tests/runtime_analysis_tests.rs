@@ -115,9 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        BadBurnFTArguments => Unreachable_Functionally(
-            "`check_special_burn_token` enforces `(uint, principal)`
-             during static analysis, making the runtime variant unobservable."),
         ExpectedTuple(_) => Unreachable_Functionally(
             "`check_special_get`/`check_special_merge` ensure every
              `(get …)`/`(merge …)` argument is statically typed as a tuple (or

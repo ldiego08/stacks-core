@@ -1057,7 +1057,7 @@ pub fn special_burn_token(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadBurnFTArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad burn FT args".to_string()).into())
     }
 }
 
