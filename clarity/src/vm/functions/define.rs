@@ -137,9 +137,12 @@ fn handle_define_function(
     env: &mut Environment,
     define_type: DefineType,
 ) -> Result<DefineResult, VmExecutionError> {
-    let (function_symbol, arg_symbols) = signature
-        .split_first()
-        .ok_or(RuntimeCheckErrorKind::DefineFunctionBadSignature)?;
+    let (function_symbol, arg_symbols) =
+        signature
+            .split_first()
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Define function bad signature".to_string(),
+            ))?;
 
     let function_name =
         function_symbol

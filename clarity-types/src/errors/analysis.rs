@@ -651,8 +651,6 @@ pub enum RuntimeCheckErrorKind {
     NoSuchMap(String),
 
     // Defines
-    /// Invalid or malformed signature in a function definition.
-    DefineFunctionBadSignature,
     /// Function name is invalid or violates naming rules.
     BadFunctionName,
     /// Public function must return a response type, but found a different type.
@@ -1190,7 +1188,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string())
             }
             CommonCheckErrorKind::DefineFunctionBadSignature => {
-                RuntimeCheckErrorKind::DefineFunctionBadSignature
+                RuntimeCheckErrorKind::ExpectsAcceptable(
+                    "Define function bad signature".to_string(),
+                )
             }
             CommonCheckErrorKind::ExpectedTraitIdentifier => {
                 RuntimeCheckErrorKind::ExpectedTraitIdentifier

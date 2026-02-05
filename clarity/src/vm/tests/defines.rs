@@ -280,7 +280,8 @@ fn test_variable_shadowing() {
 #[test]
 fn test_define_parse_panic() {
     let tests = "(define-private () 1)";
-    let expected = RuntimeCheckErrorKind::DefineFunctionBadSignature;
+    let expected =
+        RuntimeCheckErrorKind::ExpectsAcceptable("Define function bad signature".to_string());
     assert_eq_err(expected, execute(tests).unwrap_err());
 }
 
