@@ -119,7 +119,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         CircularReference(_) => Tested(vec![runtime_check_error_kind_circular_reference_ccall]), // Possible only during contract call. On contract deploy checked during parsing.
         NoSuchContract(_) => Tested(vec![runtime_check_error_kind_no_such_contract_ccall]),
         NoSuchPublicFunction(_, _) => Tested(vec![runtime_check_error_kind_no_such_public_function_ccall]),
-        PublicFunctionNotReadOnly(_, _) => Unreachable_Functionally("Environment::inner_execute_contract is invoked with read_only = false on the relevant code path, causing PublicFunctionNotReadOnly check to be skipped."),
         ContractCallExpectName => Tested(vec![
             runtime_check_error_kind_contract_call_expect_name_cdeploy,
             runtime_check_error_kind_contract_call_expect_name_ccall

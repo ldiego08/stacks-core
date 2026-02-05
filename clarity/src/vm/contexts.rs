@@ -1170,7 +1170,7 @@ impl<'a, 'b, 'hooks> Environment<'a, 'b, 'hooks> {
             if !allow_private && !func.is_public() {
                 return Err(RuntimeCheckErrorKind::NoSuchPublicFunction(contract_identifier.to_string(), tx_name.to_string()).into());
             } else if read_only && !func.is_read_only() {
-                return Err(RuntimeCheckErrorKind::PublicFunctionNotReadOnly(contract_identifier.to_string(), tx_name.to_string()).into());
+                return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!("Public function not read-only: {contract_identifier} {tx_name}")).into());
             }
 
             let args: Result<Vec<Value>, VmExecutionError> = args.iter()

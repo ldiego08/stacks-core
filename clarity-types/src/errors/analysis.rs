@@ -652,9 +652,6 @@ pub enum RuntimeCheckErrorKind {
     /// Referenced public function does not exist in the specified contract.
     /// The first `String` wraps the contract name, and the second wraps the function name.
     NoSuchPublicFunction(String, String),
-    /// Public function is not read-only when expected to be.
-    /// The first `String` wraps the contract name, and the second wraps the function name.
-    PublicFunctionNotReadOnly(String, String),
     /// Expected a contract name in a `contract-call?` expression but found an invalid token.
     ContractCallExpectName,
 
