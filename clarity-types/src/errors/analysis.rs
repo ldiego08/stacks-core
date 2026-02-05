@@ -637,8 +637,6 @@ pub enum RuntimeCheckErrorKind {
     CouldNotDetermineType,
 
     // Assets
-    /// Expected a token name as an argument but found an invalid token.
-    BadTokenName,
     /// Referenced non-fungible token (NFT) does not exist.
     /// The `String` wraps the non-existent token name.
     NoSuchNFT(String),

@@ -328,7 +328,9 @@ pub fn special_mint_token(
 
     let token_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let amount = eval(&args[1], env, context)?;
     let to = eval(&args[2], env, context)?;
@@ -393,7 +395,9 @@ pub fn special_mint_asset_v200(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let to = eval(&args[2], env, context)?;
@@ -471,7 +475,9 @@ pub fn special_mint_asset_v205(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let to = eval(&args[2], env, context)?;
@@ -546,7 +552,9 @@ pub fn special_transfer_asset_v200(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let from = eval(&args[2], env, context)?;
@@ -643,7 +651,9 @@ pub fn special_transfer_asset_v205(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let from = eval(&args[2], env, context)?;
@@ -739,7 +749,9 @@ pub fn special_transfer_token(
 
     let token_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let amount = eval(&args[1], env, context)?;
     let from = eval(&args[2], env, context)?;
@@ -844,7 +856,9 @@ pub fn special_get_balance(
 
     let token_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let owner = eval(&args[1], env, context)?;
 
@@ -880,7 +894,9 @@ pub fn special_get_owner_v200(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
 
@@ -930,7 +946,9 @@ pub fn special_get_owner_v205(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
 
@@ -979,7 +997,9 @@ pub fn special_get_token_supply(
 
     let token_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let supply = env
         .global_context
@@ -999,7 +1019,9 @@ pub fn special_burn_token(
 
     let token_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let amount = eval(&args[1], env, context)?;
     let from = eval(&args[2], env, context)?;
@@ -1068,7 +1090,9 @@ pub fn special_burn_asset_v200(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let sender = eval(&args[2], env, context)?;
@@ -1160,7 +1184,9 @@ pub fn special_burn_asset_v205(
 
     let asset_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadTokenName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad token name".to_string(),
+        ))?;
 
     let asset = eval(&args[1], env, context)?;
     let sender = eval(&args[2], env, context)?;

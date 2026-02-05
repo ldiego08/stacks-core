@@ -115,8 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        BadTokenName => Unreachable_Functionally(
-            "Asset natives call `match_atom()` on their token arg during analysis."),
         NoSuchNFT(_) => Unreachable_Functionally(
             "Analysis uses contract_context.get_nft_type during every nft-* checker,
              so a reference to an undefined NFT aborts before initialization"),
