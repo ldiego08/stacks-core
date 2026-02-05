@@ -1528,7 +1528,11 @@ fn test_option_destructs() {
         ),
         Ok(Value::Bool(true)),
         Err(RuntimeCheckErrorKind::IncorrectArgumentCount(1, 2).into()),
-        Err(RuntimeCheckErrorKind::ExpectedOptionalOrResponseValue(Box::new(Value::Int(1))).into()),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected optional or response value: {}",
+            Value::Int(1)
+        ))
+        .into()),
     ];
 
     for (program, expectation) in tests.iter().zip(expectations.iter()) {

@@ -110,12 +110,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_union_type_value_error_cdeploy,
             runtime_check_error_kind_union_type_value_error_ccall
         ]),
-        ExpectedOptionalOrResponseValue(_) => Unreachable_Functionally(
-            "The mixed helpers (`match`, `try!`, `unwrap!`, `unwrap-err!`) ultimately
-             delegate to `check_special_match` and `inner_unwrap` in the analyzer, which enforces
-             that the argument is either an optional or a response before the code is accepted.
-             There is no runtime path where a plain value reaches `native_try_ret` or the
-             option/response matchers"),
         ExpectedContractPrincipalValue(_) => Tested(vec![
             runtime_check_error_kind_expected_contract_principal_value_cdeploy,
             runtime_check_error_kind_expected_contract_principal_value_ccall

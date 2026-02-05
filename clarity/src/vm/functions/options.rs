@@ -36,9 +36,10 @@ fn inner_unwrap(to_unwrap: Value) -> Result<Option<Value>, VmExecutionError> {
             }
         }
         _ => {
-            return Err(
-                RuntimeCheckErrorKind::ExpectedOptionalOrResponseValue(Box::new(to_unwrap)).into(),
-            );
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected optional or response value: {to_unwrap}"
+            ))
+            .into());
         }
     };
 
@@ -111,7 +112,10 @@ pub fn native_try_ret(input: Value) -> Result<Value, VmExecutionError> {
                 Err(EarlyReturnError::UnwrapFailed(Box::new(short_return_val)).into())
             }
         }
-        _ => Err(RuntimeCheckErrorKind::ExpectedOptionalOrResponseValue(Box::new(input)).into()),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected optional or response value: {input}"
+        ))
+        .into()),
     }
 }
 

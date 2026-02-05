@@ -133,7 +133,10 @@ fn test_unwrap_ret() {
         execute(test1).unwrap_err(),
     );
     assert_eq_err(
-        RuntimeCheckErrorKind::ExpectedOptionalOrResponseValue(Box::new(Value::Int(1))),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected optional or response value: {}",
+            Value::Int(1)
+        )),
         execute(test2).unwrap_err(),
     );
     assert_eq_err(
