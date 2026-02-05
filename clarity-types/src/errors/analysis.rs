@@ -651,8 +651,6 @@ pub enum RuntimeCheckErrorKind {
     NoSuchMap(String),
 
     // Defines
-    /// Function name is invalid or violates naming rules.
-    BadFunctionName,
     /// Public function must return a response type, but found a different type.
     /// The `Box<TypeSignature>` wraps the actual return type.
     PublicFunctionMustReturnResponse(Box<TypeSignature>),

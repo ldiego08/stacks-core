@@ -232,7 +232,7 @@ fn test_bad_variables() {
     assert_eq_err(expected, execute(test1).unwrap_err());
 
     let test2 = "((lambda (x y) 1) 2 1)";
-    let expected = RuntimeCheckErrorKind::BadFunctionName;
+    let expected = RuntimeCheckErrorKind::ExpectsAcceptable("Bad function name".to_string());
     assert_eq_err(expected, execute(test2).unwrap_err());
 
     let test4 = "()";

@@ -102,7 +102,9 @@ fn eval_allowance(
         .ok_or(RuntimeCheckErrorKind::NonFunctionApplication)?;
     let name = name_expr
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::BadFunctionName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad function name".to_string(),
+        ))?;
     let Some(ref native_function) = NativeFunctions::lookup_by_name_at_version(
         name,
         env.contract_context.get_clarity_version(),
