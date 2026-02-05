@@ -1338,9 +1338,9 @@ impl<'a, 'b, 'hooks> Environment<'a, 'b, 'hooks> {
                 .database
                 .has_contract(&contract_identifier)
             {
-                return Err(RuntimeCheckErrorKind::ContractAlreadyExists(
-                    contract_identifier.to_string(),
-                )
+                return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Contract already exists: {contract_identifier}"
+                ))
                 .into());
             }
 
@@ -2503,9 +2503,11 @@ mod test {
             .initialize_contract_from_ast(contract_id.clone(), version, &ast, contract_src)
             .unwrap_err();
 
-        assert!(matches!(
+        assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ContractAlreadyExists(_))
-        ));
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Contract already exists: S1G2081040G2081040G2081040G208105NK8PE5.dup".to_string()
+            ))
+        );
     }
 }

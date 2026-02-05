@@ -120,10 +120,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         NoSuchContract(_) => Tested(vec![runtime_check_error_kind_no_such_contract_ccall]),
         NoSuchPublicFunction(_, _) => Tested(vec![runtime_check_error_kind_no_such_public_function_ccall]),
         PublicFunctionNotReadOnly(_, _) => Unreachable_Functionally("Environment::inner_execute_contract is invoked with read_only = false on the relevant code path, causing PublicFunctionNotReadOnly check to be skipped."),
-        ContractAlreadyExists(_) => Unreachable_Functionally(
-            "Contracts can only be created via SmartContract deployment transactions. \
-             The runtime never performs contract installation or replacement.",
-        ),
         ContractCallExpectName => Tested(vec![
             runtime_check_error_kind_contract_call_expect_name_cdeploy,
             runtime_check_error_kind_contract_call_expect_name_ccall

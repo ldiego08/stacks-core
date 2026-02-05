@@ -655,9 +655,6 @@ pub enum RuntimeCheckErrorKind {
     /// Public function is not read-only when expected to be.
     /// The first `String` wraps the contract name, and the second wraps the function name.
     PublicFunctionNotReadOnly(String, String),
-    /// Attempt to define a contract with a name that already exists.
-    /// The `String` wraps the conflicting contract name.
-    ContractAlreadyExists(String),
     /// Expected a contract name in a `contract-call?` expression but found an invalid token.
     ContractCallExpectName,
 
