@@ -829,7 +829,7 @@ pub fn special_transfer_token(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferFTArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer FT args".to_string()).into())
     }
 }
 

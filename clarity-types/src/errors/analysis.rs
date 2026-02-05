@@ -637,8 +637,6 @@ pub enum RuntimeCheckErrorKind {
     CouldNotDetermineType,
 
     // Transfer and asset operation errors
-    /// Invalid arguments provided to a fungible token transfer function.
-    BadTransferFTArguments,
     /// Invalid arguments provided to a non-fungible token transfer function.
     BadTransferNFTArguments,
     /// Invalid arguments provided to a fungible token mint function.
