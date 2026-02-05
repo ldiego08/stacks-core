@@ -651,9 +651,6 @@ pub enum RuntimeCheckErrorKind {
     NoSuchMap(String),
 
     // Defines
-    /// Public function must return a response type, but found a different type.
-    /// The `Box<TypeSignature>` wraps the actual return type.
-    PublicFunctionMustReturnResponse(Box<TypeSignature>),
     /// Return types of function branches do not match the expected type.
     /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.
     ReturnTypesMustMatch(Box<TypeSignature>, Box<TypeSignature>),

@@ -1876,12 +1876,11 @@ impl<'a, 'hooks> GlobalContext<'a, 'hooks> {
                 self.commit()?;
                 Ok(result)
             } else {
-                Err(
-                    RuntimeCheckErrorKind::PublicFunctionMustReturnResponse(Box::new(
-                        TypeSignature::type_of(&result)?,
-                    ))
-                    .into(),
-                )
+                Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Public function must return response: {}",
+                    TypeSignature::type_of(&result)?
+                ))
+                .into())
             }
         } else {
             self.roll_back()?;
