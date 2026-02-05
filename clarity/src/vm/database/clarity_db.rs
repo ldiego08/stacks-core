@@ -1537,8 +1537,12 @@ impl ClarityDatabase<'_> {
     ) -> Result<DataVariableMetadata, VmExecutionError> {
         let key = ClarityDatabase::make_metadata_key(StoreType::VariableMeta, variable_name);
 
-        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?
-            .ok_or(RuntimeCheckErrorKind::NoSuchDataVariable(variable_name.to_string()).into())
+        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?.ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "No such data variable: {variable_name}"
+            ))
+            .into(),
+        )
     }
 
     #[cfg(any(test, feature = "testing"))]

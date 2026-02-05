@@ -1668,7 +1668,8 @@ fn test_bad_lets() {
         RuntimeCheckErrorKind::NameAlreadyUsed("tx-sender".to_string()).into(),
         RuntimeCheckErrorKind::NameAlreadyUsed("*".to_string()).into(),
         RuntimeCheckErrorKind::NameAlreadyUsed("a".to_string()).into(),
-        RuntimeCheckErrorKind::NoSuchDataVariable("cursor".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("No such data variable: cursor".to_string())
+            .into(),
         RuntimeCheckErrorKind::NameAlreadyUsed("true".to_string()).into(),
         RuntimeCheckErrorKind::NameAlreadyUsed("false".to_string()).into(),
     ];

@@ -249,7 +249,7 @@ pub fn special_fetch_variable_v200(
     let contract = &env.contract_context.contract_identifier;
 
     let data_types = env.contract_context.meta_data_var.get(var_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchDataVariable(var_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such data variable: {var_name}")),
     )?;
 
     runtime_cost(
@@ -282,7 +282,7 @@ pub fn special_fetch_variable_v205(
     let contract = &env.contract_context.contract_identifier;
 
     let data_types = env.contract_context.meta_data_var.get(var_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchDataVariable(var_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such data variable: {var_name}")),
     )?;
 
     let epoch = *env.epoch();
@@ -323,7 +323,7 @@ pub fn special_set_variable_v200(
     let contract = &env.contract_context.contract_identifier;
 
     let data_types = env.contract_context.meta_data_var.get(var_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchDataVariable(var_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such data variable: {var_name}")),
     )?;
 
     runtime_cost(
@@ -365,7 +365,7 @@ pub fn special_set_variable_v205(
     let contract = &env.contract_context.contract_identifier;
 
     let data_types = env.contract_context.meta_data_var.get(var_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchDataVariable(var_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such data variable: {var_name}")),
     )?;
 
     let epoch = *env.epoch();
