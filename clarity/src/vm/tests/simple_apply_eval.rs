@@ -1306,15 +1306,15 @@ fn test_stx_ops_errors() {
 
     let expectations: &[ClarityEvalError] = &[
         RuntimeCheckErrorKind::IncorrectArgumentCount(3, 2).into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(4, 3).into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
         RuntimeCheckErrorKind::IncorrectArgumentCount(2, 1).into(),
-        RuntimeCheckErrorKind::BadTransferSTXArguments.into(),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into(),
     ];
 
     for (program, expectation) in tests.iter().zip(expectations.iter()) {

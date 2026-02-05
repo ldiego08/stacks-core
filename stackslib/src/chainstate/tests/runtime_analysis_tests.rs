@@ -115,12 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        BadTransferSTXArguments => Unreachable_Functionally(
-            "The analyzer routes all `stx-transfer?`, `stx-transfer-memo?`, and `stx-burn?`
-             calls through `check_special_stx_transfer` / `check_special_stx_burn`
-             which demand a `(uint, principal, principal)` signature before a contract
-             can be published. Because the runtime caches only sanitized values,
-             `special_stx_transfer` never receives a malformed value at runtime."),
         BadTransferFTArguments => Unreachable_Functionally(
             "`check_special_transfer_token` enforces the `(uint, principal, principal)`
             argument contract for every FT transfer during analysis, so `special_transfer_token`

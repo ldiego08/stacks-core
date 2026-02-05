@@ -181,7 +181,7 @@ pub fn special_stx_transfer(
     {
         stx_transfer_consolidated(env, from, to, amount, memo)
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferSTXArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into())
     }
 }
 
@@ -207,7 +207,7 @@ pub fn special_stx_transfer_memo(
     {
         stx_transfer_consolidated(env, from, to, amount, memo)
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferSTXArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into())
     }
 }
 
@@ -313,7 +313,7 @@ pub fn special_stx_burn(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferSTXArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer STX args".to_string()).into())
     }
 }
 
@@ -340,11 +340,9 @@ pub fn special_mint_token(
             return clarity_ecode!(MintTokenErrorCodes::NON_POSITIVE_AMOUNT);
         }
 
-        let ft_info = env
-            .contract_context
-            .meta_ft
-            .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
+        let ft_info = env.contract_context.meta_ft.get(token_name).ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")),
+        )?;
 
         env.global_context.database.checked_increase_token_supply(
             &env.contract_context.contract_identifier,
@@ -763,11 +761,9 @@ pub fn special_transfer_token(
             return clarity_ecode!(TransferTokenErrorCodes::SENDER_IS_RECIPIENT);
         }
 
-        let ft_info = env
-            .contract_context
-            .meta_ft
-            .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
+        let ft_info = env.contract_context.meta_ft.get(token_name).ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")),
+        )?;
 
         let from_bal = env.global_context.database.get_ft_balance(
             &env.contract_context.contract_identifier,
@@ -855,11 +851,9 @@ pub fn special_get_balance(
     let owner = eval(&args[1], env, context)?;
 
     if let Value::Principal(ref principal) = owner {
-        let ft_info = env
-            .contract_context
-            .meta_ft
-            .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
+        let ft_info = env.contract_context.meta_ft.get(token_name).ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")),
+        )?;
 
         let balance = env.global_context.database.get_ft_balance(
             &env.contract_context.contract_identifier,
