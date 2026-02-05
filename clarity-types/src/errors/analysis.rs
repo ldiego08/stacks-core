@@ -656,9 +656,6 @@ pub enum RuntimeCheckErrorKind {
     ContractCallExpectName,
 
     // get-block-info? errors
-    /// Referenced Stacks block info property does not exist.
-    /// The `String` wraps the non-existent property name.
-    NoSuchStacksBlockInfoProperty(String),
     /// Expected a block info property name but found an invalid token.
     GetBlockInfoExpectPropertyName,
     /// Expected a Stacks block info property name but found an invalid token.

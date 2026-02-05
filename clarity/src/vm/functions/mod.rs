@@ -1201,8 +1201,8 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::NoSuchStacksBlockInfoProperty(
-                "not-a-valid-stacks-prop".to_string()
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "No such stacks block info property: not-a-valid-stacks-prop".to_string()
             ))
         );
     }

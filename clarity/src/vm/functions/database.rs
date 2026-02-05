@@ -1054,7 +1054,9 @@ pub fn special_get_stacks_block_info(
         .ok_or(RuntimeCheckErrorKind::GetStacksBlockInfoExpectPropertyName)?;
 
     let block_info_prop = StacksBlockInfoProperty::lookup_by_name(property_name).ok_or(
-        RuntimeCheckErrorKind::NoSuchStacksBlockInfoProperty(property_name.to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "No such stacks block info property: {property_name}"
+        )),
     )?;
 
     // Handle the block-height input arg.
