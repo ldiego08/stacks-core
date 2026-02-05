@@ -18,9 +18,7 @@ use clarity_types::errors::ClarityTypeError;
 use crate::vm::errors::{
     ClarityEvalError, EarlyReturnError, RuntimeCheckErrorKind, SyntaxBindingError, VmExecutionError,
 };
-use crate::vm::types::{
-    ListData, SequenceData, TupleData, TupleTypeSignature, TypeSignature, Value,
-};
+use crate::vm::types::{ListData, SequenceData, TupleData, Value};
 use crate::vm::{ClarityName, execute};
 
 fn assert_executes(expected: Result<Value, ClarityTypeError>, input: &str) {
@@ -682,10 +680,7 @@ fn bad_tuples() {
         RuntimeCheckErrorKind::NameAlreadyUsed("name".into()),
         RuntimeCheckErrorKind::BadSyntaxBinding(SyntaxBindingError::tuple_cons_not_list(0)),
         RuntimeCheckErrorKind::BadSyntaxBinding(SyntaxBindingError::tuple_cons_invalid_length(1)),
-        RuntimeCheckErrorKind::NoSuchTupleField(
-            "value".into(),
-            TupleTypeSignature::try_from(vec![("name".into(), TypeSignature::IntType)]).unwrap(),
-        ),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Unexpected error type during runtime analysis: NoSuchTupleField(\"value\", TupleTypeSignature { \"name\": int,})".to_string()),
         RuntimeCheckErrorKind::IncorrectArgumentCount(2, 3),
         RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
     ];

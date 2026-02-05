@@ -115,9 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        NoSuchTupleField(_, _) => Unreachable_Functionally(
-            "`check_special_get` verifies tuple field existence for every `(get …)`
-             during static analysis, so `tuple_get` never receives a missing field"),
         DefineFunctionBadSignature | BadFunctionName | PublicFunctionMustReturnResponse(_) => Unreachable_Functionally(
             "On contract deploy checked during static analysis."),
         EmptyTuplesNotAllowed | NoSuchMap(_) => Unreachable_Functionally(

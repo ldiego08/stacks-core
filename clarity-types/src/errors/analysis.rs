@@ -637,9 +637,6 @@ pub enum RuntimeCheckErrorKind {
     CouldNotDetermineType,
 
     // Tuples
-    /// Referenced tuple field does not exist in the tuple type.
-    /// The `String` wraps the requested field name, and the `TupleTypeSignature` wraps the tuple’s type.
-    NoSuchTupleField(String, TupleTypeSignature),
     /// Empty tuple is not allowed in Clarity.
     EmptyTuplesNotAllowed,
 
@@ -945,9 +942,6 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             ClarityTypeError::TypeSignatureTooDeep => Self::TypeSignatureTooDeep,
             ClarityTypeError::ValueOutOfBounds => Self::ValueOutOfBounds,
             ClarityTypeError::DuplicateTupleField(name) => Self::NameAlreadyUsed(name),
-            ClarityTypeError::NoSuchTupleField(field, tuple_sig) => {
-                Self::NoSuchTupleField(field, tuple_sig)
-            }
             ClarityTypeError::TypeMismatchValue(ty, value) => Self::TypeValueError(ty, value),
             ClarityTypeError::TypeMismatch(expected, found) => Self::TypeError(expected, found),
             ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
@@ -966,6 +960,7 @@ impl From<ClarityTypeError> for RuntimeCheckErrorKind {
             | ClarityTypeError::InvalidPrincipalEncoding(_)
             | ClarityTypeError::InvalidPrincipalLength(_)
             | ClarityTypeError::InvalidTypeDescription
+            | ClarityTypeError::NoSuchTupleField(_, _)
             | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
                 "Unexpected error type during runtime analysis: {err}"
             )),
