@@ -628,7 +628,7 @@ pub fn special_transfer_asset_v200(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferNFTArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer NFT args".to_string()).into())
     }
 }
 
@@ -724,7 +724,7 @@ pub fn special_transfer_asset_v205(
 
         Ok(Value::okay_true())
     } else {
-        Err(RuntimeCheckErrorKind::BadTransferNFTArguments.into())
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable("Bad transfer NFT args".to_string()).into())
     }
 }
 

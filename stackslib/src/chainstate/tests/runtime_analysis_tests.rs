@@ -115,10 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        BadTransferNFTArguments => Unreachable_Functionally(
-            "`check_special_transfer_asset` ensures that the NFT
-            identifier plus `(principal, principal)` pair have the right types,
-            preventing `special_transfer_asset` from failing at runtime."),
         BadMintFTArguments => Unreachable_Functionally(
             "`check_special_mint_token` requires a `(uint, principal)`
              argument tuple for fungible minting before deployment, so the runtime
