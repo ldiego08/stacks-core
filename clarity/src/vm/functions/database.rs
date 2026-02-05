@@ -403,11 +403,9 @@ pub fn special_fetch_entry_v200(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     runtime_cost(
         ClarityCostFunction::FetchEntry,
@@ -440,11 +438,9 @@ pub fn special_fetch_entry_v205(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     let epoch = *env.epoch();
     let result = env
@@ -518,11 +514,9 @@ pub fn special_set_entry_v200(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     runtime_cost(
         ClarityCostFunction::SetEntry,
@@ -565,11 +559,9 @@ pub fn special_set_entry_v205(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     let epoch = *env.epoch();
     let result = env
@@ -612,11 +604,9 @@ pub fn special_insert_entry_v200(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     runtime_cost(
         ClarityCostFunction::SetEntry,
@@ -660,11 +650,9 @@ pub fn special_insert_entry_v205(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     let epoch = *env.epoch();
     let result = env
@@ -705,11 +693,9 @@ pub fn special_delete_entry_v200(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     runtime_cost(
         ClarityCostFunction::SetEntry,
@@ -749,11 +735,9 @@ pub fn special_delete_entry_v205(
 
     let contract = &env.contract_context.contract_identifier;
 
-    let data_types = env
-        .contract_context
-        .meta_data_map
-        .get(map_name)
-        .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()))?;
+    let data_types = env.contract_context.meta_data_map.get(map_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")),
+    )?;
 
     let epoch = *env.epoch();
     let result = env

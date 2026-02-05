@@ -641,11 +641,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `String` wraps the non-existent variable name.
     NoSuchDataVariable(String),
 
-    // Data map
-    /// Referenced data map does not exist in scope.
-    /// The `String` wraps the non-existent map name.
-    NoSuchMap(String),
-
     // Defines
     /// Return types of function branches do not match the expected type.
     /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.

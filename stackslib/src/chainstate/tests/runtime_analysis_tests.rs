@@ -115,8 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        NoSuchMap(_) => Unreachable_Functionally(
-            "On contract deploy checked during static analysis. (At runtime, just used for loading cost functions on block begin)"),
         NoSuchDataVariable(_) => Unreachable_Functionally(
             "On contract deploy checked during static analysis. (At runtime, just used for loading cost functions on block begin and for handle prepare phase)"),
         ReturnTypesMustMatch(_, _) => Tested(vec![runtime_check_error_kind_return_types_must_match_ccall]),

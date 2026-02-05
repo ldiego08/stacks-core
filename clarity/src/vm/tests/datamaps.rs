@@ -476,7 +476,8 @@ fn datamap_errors() {
     for program in tests.iter() {
         assert_eq!(
             execute(program).unwrap_err(),
-            RuntimeCheckErrorKind::NoSuchMap("non-existent".to_string()).into()
+            RuntimeCheckErrorKind::ExpectsAcceptable("No such map: non-existent".to_string())
+                .into()
         );
     }
 }

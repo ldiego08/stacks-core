@@ -1678,8 +1678,9 @@ impl ClarityDatabase<'_> {
     ) -> Result<DataMapMetadata, VmExecutionError> {
         let key = ClarityDatabase::make_metadata_key(StoreType::DataMapMeta, map_name);
 
-        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?
-            .ok_or(RuntimeCheckErrorKind::NoSuchMap(map_name.to_string()).into())
+        map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?.ok_or(
+            RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such map: {map_name}")).into(),
+        )
     }
 
     pub fn make_key_for_data_map_entry(
