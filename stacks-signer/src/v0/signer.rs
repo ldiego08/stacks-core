@@ -676,6 +676,13 @@ impl Signer {
                         // We have already globally accepted this block. Do nothing.
                         return;
                     }
+                    info!(
+                        "{self}: Received a new block event.";
+                        "block_id" => %block_id,
+                        "signer_signature_hash" => %signer_sighash,
+                        "consensus_hash" => %consensus_hash,
+                        "block_height" => block_height,
+                    );
                     if let Err(e) = self.signer_db.mark_block_globally_accepted(&mut block_info) {
                         warn!("{self}: Failed to mark block as globally accepted: {e:?}");
                         return;
