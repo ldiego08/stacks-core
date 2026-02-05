@@ -656,8 +656,6 @@ pub enum RuntimeCheckErrorKind {
     ContractCallExpectName,
 
     // get-block-info? errors
-    /// Expected a Stacks block info property name but found an invalid token.
-    GetStacksBlockInfoExpectPropertyName,
     /// Expected a tenure info property name but found an invalid token.
     GetTenureInfoExpectPropertyName,
 

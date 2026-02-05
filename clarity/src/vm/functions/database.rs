@@ -1038,8 +1038,8 @@ pub fn special_get_burn_block_info(
 ///
 /// # Errors:
 /// - [`RuntimeCheckErrorKind::IncorrectArgumentCount`] if there aren't 2 arguments.
-/// - [`RuntimeCheckErrorKind::GetStacksBlockInfoExpectPropertyName`] if `args[0]` isn't a ClarityName.
-/// - [`RuntimeCheckErrorKind::NoSuchStacksBlockInfoProperty`] if `args[0]` isn't a [`StacksBlockInfoProperty`].
+/// - [`RuntimeCheckErrorKind::ExpectsAcceptable`] if `args[0]` isn't a ClarityName.
+/// - [`RuntimeCheckErrorKind::ExpectsAcceptable`] if `args[0]` isn't a [`StacksBlockInfoProperty`].
 /// - [`RuntimeCheckErrorKind::TypeValueError`] if `args[1]` doesn't evaluate to a `uint`.
 /// - [`RuntimeCheckErrorKind`] cost errors (e.g., `CostOverflow`, `CostBalanceExceeded`) from [`runtime_cost`].
 /// - [`VmExecutionError`] propagated from [`eval`] when evaluating `args[1]`.
@@ -1057,7 +1057,9 @@ pub fn special_get_stacks_block_info(
     // Handle the block property name input arg.
     let property_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::GetStacksBlockInfoExpectPropertyName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get stacks block info expect property name".to_string(),
+        ))?;
 
     let block_info_prop = StacksBlockInfoProperty::lookup_by_name(property_name).ok_or(
         RuntimeCheckErrorKind::ExpectsAcceptable(format!(

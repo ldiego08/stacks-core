@@ -1066,7 +1066,7 @@ mod test {
     }
 
     /// If we bypass static analysis and pass a non-atom as the property name to `get-burn-block-info?`,
-    /// the runtime returns `GetBlockInfoExpectPropertyName`.
+    /// the runtime returns `ExpectsAcceptable`.
     #[apply(test_clarity_versions)]
     fn special_get_burn_block_info_expected_property_name(
         #[case] version: ClarityVersion,
@@ -1115,7 +1115,7 @@ mod test {
     }
 
     /// If we bypass static analysis and pass a non-atom to `get-stacks-block-info?`,
-    /// the runtime returns `GetStacksBlockInfoExpectPropertyName`.
+    /// the runtime returns `ExpectsAcceptable`.
     #[apply(test_clarity_versions)]
     fn special_get_stacks_block_info_expect_property_name_non_atom(
         #[case] version: ClarityVersion,
@@ -1155,14 +1155,14 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(
-                RuntimeCheckErrorKind::GetStacksBlockInfoExpectPropertyName
-            )
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Get stacks block info expect property name".to_string()
+            ))
         );
     }
 
     /// If we bypass static analysis and pass an atom for a non existing property to `get-stacks-block-info?`,
-    /// the runtime returns `NoSuchStacksBlockInfoProperty`.
+    /// the runtime returns `ExpectsAcceptable`.
     #[apply(test_clarity_versions)]
     fn special_get_stacks_block_info_no_such_property(
         #[case] version: ClarityVersion,
@@ -1210,7 +1210,7 @@ mod test {
     }
 
     /// If we bypass static analysis and pass an atom for a non existing property to `get-burn-block-info?`,
-    /// the runtime returns `NoSuchBurnBlockInfoProperty`.
+    /// the runtime returns `ExpectsAcceptable`.
     #[apply(test_clarity_versions)]
     fn special_get_burn_block_info_no_such_property(
         #[case] version: ClarityVersion,

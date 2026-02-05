@@ -123,10 +123,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_contract_call_expect_name_cdeploy,
             runtime_check_error_kind_contract_call_expect_name_ccall
         ]),
-        GetStacksBlockInfoExpectPropertyName => Unreachable_Functionally(
-            "`get-stacks-block-info?` requires a literal property name; \
-             non-atom arguments are rejected during static analysis.",
-        ),
         GetTenureInfoExpectPropertyName => Unreachable_Functionally(
             "`get-tenure-info?` requires a literal property name; \
              non-atom arguments are rejected during static analysis.",
