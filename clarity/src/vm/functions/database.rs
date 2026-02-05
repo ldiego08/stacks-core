@@ -790,12 +790,16 @@ pub fn special_get_block_info(
     // Handle the block property name input arg.
     let property_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::GetBlockInfoExpectPropertyName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get block info expect property name".to_string(),
+        ))?;
 
     let version = env.contract_context.get_clarity_version();
 
     let block_info_prop = BlockInfoProperty::lookup_by_name_at_version(property_name, version)
-        .ok_or(RuntimeCheckErrorKind::GetBlockInfoExpectPropertyName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get block info expect property name".to_string(),
+        ))?;
 
     // Handle the block-height input arg clause.
     let height_eval = eval(&args[1], env, context)?;
@@ -944,7 +948,9 @@ pub fn special_get_burn_block_info(
     // Handle the block property name input arg.
     let property_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::GetBlockInfoExpectPropertyName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get block info expect property name".to_string(),
+        ))?;
 
     let block_info_prop = BurnBlockInfoProperty::lookup_by_name(property_name).ok_or(
         RuntimeCheckErrorKind::ExpectsAcceptable(format!(

@@ -1108,7 +1108,9 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::GetBlockInfoExpectPropertyName)
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Get block info expect property name".to_string()
+            ))
         );
     }
 
