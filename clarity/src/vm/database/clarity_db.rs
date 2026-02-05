@@ -2043,7 +2043,7 @@ impl ClarityDatabase<'_> {
         let key = ClarityDatabase::make_metadata_key(StoreType::FungibleTokenMeta, token_name);
 
         map_no_contract_as_none(self.fetch_metadata(contract_identifier, &key))?
-            .ok_or(RuntimeCheckErrorKind::NoSuchFT(token_name.to_string()).into())
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")).into())
     }
 
     pub fn create_non_fungible_token(

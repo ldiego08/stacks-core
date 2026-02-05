@@ -636,11 +636,6 @@ pub enum RuntimeCheckErrorKind {
     /// Could not determine the type of an expression during analysis.
     CouldNotDetermineType,
 
-    // Assets
-    /// Referenced fungible token (FT) does not exist.
-    /// The `String` wraps the non-existent token name.
-    NoSuchFT(String),
-
     // Transfer and asset operation errors
     /// Invalid arguments provided to a `stx-transfer?` function.
     BadTransferSTXArguments,

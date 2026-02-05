@@ -115,9 +115,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_expected_contract_principal_value_ccall
         ]),
         CouldNotDetermineType => Tested(vec![runtime_check_error_kind_could_not_determine_type_ccall]),
-        NoSuchFT(_) => Unreachable_Functionally(
-            "ft-* analyzers call contract_context.ft_exists, preventing undefined
-             fungible tokens from ever reaching the runtime handlers."),
         BadTransferSTXArguments => Unreachable_Functionally(
             "The analyzer routes all `stx-transfer?`, `stx-transfer-memo?`, and `stx-burn?`
              calls through `check_special_stx_transfer` / `check_special_stx_burn`

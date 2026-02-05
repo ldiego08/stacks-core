@@ -344,7 +344,7 @@ pub fn special_mint_token(
             .contract_context
             .meta_ft
             .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::NoSuchFT(token_name.to_string()))?;
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
 
         env.global_context.database.checked_increase_token_supply(
             &env.contract_context.contract_identifier,
@@ -767,7 +767,7 @@ pub fn special_transfer_token(
             .contract_context
             .meta_ft
             .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::NoSuchFT(token_name.to_string()))?;
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
 
         let from_bal = env.global_context.database.get_ft_balance(
             &env.contract_context.contract_identifier,
@@ -859,7 +859,7 @@ pub fn special_get_balance(
             .contract_context
             .meta_ft
             .get(token_name)
-            .ok_or(RuntimeCheckErrorKind::NoSuchFT(token_name.to_string()))?;
+            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!("No such FT: {token_name}")))?;
 
         let balance = env.global_context.database.get_ft_balance(
             &env.contract_context.contract_identifier,
