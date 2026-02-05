@@ -1,5 +1,5 @@
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
-// Copyright (C) 2020 Stacks Open Internet Foundation
+// Copyright (C) 2020-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -193,14 +193,14 @@ impl StacksTransactionReceipt {
         error: ClarityError,
     ) -> StacksTransactionReceipt {
         let error_string = match error {
-            ClarityError::StaticCheck(ref check_error) => {
-                if let Some(span) = check_error.diagnostic.spans.first() {
+            ClarityError::StaticCheck(ref static_check_error) => {
+                if let Some(span) = static_check_error.diagnostic.spans.first() {
                     format!(
                         ":{}:{}: {}",
-                        span.start_line, span.start_column, check_error.diagnostic.message
+                        span.start_line, span.start_column, static_check_error.diagnostic.message
                     )
                 } else {
-                    check_error.diagnostic.message.to_string()
+                    static_check_error.diagnostic.message.to_string()
                 }
             }
             ClarityError::Parse(ref parse_error) => {
@@ -252,7 +252,7 @@ impl StacksTransactionReceipt {
         tx: StacksTransaction,
         cost: ExecutionCost,
         contract_analysis: ContractAnalysis,
-        error: CheckErrorKind,
+        error: RuntimeCheckErrorKind,
     ) -> StacksTransactionReceipt {
         StacksTransactionReceipt {
             transaction: tx.into(),
@@ -271,7 +271,7 @@ impl StacksTransactionReceipt {
     pub fn from_runtime_failure_contract_call(
         tx: StacksTransaction,
         cost: ExecutionCost,
-        error: CheckErrorKind,
+        error: RuntimeCheckErrorKind,
     ) -> StacksTransactionReceipt {
         StacksTransactionReceipt {
             transaction: tx.into(),
@@ -366,7 +366,7 @@ pub enum ClarityRuntimeTxError {
         reason: String,
     },
     CostError(ExecutionCost, ExecutionCost),
-    AnalysisError(CheckErrorKind),
+    AnalysisError(RuntimeCheckErrorKind),
     Rejectable(ClarityError),
 }
 
@@ -385,13 +385,13 @@ pub fn handle_clarity_runtime_error(error: ClarityError) -> ClarityRuntimeTxErro
                 err_type: "short return/panic",
             }
         }
-        ClarityError::Interpreter(VmExecutionError::Unchecked(check_error)) => {
-            if check_error.rejectable() {
+        ClarityError::Interpreter(VmExecutionError::RuntimeCheck(runtime_check_err)) => {
+            if runtime_check_err.rejectable() {
                 ClarityRuntimeTxError::Rejectable(ClarityError::Interpreter(
-                    VmExecutionError::Unchecked(check_error),
+                    VmExecutionError::RuntimeCheck(runtime_check_err),
                 ))
             } else {
-                ClarityRuntimeTxError::AnalysisError(check_error)
+                ClarityRuntimeTxError::AnalysisError(runtime_check_err)
             }
         }
         ClarityError::AbortedByCallback {
@@ -956,11 +956,9 @@ impl StacksChainState {
             .get_microblock_poison_report(mblock_pubk_height)?
         {
             // account for report loaded
-            env.add_memory(u64::from(
-                TypeSignature::PrincipalType
-                    .size()
-                    .map_err(VmExecutionError::from)?,
-            ))
+            env.add_memory(u64::from(TypeSignature::PrincipalType.size().map_err(
+                |_| Error::Expects("Failed to get size of PrincipalType".into()),
+            )?))
             .map_err(|e| Error::from_cost_error(e, cost_before.clone(), env.global_context))?;
 
             // u128 sequence
@@ -1178,7 +1176,7 @@ impl StacksChainState {
                             warn!("Block compute budget exceeded: if included, this will invalidate a block"; "txid" => %tx.txid(), "cost" => %cost_after, "budget" => %budget);
                             return Err(Error::CostOverflowError(cost_before, cost_after, budget));
                         }
-                        ClarityRuntimeTxError::AnalysisError(check_error) => {
+                        ClarityRuntimeTxError::AnalysisError(runtime_check_err) => {
                             if epoch_id >= StacksEpochId::Epoch21 {
                                 // in 2.1 and later, this is a permitted runtime error.  take the
                                 // fee from the payer and keep the tx.
@@ -1189,13 +1187,13 @@ impl StacksChainState {
                                       "contract_name" => %contract_id,
                                       "function_name" => %contract_call.function_name,
                                       "function_args" => %VecDisplay(&contract_call.function_args),
-                                      "error" => %check_error);
+                                      "error" => %runtime_check_err);
 
                                 let receipt =
                                     StacksTransactionReceipt::from_runtime_failure_contract_call(
                                         tx.clone(),
                                         total_cost,
-                                        check_error,
+                                        runtime_check_err,
                                     );
                                 return Ok(receipt);
                             } else {
@@ -1207,9 +1205,9 @@ impl StacksChainState {
                                            "contract_name" => %contract_id,
                                            "function_name" => %contract_call.function_name,
                                            "function_args" => %VecDisplay(&contract_call.function_args),
-                                           "error" => %check_error);
+                                           "error" => %runtime_check_err);
                                 return Err(Error::ClarityError(ClarityError::Interpreter(
-                                    VmExecutionError::Unchecked(check_error),
+                                    VmExecutionError::RuntimeCheck(runtime_check_err),
                                 )));
                             }
                         }
@@ -1409,21 +1407,21 @@ impl StacksChainState {
                                       "budget" => %budget);
                             return Err(Error::CostOverflowError(cost_before, cost_after, budget));
                         }
-                        ClarityRuntimeTxError::AnalysisError(check_error) => {
+                        ClarityRuntimeTxError::AnalysisError(runtime_check_err) => {
                             if epoch_id >= StacksEpochId::Epoch21 {
                                 // in 2.1 and later, this is a permitted runtime error.  take the
                                 // fee from the payer and keep the tx.
                                 info!("Smart-contract encountered an analysis error at runtime";
                                       "txid" => %tx.txid(),
                                       "contract" => %contract_id,
-                                      "error" => %check_error);
+                                      "error" => %runtime_check_err);
 
                                 let receipt =
                                     StacksTransactionReceipt::from_runtime_failure_smart_contract(
                                         tx.clone(),
                                         total_cost,
                                         contract_analysis,
-                                        check_error,
+                                        runtime_check_err,
                                     );
                                 return Ok(receipt);
                             } else {
@@ -1431,9 +1429,9 @@ impl StacksChainState {
                                 warn!("Unexpected analysis error invalidating transaction: if included, this will invalidate a block";
                                       "txid" => %tx.txid(),
                                       "contract" => %contract_id,
-                                      "error" => %check_error);
+                                      "error" => %runtime_check_err);
                                 return Err(Error::ClarityError(ClarityError::Interpreter(
-                                    VmExecutionError::Unchecked(check_error),
+                                    VmExecutionError::RuntimeCheck(runtime_check_err),
                                 )));
                             }
                         }
@@ -1551,6 +1549,20 @@ impl StacksChainState {
         quiet: bool,
         max_execution_time: Option<std::time::Duration>,
     ) -> Result<(u64, StacksTransactionReceipt), Error> {
+        Self::process_transaction_with_check(clarity_block, tx, quiet, max_execution_time, |_| {
+            Ok(())
+        })
+    }
+
+    pub fn process_transaction_with_check<
+        F: FnMut(&StacksTransactionReceipt) -> Result<(), Error>,
+    >(
+        clarity_block: &mut ClarityTx,
+        tx: &StacksTransaction,
+        quiet: bool,
+        max_execution_time: Option<std::time::Duration>,
+        mut check: F,
+    ) -> Result<(u64, StacksTransactionReceipt), Error> {
         debug!("Process transaction {} ({})", tx.txid(), tx.payload.name());
         let epoch = clarity_block.get_epoch();
 
@@ -1639,6 +1651,8 @@ impl StacksChainState {
             tx_receipt
         };
 
+        check(&tx_receipt)?;
+
         transaction
             .commit()
             .map_err(|e| Error::InvalidStacksTransaction(e.to_string(), false))?;
@@ -1653,7 +1667,7 @@ pub mod test {
     use clarity::vm::representations::{ClarityName, ContractName};
     use clarity::vm::test_util::{UnitTestBurnStateDB, TEST_BURN_STATE_DB};
     use clarity::vm::tests::TEST_HEADER_DB;
-    use clarity::vm::types::*;
+    use clarity::vm::types::ResponseData;
     use rand::Rng;
     use stacks_common::types::chainstate::SortitionId;
     use stacks_common::util::hash::*;
@@ -1686,6 +1700,9 @@ pub mod test {
     pub const TestBurnStateDB_33: UnitTestBurnStateDB = UnitTestBurnStateDB {
         epoch_id: StacksEpochId::Epoch33,
     };
+    pub const TestBurnStateDB_34: UnitTestBurnStateDB = UnitTestBurnStateDB {
+        epoch_id: StacksEpochId::Epoch34,
+    };
 
     pub const ALL_BURN_DBS: &[&dyn BurnStateDB] = &[
         &TestBurnStateDB_20 as &dyn BurnStateDB,
@@ -1695,6 +1712,7 @@ pub mod test {
         &TestBurnStateDB_31 as &dyn BurnStateDB,
         &TestBurnStateDB_32 as &dyn BurnStateDB,
         &TestBurnStateDB_33 as &dyn BurnStateDB,
+        &TestBurnStateDB_34 as &dyn BurnStateDB,
     ];
 
     pub const PRE_33_DBS: &[&dyn BurnStateDB] = &[
@@ -1716,6 +1734,7 @@ pub mod test {
         &TestBurnStateDB_31 as &dyn BurnStateDB,
         &TestBurnStateDB_32 as &dyn BurnStateDB,
         &TestBurnStateDB_33 as &dyn BurnStateDB,
+        &TestBurnStateDB_34 as &dyn BurnStateDB,
     ];
 
     #[test]
@@ -8548,6 +8567,7 @@ pub mod test {
                     StacksEpochId::Epoch31 => self.get_stacks_epoch(8),
                     StacksEpochId::Epoch32 => self.get_stacks_epoch(9),
                     StacksEpochId::Epoch33 => self.get_stacks_epoch(10),
+                    StacksEpochId::Epoch34 => self.get_stacks_epoch(11),
                 }
             }
             fn get_pox_payout_addrs(
@@ -9205,7 +9225,7 @@ pub mod test {
               (ok (var-set mutex (not (var-get mutex))))
             )
 
-            ;; triggers checkerror at runtime because <trait> gets coerced
+            ;; triggers RuntimeCheckErrorKind because <trait> gets coerced
             ;; into a principal when `internal` is called.
             (define-public (test (ref <trait>))
                 (ok (internal (if (var-get mutex)
@@ -9225,7 +9245,7 @@ pub mod test {
         let runtime_checkerror_contract = "
             (begin
                 (print \"about to contract-call with trait impl\")
-                (unwrap-panic (contract-call? .trait-checkerror test .foo-impl))
+                (unwrap-panic (contract-call? .trait-runtime-analysis-error test .foo-impl))
                 (print \"contract-call with trait impl finished\")
             )
             ";
@@ -9316,7 +9336,7 @@ pub mod test {
             TransactionVersion::Testnet,
             auth.clone(),
             TransactionPayload::new_smart_contract(
-                "trait-checkerror",
+                "trait-runtime-analysis-error",
                 &runtime_checkerror,
                 Some(ClarityVersion::Clarity1),
             )
@@ -9336,8 +9356,12 @@ pub mod test {
         let mut tx_runtime_checkerror_clar1_no_version = StacksTransaction::new(
             TransactionVersion::Testnet,
             auth.clone(),
-            TransactionPayload::new_smart_contract("trait-checkerror", &runtime_checkerror, None)
-                .unwrap(),
+            TransactionPayload::new_smart_contract(
+                "trait-runtime-analysis-error",
+                &runtime_checkerror,
+                None,
+            )
+            .unwrap(),
         );
 
         tx_runtime_checkerror_clar1_no_version.post_condition_mode =
@@ -9355,7 +9379,7 @@ pub mod test {
             TransactionVersion::Testnet,
             auth.clone(),
             TransactionPayload::new_smart_contract(
-                "trait-checkerror",
+                "trait-runtime-analysis-error",
                 &runtime_checkerror,
                 Some(ClarityVersion::Clarity2),
             )
@@ -9372,12 +9396,12 @@ pub mod test {
 
         let signed_runtime_checkerror_tx_clar2 = signer.get_tx().unwrap();
 
-        let mut tx_test_trait_checkerror = StacksTransaction::new(
+        let mut tx_test_trait_runtime_checkerror = StacksTransaction::new(
             TransactionVersion::Testnet,
             auth.clone(),
             TransactionPayload::new_contract_call(
                 addr.clone(),
-                "trait-checkerror",
+                "trait-runtime-analysis-error",
                 "test",
                 vec![Value::Principal(PrincipalData::Contract(
                     QualifiedContractIdentifier::parse(&format!("{}.foo-impl", &addr)).unwrap(),
@@ -9386,21 +9410,21 @@ pub mod test {
             .unwrap(),
         );
 
-        tx_test_trait_checkerror.post_condition_mode = TransactionPostConditionMode::Allow;
-        tx_test_trait_checkerror.chain_id = 0x80000000;
-        tx_test_trait_checkerror.set_tx_fee(1);
-        tx_test_trait_checkerror.set_origin_nonce(3);
+        tx_test_trait_runtime_checkerror.post_condition_mode = TransactionPostConditionMode::Allow;
+        tx_test_trait_runtime_checkerror.chain_id = 0x80000000;
+        tx_test_trait_runtime_checkerror.set_tx_fee(1);
+        tx_test_trait_runtime_checkerror.set_origin_nonce(3);
 
-        let mut signer = StacksTransactionSigner::new(&tx_test_trait_checkerror);
+        let mut signer = StacksTransactionSigner::new(&tx_test_trait_runtime_checkerror);
         signer.sign_origin(&privk).unwrap();
 
-        let signed_test_trait_checkerror_tx = signer.get_tx().unwrap();
+        let signed_test_trait_runtime_checkerror_tx = signer.get_tx().unwrap();
 
         let mut tx_runtime_checkerror_cc_contract_clar1 = StacksTransaction::new(
             TransactionVersion::Testnet,
             auth.clone(),
             TransactionPayload::new_smart_contract(
-                "trait-checkerror-cc",
+                "trait-runtime-analysis-error-cc",
                 runtime_checkerror_contract,
                 Some(ClarityVersion::Clarity1),
             )
@@ -9422,7 +9446,7 @@ pub mod test {
             TransactionVersion::Testnet,
             auth.clone(),
             TransactionPayload::new_smart_contract(
-                "trait-checkerror-cc",
+                "trait-runtime-analysis-error-cc",
                 runtime_checkerror_contract,
                 None,
             )
@@ -9445,7 +9469,7 @@ pub mod test {
             TransactionVersion::Testnet,
             auth,
             TransactionPayload::new_smart_contract(
-                "trait-checkerror-cc",
+                "trait-runtime-analysis-error-cc",
                 runtime_checkerror_contract,
                 Some(ClarityVersion::Clarity2),
             )
@@ -9465,7 +9489,7 @@ pub mod test {
 
         let contract_id = QualifiedContractIdentifier::new(
             StandardPrincipalData::from(addr.clone()),
-            ContractName::from("trait-checkerror"),
+            ContractName::from("trait-runtime-analysis-error"),
         );
 
         // in 2.0, this invalidates the block
@@ -9503,12 +9527,12 @@ pub mod test {
 
         let err = validate_transactions_static_epoch_and_process_transaction(
             &mut conn,
-            &signed_test_trait_checkerror_tx,
+            &signed_test_trait_runtime_checkerror_tx,
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            _check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            _runtime_check_err,
         ))) = err
         {
         } else {
@@ -9560,8 +9584,8 @@ pub mod test {
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            _check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            _runtime_check_err,
         ))) = err
         {
         } else {
@@ -9607,12 +9631,12 @@ pub mod test {
 
         let err = validate_transactions_static_epoch_and_process_transaction(
             &mut conn,
-            &signed_test_trait_checkerror_tx,
+            &signed_test_trait_runtime_checkerror_tx,
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            _check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            _runtime_check_err,
         ))) = err
         {
         } else {
@@ -9663,8 +9687,8 @@ pub mod test {
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            _check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            _runtime_check_err,
         ))) = err
         {
         } else {
@@ -9718,7 +9742,7 @@ pub mod test {
 
         let (fee, tx_receipt) = validate_transactions_static_epoch_and_process_transaction(
             &mut conn,
-            &signed_test_trait_checkerror_tx,
+            &signed_test_trait_runtime_checkerror_tx,
             false,
         )
         .unwrap();
@@ -9799,7 +9823,7 @@ pub mod test {
 
         let (fee, tx_receipt) = validate_transactions_static_epoch_and_process_transaction(
             &mut conn,
-            &signed_test_trait_checkerror_tx,
+            &signed_test_trait_runtime_checkerror_tx,
             false,
         )
         .unwrap();
@@ -10040,7 +10064,7 @@ pub mod test {
 
         let contract_id = QualifiedContractIdentifier::new(
             StandardPrincipalData::from(addr.clone()),
-            ContractName::from("trait-checkerror"),
+            ContractName::from("trait-runtime-analysis-error"),
         );
 
         // in 2.0: analysis error should cause contract publish to fail
@@ -10167,8 +10191,8 @@ pub mod test {
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            runtime_check_err,
         ))) = err
         {
         } else {
@@ -10576,7 +10600,7 @@ pub mod test {
 
         let contract_id = QualifiedContractIdentifier::new(
             StandardPrincipalData::from(addr.clone()),
-            ContractName::from("trait-checkerror"),
+            ContractName::from("trait-runtime-analysis-error"),
         );
 
         // in 2.0: calling call-foo invalidates the block
@@ -10626,8 +10650,8 @@ pub mod test {
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            runtime_check_err,
         ))) = err
         {
         } else {
@@ -10732,8 +10756,8 @@ pub mod test {
             false,
         )
         .unwrap_err();
-        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::Unchecked(
-            check_error,
+        if let Error::ClarityError(ClarityError::Interpreter(VmExecutionError::RuntimeCheck(
+            runtime_check_err,
         ))) = err
         {
         } else {

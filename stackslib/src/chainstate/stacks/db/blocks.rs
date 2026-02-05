@@ -1,5 +1,5 @@
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
-// Copyright (C) 2020 Stacks Open Internet Foundation
+// Copyright (C) 2020-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::{cmp, fs, io};
 
-pub use clarity::vm::analysis::errors::{CheckErrorKind, StaticCheckError};
+pub use clarity::vm::analysis::errors::{RuntimeCheckErrorKind, StaticCheckError};
 use clarity::vm::clarity::TransactionConnection;
 use clarity::vm::costs::LimitedCostTracker;
 use clarity::vm::database::BurnStateDB;
@@ -157,6 +157,8 @@ pub struct SetupBlockResult<'a, 'b> {
 
 pub struct DummyEventDispatcher;
 
+pub const MAX_RECEIPT_SIZES: u64 = 50 * 1024 * 1024;
+
 impl BlockEventDispatcher for DummyEventDispatcher {
     fn announce_block(
         &self,
@@ -188,6 +190,7 @@ impl BlockEventDispatcher for DummyEventDispatcher {
         _burn_block_height: u64,
         _rewards: Vec<(PoxAddress, u64)>,
         _burns: u64,
+        _pox_transactions: Vec<crate::chainstate::coordinator::PoxTransactionReward>,
         _slot_holders: Vec<PoxAddress>,
         _consensus_hash: &ConsensusHash,
         _parent_burn_block_hash: &BurnchainHeaderHash,
@@ -2687,7 +2690,7 @@ impl StacksChainState {
     ) -> Result<bool, Error> {
         StacksChainState::has_any_i64(
             self.db(),
-            "SELECT processed FROM staging_microblocks WHERE index_block_hash = ?1 AND sequence >= ?2 LIMIT 1", 
+            "SELECT processed FROM staging_microblocks WHERE index_block_hash = ?1 AND sequence >= ?2 LIMIT 1",
             &[&parent_index_block_hash, &min_seq]
         )
     }
@@ -4020,7 +4023,11 @@ impl StacksChainState {
                         current_epoch = StacksEpochId::Epoch33;
                     }
                     StacksEpochId::Epoch33 => {
-                        panic!("No defined transition from Epoch33 forward")
+                        receipts.append(&mut clarity_tx.block.initialize_epoch_3_4()?);
+                        current_epoch = StacksEpochId::Epoch34;
+                    }
+                    StacksEpochId::Epoch34 => {
+                        panic!("No defined transition from Epoch34 forward")
                     }
                 }
 
@@ -4492,11 +4499,20 @@ impl StacksChainState {
         let mut fees = 0u128;
         let mut burns = 0u128;
         let mut receipts = vec![];
+        let mut total_size = 0u64;
         for tx in block_txs.iter() {
             let (tx_fee, mut tx_receipt) =
                 StacksChainState::process_transaction(clarity_tx, tx, false, None)?;
             fees = fees.checked_add(u128::from(tx_fee)).expect("Fee overflow");
             tx_receipt.tx_index = tx_index;
+            total_size = total_size.saturating_add(tx_receipt.size().ok_or_else(|| {
+                Error::InvalidStacksBlock("Failure calculating tx receipt size".into())
+            })?);
+            if total_size >= MAX_RECEIPT_SIZES {
+                return Err(Error::InvalidStacksBlock(
+                    "Total tx receipt size too large".into(),
+                ));
+            }
             burns = burns
                 .checked_add(tx_receipt.stx_burned)
                 .expect("Burns overflow");
@@ -4582,55 +4598,60 @@ impl StacksChainState {
     ) -> Result<(u128, Vec<StacksTransactionEvent>), Error> {
         let mainnet = clarity_tx.config.mainnet;
         let lockup_contract_id = boot_code_id("lockup", mainnet);
-        clarity_tx
-            .connection()
-            .as_transaction(|tx_connection| {
-                let epoch = tx_connection.get_epoch();
-                let result = tx_connection.with_clarity_db(|db| {
-                    let block_height = Value::UInt(db.get_current_block_height().into());
-                    let res = db.fetch_entry_unknown_descriptor(
-                        &lockup_contract_id,
-                        "lockups",
-                        &block_height,
-                        &epoch,
-                    )?;
-                    Ok(res)
-                })?;
+        clarity_tx.connection().as_transaction(|tx_connection| {
+            let epoch = tx_connection.get_epoch();
+            let result = tx_connection.with_clarity_db(|db| {
+                let block_height = Value::UInt(db.get_current_block_height().into());
+                let res = db.fetch_entry_unknown_descriptor(
+                    &lockup_contract_id,
+                    "lockups",
+                    &block_height,
+                    &epoch,
+                )?;
+                Ok(res)
+            })?;
 
-                let entries = match result {
-                    Value::Optional(_) => match result.expect_optional()? {
-                        Some(Value::Sequence(SequenceData::List(entries))) => entries.data,
-                        _ => return Ok((0, vec![])),
-                    },
+            let entries = match result {
+                Value::Optional(_) => match result
+                    .expect_optional()
+                    .map_err(|_| Error::Expects("expected lockups to return an optional".into()))?
+                {
+                    Some(Value::Sequence(SequenceData::List(entries))) => entries.data,
                     _ => return Ok((0, vec![])),
-                };
+                },
+                _ => return Ok((0, vec![])),
+            };
 
-                let mut total_minted = 0;
-                let mut events = vec![];
-                for entry in entries.into_iter() {
-                    let schedule: TupleData = entry.expect_tuple()?;
-                    let amount = schedule
-                        .get("amount")
-                        .expect("Lockup malformed")
-                        .to_owned()
-                        .expect_u128()?;
-                    let recipient = schedule
-                        .get("recipient")
-                        .expect("Lockup malformed")
-                        .to_owned()
-                        .expect_principal()?;
-                    total_minted += amount;
-                    StacksChainState::account_credit(
-                        tx_connection,
-                        &recipient,
-                        u64::try_from(amount).expect("FATAL: transferred more STX than exist"),
-                    );
-                    let event = STXEventType::STXMintEvent(STXMintEventData { recipient, amount });
-                    events.push(StacksTransactionEvent::STXEvent(event));
-                }
-                Ok((total_minted, events))
-            })
-            .map_err(Error::ClarityError)
+            let mut total_minted = 0;
+            let mut events = vec![];
+            for entry in entries.into_iter() {
+                let schedule: TupleData = entry
+                    .expect_tuple()
+                    .map_err(|_| Error::Expects("expected unlock schedule tuple".into()))?;
+                let amount = schedule
+                    .get("amount")
+                    .map_err(|_| Error::Expects("missing amount in unlock schedule".into()))?
+                    .to_owned()
+                    .expect_u128()
+                    .map_err(|_| Error::Expects("invalid amount in unlock schedule".into()))?;
+                let recipient = schedule
+                    .get("recipient")
+                    .map_err(|_| Error::Expects("missing recipient in unlock schedule".into()))?
+                    .to_owned()
+                    .expect_principal()
+                    .map_err(|_| Error::Expects("invalid recipient in unlock schedule".into()))?;
+                total_minted += amount;
+                StacksChainState::account_credit(
+                    tx_connection,
+                    &recipient,
+                    u64::try_from(amount)
+                        .map_err(|_| Error::Expects("transferred more STX than exists".into()))?,
+                );
+                let event = STXEventType::STXMintEvent(STXMintEventData { recipient, amount });
+                events.push(StacksTransactionEvent::STXEvent(event));
+            }
+            Ok((total_minted, events))
+        })
     }
 
     /// Given the list of matured miners, find the miner reward schedule that produced the parent
@@ -4852,7 +4873,8 @@ impl StacksChainState {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => {
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => {
                 StacksChainState::get_stacking_and_transfer_and_delegate_burn_ops_v210(
                     chainstate_tx,
                     parent_index_hash,
@@ -4946,7 +4968,8 @@ impl StacksChainState {
                 | StacksEpochId::Epoch30
                 | StacksEpochId::Epoch31
                 | StacksEpochId::Epoch32
-                | StacksEpochId::Epoch33 => Self::handle_pox_cycle_start_pox_4(
+                | StacksEpochId::Epoch33
+                | StacksEpochId::Epoch34 => Self::handle_pox_cycle_start_pox_4(
                     clarity_tx,
                     pox_reward_cycle,
                     pox_start_cycle_info,
@@ -5857,7 +5880,7 @@ impl StacksChainState {
     /// parent block has been processed.
     /// If it's not known, return None.
     pub fn get_parent_header_info(
-        chainstate_tx: &mut ChainstateTx,
+        chainstate_tx: &ChainstateTx,
         next_staging_block: &StagingBlock,
     ) -> Result<Option<StacksHeaderInfo>, Error> {
         let parent_block_header_info = match StacksChainState::get_anchored_block_header_info(
@@ -6055,13 +6078,11 @@ impl StacksChainState {
             &next_staging_block.parent_microblock_hash,
         );
 
-        let parent_header_info = match StacksChainState::get_parent_header_info(
-            &mut chainstate_tx,
-            &next_staging_block,
-        )? {
-            Some(hinfo) => hinfo,
-            None => return Ok((None, None)),
-        };
+        let parent_header_info =
+            match StacksChainState::get_parent_header_info(&chainstate_tx, &next_staging_block)? {
+                Some(hinfo) => hinfo,
+                None => return Ok((None, None)),
+            };
 
         let block = StacksChainState::extract_stacks_block(&next_staging_block)?;
         let block_size = u64::try_from(next_staging_block.block_data.len())

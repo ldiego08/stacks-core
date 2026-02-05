@@ -1,5 +1,5 @@
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
-// Copyright (C) 2020 Stacks Open Internet Foundation
+// Copyright (C) 2020-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,12 +28,15 @@ use stacks_common::types::StacksEpochId;
 pub use self::analysis_db::AnalysisDatabase;
 use self::arithmetic_checker::ArithmeticOnlyChecker;
 use self::contract_interface_builder::build_contract_interface;
-pub use self::errors::{CheckErrorKind, StaticCheckError};
+pub use self::errors::{
+    CommonCheckErrorKind, RuntimeCheckErrorKind, StaticCheckError, StaticCheckErrorKind,
+};
 use self::read_only_checker::ReadOnlyChecker;
 use self::trait_checker::TraitChecker;
-use self::type_checker::v2_05::TypeChecker as TypeChecker2_05;
 use self::type_checker::v2_1::TypeChecker as TypeChecker2_1;
+use self::type_checker::v2_05::TypeChecker as TypeChecker2_05;
 pub use self::types::{AnalysisPass, ContractAnalysis};
+use crate::vm::ClarityVersion;
 #[cfg(feature = "rusqlite")]
 use crate::vm::ast::build_ast;
 use crate::vm::costs::LimitedCostTracker;
@@ -44,7 +47,6 @@ use crate::vm::representations::SymbolicExpression;
 use crate::vm::types::QualifiedContractIdentifier;
 #[cfg(feature = "rusqlite")]
 use crate::vm::types::TypeSignature;
-use crate::vm::ClarityVersion;
 
 /// Used by CLI tools like the docs generator. Not used in production
 #[cfg(feature = "rusqlite")]
@@ -55,7 +57,7 @@ pub fn mem_type_check(
 ) -> Result<(Option<TypeSignature>, ContractAnalysis), StaticCheckError> {
     let contract_identifier = QualifiedContractIdentifier::transient();
     let contract = build_ast(&contract_identifier, snippet, &mut (), version, epoch)
-        .map_err(|e| CheckErrorKind::Expects(format!("Failed to build AST: {e}")))?
+        .map_err(|e| StaticCheckErrorKind::ExpectsRejectable(format!("Failed to build AST: {e}")))?
         .expressions;
 
     let mut marf = MemoryBackingStore::new();
@@ -73,15 +75,16 @@ pub fn mem_type_check(
     ) {
         Ok(x) => {
             // return the first type result of the type checker
+
             let first_type = x
                 .type_map
                 .as_ref()
-                .ok_or_else(|| CheckErrorKind::Expects("Should be non-empty".into()))?
-                .get_type_expected(
-                    x.expressions
-                        .last()
-                        .ok_or_else(|| CheckErrorKind::Expects("Should be non-empty".into()))?,
-                )
+                .ok_or_else(|| {
+                    StaticCheckErrorKind::ExpectsRejectable("Should be non-empty".into())
+                })?
+                .get_type_expected(x.expressions.last().ok_or_else(|| {
+                    StaticCheckErrorKind::ExpectsRejectable("Should be non-empty".into())
+                })?)
                 .cloned();
             Ok((first_type, x))
         }
@@ -147,14 +150,15 @@ pub fn run_analysis(
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => {
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => {
                 TypeChecker2_1::run_pass(&epoch, &mut contract_analysis, db, build_type_map)
             }
             StacksEpochId::Epoch10 => {
-                return Err(CheckErrorKind::Expects(
+                return Err(StaticCheckErrorKind::ExpectsRejectable(
                     "Epoch 1.0 is not a valid epoch for analysis".into(),
                 )
-                .into())
+                .into());
             }
         }?;
         TraitChecker::run_pass(&epoch, &mut contract_analysis, db)?;

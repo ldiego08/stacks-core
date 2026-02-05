@@ -33,7 +33,7 @@ use crate::consts::{
     MICROSTACKS_PER_STACKS, PEER_VERSION_EPOCH_1_0, PEER_VERSION_EPOCH_2_0,
     PEER_VERSION_EPOCH_2_05, PEER_VERSION_EPOCH_2_1, PEER_VERSION_EPOCH_2_2,
     PEER_VERSION_EPOCH_2_3, PEER_VERSION_EPOCH_2_4, PEER_VERSION_EPOCH_2_5, PEER_VERSION_EPOCH_3_0,
-    PEER_VERSION_EPOCH_3_1, PEER_VERSION_EPOCH_3_2, PEER_VERSION_EPOCH_3_3,
+    PEER_VERSION_EPOCH_3_1, PEER_VERSION_EPOCH_3_2, PEER_VERSION_EPOCH_3_3, PEER_VERSION_EPOCH_3_4,
 };
 use crate::types::chainstate::{StacksAddress, StacksPublicKey};
 use crate::util::hash::Hash160;
@@ -130,26 +130,7 @@ define_stacks_epochs! {
     Epoch31 = 0x03001,
     Epoch32 = 0x03002,
     Epoch33 = 0x03003,
-}
-
-impl StacksEpochId {
-    /// Return the network epoch associated with the StacksEpochId
-    pub fn network_epoch(epoch: StacksEpochId) -> u8 {
-        match epoch {
-            StacksEpochId::Epoch10 => PEER_VERSION_EPOCH_1_0,
-            StacksEpochId::Epoch20 => PEER_VERSION_EPOCH_2_0,
-            StacksEpochId::Epoch2_05 => PEER_VERSION_EPOCH_2_05,
-            StacksEpochId::Epoch21 => PEER_VERSION_EPOCH_2_1,
-            StacksEpochId::Epoch22 => PEER_VERSION_EPOCH_2_2,
-            StacksEpochId::Epoch23 => PEER_VERSION_EPOCH_2_3,
-            StacksEpochId::Epoch24 => PEER_VERSION_EPOCH_2_4,
-            StacksEpochId::Epoch25 => PEER_VERSION_EPOCH_2_5,
-            StacksEpochId::Epoch30 => PEER_VERSION_EPOCH_3_0,
-            StacksEpochId::Epoch31 => PEER_VERSION_EPOCH_3_1,
-            StacksEpochId::Epoch32 => PEER_VERSION_EPOCH_3_2,
-            StacksEpochId::Epoch33 => PEER_VERSION_EPOCH_3_3,
-        }
-    }
+    Epoch34 = 0x03004,
 }
 
 #[derive(Debug)]
@@ -479,7 +460,7 @@ impl SIP031EmissionInterval {
 impl StacksEpochId {
     #[cfg(any(test, feature = "testing"))]
     pub const fn latest() -> StacksEpochId {
-        StacksEpochId::Epoch33
+        StacksEpochId::Epoch34
     }
 
     #[cfg(not(any(test, feature = "testing")))]
@@ -501,7 +482,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => MempoolCollectionBehavior::ByReceiveTime,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => MempoolCollectionBehavior::ByReceiveTime,
         }
     }
 
@@ -520,7 +502,8 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => true,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -539,7 +522,8 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => true,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -556,7 +540,7 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32 => false,
-            StacksEpochId::Epoch33 => true,
+            StacksEpochId::Epoch33 | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -575,7 +559,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => true,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -594,7 +579,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => true,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -612,7 +598,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => true,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -646,7 +633,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => MINING_COMMITMENT_FREQUENCY_NAKAMOTO,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => MINING_COMMITMENT_FREQUENCY_NAKAMOTO,
         }
     }
 
@@ -685,7 +673,8 @@ impl StacksEpochId {
             StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32
-            | StacksEpochId::Epoch33 => cur_reward_cycle > first_epoch30_reward_cycle,
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => cur_reward_cycle > first_epoch30_reward_cycle,
         }
     }
 
@@ -801,8 +790,14 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30 => {
                 self.coinbase_reward_pre_sip029(first_burnchain_height, current_burnchain_height)
             }
-            StacksEpochId::Epoch31 | StacksEpochId::Epoch32 | StacksEpochId::Epoch33 => self
-                .coinbase_reward_sip029(mainnet, first_burnchain_height, current_burnchain_height),
+            StacksEpochId::Epoch31
+            | StacksEpochId::Epoch32
+            | StacksEpochId::Epoch33
+            | StacksEpochId::Epoch34 => self.coinbase_reward_sip029(
+                mainnet,
+                first_burnchain_height,
+                current_burnchain_height,
+            ),
         }
     }
 
@@ -819,7 +814,7 @@ impl StacksEpochId {
             | StacksEpochId::Epoch25
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31 => false,
-            StacksEpochId::Epoch32 | StacksEpochId::Epoch33 => true,
+            StacksEpochId::Epoch32 | StacksEpochId::Epoch33 | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -836,7 +831,7 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32 => false,
-            StacksEpochId::Epoch33 => true,
+            StacksEpochId::Epoch33 | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -857,7 +852,7 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32 => false,
-            StacksEpochId::Epoch33 => true,
+            StacksEpochId::Epoch33 | StacksEpochId::Epoch34 => true,
         }
     }
 
@@ -876,8 +871,37 @@ impl StacksEpochId {
             | StacksEpochId::Epoch30
             | StacksEpochId::Epoch31
             | StacksEpochId::Epoch32 => false,
-            StacksEpochId::Epoch33 => true,
+            StacksEpochId::Epoch33 | StacksEpochId::Epoch34 => true,
         }
+    }
+
+    /// Return the network epoch associated with the StacksEpochId
+    pub fn network_epoch(epoch: StacksEpochId) -> u8 {
+        match epoch {
+            StacksEpochId::Epoch10 => PEER_VERSION_EPOCH_1_0,
+            StacksEpochId::Epoch20 => PEER_VERSION_EPOCH_2_0,
+            StacksEpochId::Epoch2_05 => PEER_VERSION_EPOCH_2_05,
+            StacksEpochId::Epoch21 => PEER_VERSION_EPOCH_2_1,
+            StacksEpochId::Epoch22 => PEER_VERSION_EPOCH_2_2,
+            StacksEpochId::Epoch23 => PEER_VERSION_EPOCH_2_3,
+            StacksEpochId::Epoch24 => PEER_VERSION_EPOCH_2_4,
+            StacksEpochId::Epoch25 => PEER_VERSION_EPOCH_2_5,
+            StacksEpochId::Epoch30 => PEER_VERSION_EPOCH_3_0,
+            StacksEpochId::Epoch31 => PEER_VERSION_EPOCH_3_1,
+            StacksEpochId::Epoch32 => PEER_VERSION_EPOCH_3_2,
+            StacksEpochId::Epoch33 => PEER_VERSION_EPOCH_3_3,
+            StacksEpochId::Epoch34 => PEER_VERSION_EPOCH_3_4,
+        }
+    }
+
+    #[cfg(any(test, feature = "testing"))]
+    pub fn since(epoch: StacksEpochId) -> &'static [StacksEpochId] {
+        let idx = Self::ALL
+            .iter()
+            .position(|&e| e == epoch)
+            .expect("epoch not found in ALL");
+
+        &Self::ALL[idx..]
     }
 }
 
@@ -896,6 +920,7 @@ impl std::fmt::Display for StacksEpochId {
             StacksEpochId::Epoch31 => write!(f, "3.1"),
             StacksEpochId::Epoch32 => write!(f, "3.2"),
             StacksEpochId::Epoch33 => write!(f, "3.3"),
+            StacksEpochId::Epoch34 => write!(f, "3.4"),
         }
     }
 }
@@ -917,6 +942,7 @@ impl FromStr for StacksEpochId {
             "3.1" => Ok(StacksEpochId::Epoch31),
             "3.2" => Ok(StacksEpochId::Epoch32),
             "3.3" => Ok(StacksEpochId::Epoch33),
+            "3.4" => Ok(StacksEpochId::Epoch34),
             _ => Err("Invalid epoch string"),
         }
     }
@@ -939,6 +965,7 @@ impl TryFrom<u32> for StacksEpochId {
             x if x == StacksEpochId::Epoch31 as u32 => Ok(StacksEpochId::Epoch31),
             x if x == StacksEpochId::Epoch32 as u32 => Ok(StacksEpochId::Epoch32),
             x if x == StacksEpochId::Epoch33 as u32 => Ok(StacksEpochId::Epoch33),
+            x if x == StacksEpochId::Epoch34 as u32 => Ok(StacksEpochId::Epoch34),
             _ => Err("Invalid epoch"),
         }
     }

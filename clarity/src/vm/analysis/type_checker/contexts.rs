@@ -1,5 +1,5 @@
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
-// Copyright (C) 2020-2022 Stacks Open Internet Foundation
+// Copyright (C) 2020-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@ use std::collections::{HashMap, HashSet};
 
 use stacks_common::types::StacksEpochId;
 
-use crate::vm::analysis::errors::{CheckErrorKind, StaticCheckError};
+use crate::vm::analysis::errors::{StaticCheckError, StaticCheckErrorKind};
 use crate::vm::types::signatures::CallableSubtype;
 use crate::vm::types::{TraitIdentifier, TypeSignature};
-use crate::vm::{ClarityName, ClarityVersion, SymbolicExpression, MAX_CONTEXT_DEPTH};
+use crate::vm::{ClarityName, ClarityVersion, MAX_CONTEXT_DEPTH, SymbolicExpression};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeMap {
@@ -69,7 +69,7 @@ impl TypeMap {
             TypeMapDataType::Map(ref mut map) => {
                 if map.insert(expr.id, type_sig).is_some() {
                     Err(StaticCheckError::new(
-                        CheckErrorKind::TypeAlreadyAnnotatedFailure,
+                        StaticCheckErrorKind::TypeAlreadyAnnotatedFailure,
                     ))
                 } else {
                     Ok(())
@@ -78,7 +78,7 @@ impl TypeMap {
             TypeMapDataType::Set(ref mut map) => {
                 if !map.insert(expr.id) {
                     Err(StaticCheckError::new(
-                        CheckErrorKind::TypeAlreadyAnnotatedFailure,
+                        StaticCheckErrorKind::TypeAlreadyAnnotatedFailure,
                     ))
                 } else {
                     Ok(())
@@ -110,7 +110,7 @@ impl TypingContext<'_> {
     pub fn extend(&self) -> Result<TypingContext<'_>, StaticCheckError> {
         if self.depth >= MAX_CONTEXT_DEPTH {
             Err(StaticCheckError::new(
-                CheckErrorKind::MaxContextDepthReached,
+                StaticCheckErrorKind::MaxContextDepthReached,
             ))
         } else {
             Ok(TypingContext {

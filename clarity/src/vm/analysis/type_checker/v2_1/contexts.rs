@@ -16,13 +16,13 @@
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
-use crate::vm::analysis::errors::{CheckErrorKind, StaticCheckError};
+use crate::vm::ClarityVersion;
+use crate::vm::analysis::errors::{StaticCheckError, StaticCheckErrorKind};
 use crate::vm::analysis::type_checker::is_reserved_word;
 use crate::vm::analysis::types::ContractAnalysis;
 use crate::vm::representations::ClarityName;
 use crate::vm::types::signatures::FunctionSignature;
 use crate::vm::types::{FunctionType, QualifiedContractIdentifier, TraitIdentifier, TypeSignature};
-use crate::vm::ClarityVersion;
 
 enum TraitContext {
     /// Traits stored in this context use the trait type-checking behavior defined in Clarity1
@@ -40,12 +40,13 @@ impl TraitContext {
     pub fn new(clarity_version: ClarityVersion) -> TraitContext {
         match clarity_version {
             ClarityVersion::Clarity1 => Self::Clarity1(HashMap::new()),
-            ClarityVersion::Clarity2 | ClarityVersion::Clarity3 | ClarityVersion::Clarity4 => {
-                Self::Clarity2 {
-                    defined: HashSet::new(),
-                    all: HashMap::new(),
-                }
-            }
+            ClarityVersion::Clarity2
+            | ClarityVersion::Clarity3
+            | ClarityVersion::Clarity4
+            | ClarityVersion::Clarity5 => Self::Clarity2 {
+                defined: HashSet::new(),
+                all: HashMap::new(),
+            },
         }
     }
 
@@ -169,7 +170,7 @@ impl ContractContext {
 
     pub fn check_name_used(&self, name: &str) -> Result<(), StaticCheckError> {
         if is_reserved_word(name, self.clarity_version) {
-            return Err(StaticCheckError::new(CheckErrorKind::ReservedWord(
+            return Err(StaticCheckError::new(StaticCheckErrorKind::ReservedWord(
                 name.to_string(),
             )));
         }
@@ -183,9 +184,9 @@ impl ContractContext {
             || self.traits.is_name_used(name)
             || self.map_types.contains_key(name)
         {
-            Err(StaticCheckError::new(CheckErrorKind::NameAlreadyUsed(
-                name.to_string(),
-            )))
+            Err(StaticCheckError::new(
+                StaticCheckErrorKind::NameAlreadyUsed(name.to_string()),
+            ))
         } else {
             Ok(())
         }

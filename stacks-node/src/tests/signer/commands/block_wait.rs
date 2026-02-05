@@ -1,16 +1,31 @@
+// Copyright (C) 2026 Stacks Open Internet Foundation
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+//! This module contains consensus tests related to Runtime errors.
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
 use libsigner::v0::messages::RejectReason;
 use madhouse::{Command, CommandWrapper};
 use proptest::prelude::{Just, Strategy};
-use proptest::prop_oneof;
 use stacks::chainstate::stacks::{TenureChangeCause, TenureChangePayload, TransactionPayload};
 
 use super::context::{SignerTestContext, SignerTestState};
 use crate::tests::neon_integrations::get_chain_info;
 use crate::tests::signer::v0::{
-    wait_for_block_global_rejection_with_reject_reason, wait_for_block_proposal,
+    wait_for_block_global_rejection_with_reject_reason, wait_for_block_proposal_block,
     wait_for_block_pushed_by_miner_key,
 };
 
@@ -245,7 +260,7 @@ impl Command<SignerTestState, SignerTestContext> for ChainExpectNakaBlockProposa
 
         info!("Waiting for block proposal at height {expected_height}");
 
-        let proposed_block = wait_for_block_proposal(30, expected_height, &miner_pk)
+        let proposed_block = wait_for_block_proposal_block(30, expected_height, &miner_pk)
             .expect("Timed out waiting for block proposal");
 
         let block_hash = proposed_block.header.signer_signature_hash();

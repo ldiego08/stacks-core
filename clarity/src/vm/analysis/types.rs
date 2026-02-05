@@ -1,5 +1,5 @@
 // Copyright (C) 2013-2020 Blockstack PBC, a public benefit corporation
-// Copyright (C) 2020 Stacks Open Internet Foundation
+// Copyright (C) 2020-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,11 +22,11 @@ use stacks_common::types::StacksEpochId;
 
 use crate::vm::analysis::analysis_db::AnalysisDatabase;
 use crate::vm::analysis::contract_interface_builder::ContractInterface;
-use crate::vm::analysis::errors::{CheckErrorKind, StaticCheckError};
+use crate::vm::analysis::errors::{StaticCheckError, StaticCheckErrorKind};
 use crate::vm::analysis::type_checker::contexts::TypeMap;
 use crate::vm::costs::LimitedCostTracker;
-use crate::vm::types::signatures::FunctionSignature;
 use crate::vm::types::FunctionType;
+use crate::vm::types::signatures::FunctionSignature;
 use crate::vm::{ClarityVersion, SymbolicExpression};
 
 const DESERIALIZE_FAIL_MESSAGE: &str =
@@ -242,7 +242,7 @@ impl ContractAnalysis {
                 | (None, Some(FunctionType::Fixed(func))) => {
                     let args_sig = func.args.iter().map(|a| a.signature.clone()).collect();
                     if !expected_sig.check_args_trait_compliance(epoch, args_sig)? {
-                        return Err(CheckErrorKind::BadTraitImplementation(
+                        return Err(StaticCheckErrorKind::BadTraitImplementation(
                             trait_name,
                             func_name.to_string(),
                         )
@@ -250,7 +250,7 @@ impl ContractAnalysis {
                     }
 
                     if !expected_sig.returns.admits_type(epoch, &func.returns)? {
-                        return Err(CheckErrorKind::BadTraitImplementation(
+                        return Err(StaticCheckErrorKind::BadTraitImplementation(
                             trait_name,
                             func_name.to_string(),
                         )
@@ -258,11 +258,11 @@ impl ContractAnalysis {
                     }
                 }
                 (_, _) => {
-                    return Err(CheckErrorKind::BadTraitImplementation(
+                    return Err(StaticCheckErrorKind::BadTraitImplementation(
                         trait_name,
                         func_name.to_string(),
                     )
-                    .into())
+                    .into());
                 }
             }
         }

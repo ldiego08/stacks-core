@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Stacks Open Internet Foundation
+// Copyright (C) 2025-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 use std::{error, fmt};
 
 use crate::diagnostic::{DiagnosableError, Diagnostic};
-use crate::errors::CostErrors;
+use crate::errors::{ClarityTypeError, CostErrors};
 use crate::execution_cost::ExecutionCost;
 use crate::representations::SymbolicExpression;
 use crate::types::{TraitIdentifier, TupleTypeSignature, TypeSignature, Value};
@@ -136,18 +136,127 @@ impl SyntaxBindingError {
     }
 }
 
-impl From<SyntaxBindingError> for CheckErrorKind {
+/// Converts a [`SyntaxBindingError`] into a [`StaticCheckErrorKind`].
+/// Used for propagating binding errors from
+/// [`crate::vm::analysis::read_only_checker::ReadOnlyChecker::check_each_expression_is_read_only`]
+impl From<SyntaxBindingError> for StaticCheckErrorKind {
     fn from(e: SyntaxBindingError) -> Self {
         Self::BadSyntaxBinding(e)
     }
 }
 
-/// Errors encountered during type-checking and analysis of Clarity contract code, ensuring
-/// type safety, correct function signatures, and adherence to resource constraints.
-/// These errors prevent invalid contracts from being deployed or executed,
-/// halting analysis and failing the transaction or contract deployment.
+/// Converts a [`SyntaxBindingError`] into a [`CommonCheckErrorKind`].
+/// Used for propagating binding errors from [`crate::vm::functions::handle_binding_list`],
+/// which is utilized in both static and runtime analysis to ensure consistent error handling.
+impl From<SyntaxBindingError> for CommonCheckErrorKind {
+    fn from(e: SyntaxBindingError) -> Self {
+        CommonCheckErrorKind::BadSyntaxBinding(e)
+    }
+}
+
+/// Shared set of error variants that are between static analysis (during contract deployment)
+/// and runtime checking (during contract execution), specifically for validation logic that
+/// is implemented in common code paths used by both.
+///
+/// All these variants represent errors that can arise only from code executed in both analysis and
+/// execution contexts—such as argument count checks, type size limits, or shared cost tracking logic.
+/// If an error may be triggered by either context via common logic, it lives here.
+///
+/// Importantly, this enum does not cover all errors common to both analysis and execution.
+/// There are other error shared error variants, but those are generated specifically by logic
+/// that is unique to static analysis or unique to execution. These errors are defined separately
+/// and do not pass through this enum. Only error cases that can possibly arise from a shared
+/// validation flow will appear here.
 #[derive(Debug, PartialEq)]
-pub enum CheckErrorKind {
+pub enum CommonCheckErrorKind {
+    // Cost checker errors
+    /// Arithmetic overflow in cost computation during type-checking, exceeding the maximum threshold.
+    CostOverflow,
+    /// Cumulative type-checking cost exceeds the allocated budget, indicating budget depletion.
+    /// The first `ExecutionCost` represents the total consumed cost, and the second represents the budget limit.
+    CostBalanceExceeded(ExecutionCost, ExecutionCost),
+    /// Memory usage during type-checking exceeds the allocated budget.
+    /// The first `u64` represents the total consumed memory, and the second represents the memory limit.
+    MemoryBalanceExceeded(u64, u64),
+    /// Failure in cost-tracking due to an unexpected condition or invalid state.
+    /// The `String` wraps the specific reason for the failure.
+    CostComputationFailed(String),
+    // Time checker errors
+    /// Type-checking time exceeds the allowed budget, halting analysis to ensure responsiveness.
+    ExecutionTimeExpired,
+
+    /// Value exceeds the maximum allowed size for type-checking or serialization.
+    ValueTooLarge,
+    /// Value is outside the acceptable range for its type (e.g., integer bounds).
+    ValueOutOfBounds,
+    /// Type signature nesting depth exceeds the allowed limit during analysis.
+    TypeSignatureTooDeep,
+    /// Expected a name (e.g., variable, function) but found an invalid or missing token.
+    ExpectedName,
+
+    // Unexpected interpreter behavior
+    /// Unexpected condition or failure in the type-checker, indicating a bug or invalid state.
+    ExpectsRejectable(String),
+    // Unexpected interpreter behavior
+    /// Unexpected condition or failure in the type-checker, indicating a bug or invalid state.
+    /// This error does NOT indicate a transaction would invalidate a block if included.
+    ExpectsAcceptable(String),
+
+    /// Type description is invalid or malformed, preventing proper type-checking.
+    InvalidTypeDescription,
+    /// Referenced type name does not exist or is undefined.
+    /// The `String` wraps the non-existent type name.
+    UnknownTypeName(String),
+
+    /// Could not determine the type of an expression during analysis.
+    CouldNotDetermineType,
+
+    /// Empty tuple is not allowed in Clarity.
+    EmptyTuplesNotAllowed,
+
+    /// Invalid or malformed signature in a function definition.
+    DefineFunctionBadSignature,
+
+    /// Name (e.g., variable, function) is already in use within the same scope.
+    /// The `String` wraps the conflicting name.
+    NameAlreadyUsed(String),
+
+    /// Invalid binding syntax in a generic construct (e.g., `let`, `match`).
+    /// The `SyntaxBindingError` wraps the specific binding error.
+    BadSyntaxBinding(SyntaxBindingError),
+
+    // Argument counts
+    /// Function requires at least the specified number of arguments, but fewer were provided.
+    /// The first `usize` represents the minimum required, and the second represents the actual count.
+    RequiresAtLeastArguments(usize, usize),
+    /// Function requires at most the specified number of arguments, but more were provided.
+    /// The first `usize` represents the maximum allowed, and the second represents the actual count.
+    RequiresAtMostArguments(usize, usize),
+    /// Incorrect number of arguments provided to a function.
+    /// The first `usize` represents the expected count, and the second represents the actual count.
+    IncorrectArgumentCount(usize, usize),
+    /// Too many function parameters specified.
+    /// The first `usize` represents the number of parameters found, the second represents the maximum allowed.
+    TooManyFunctionParameters(usize, usize),
+
+    /// Expected a trait identifier (e.g., `.trait-name`) but found an invalid token.
+    ExpectedTraitIdentifier,
+    /// Invalid or malformed signature in a `(define-trait ...)` expression.
+    DefineTraitBadSignature,
+    /// Trait definition contains duplicate method names.
+    /// The `String` wraps the duplicate method name.
+    DefineTraitDuplicateMethod(String),
+    /// Too many trait methods specified.
+    /// The first `usize` represents the number of methods found, the second the maximum allowed.
+    TraitTooManyMethods(usize, usize),
+}
+
+/// An error detected during the static analysis of a smart contract at deployment time.
+///
+/// These checks are performed once, before any contract execution occurs, to find issues
+/// like type mismatches, invalid function signatures, or incorrect control flow.
+#[derive(Debug, PartialEq)]
+pub enum StaticCheckErrorKind {
     // Cost checker errors
     /// Arithmetic overflow in cost computation during type-checking, exceeding the maximum threshold.
     CostOverflow,
@@ -173,28 +282,27 @@ pub enum CheckErrorKind {
     /// Expected a name (e.g., variable, function) but found an invalid or missing token.
     ExpectedName,
     /// Supertype (e.g., trait or union) exceeds the maximum allowed size or complexity.
-    /// This error indicates a transaction would invalidate a block if included.
     SupertypeTooLarge,
 
     // Unexpected interpreter behavior
     /// Unexpected condition or failure in the type-checker, indicating a bug or invalid state.
-    /// This error indicates a transaction would invalidate a block if included.
-    Expects(String),
+    ExpectsRejectable(String),
+    // Unexpected interpreter behavior
+    /// Unexpected condition or failure in the type-checker, indicating a bug or invalid state.
+    /// This error does NOT indicate a transaction would invalidate a block if included.
+    ExpectsAcceptable(String),
 
     // Match expression errors
     /// Invalid syntax in an `option` match expression.
-    /// The `Box<CheckErrorKind>` wraps the underlying error causing the syntax issue.
-    BadMatchOptionSyntax(Box<CheckErrorKind>),
+    /// The `Box<StaticCheckErrorKind>` wraps the underlying error causing the syntax issue.
+    BadMatchOptionSyntax(Box<StaticCheckErrorKind>),
     /// Invalid syntax in a `response` match expression.
-    /// The `Box<CheckErrorKind>` wraps the underlying error causing the syntax issue.
-    BadMatchResponseSyntax(Box<CheckErrorKind>),
+    /// The `Box<StaticCheckErrorKind>` wraps the underlying error causing the syntax issue.
+    BadMatchResponseSyntax(Box<StaticCheckErrorKind>),
     /// Input to a `match` expression does not conform to the expected type (e.g., `Option` or `Response`).
     /// The `Box<TypeSignature>` wraps the actual type of the provided input.
     BadMatchInput(Box<TypeSignature>),
 
-    // List typing errors
-    /// List elements have mismatched types, violating type consistency.
-    ListTypesMustMatch,
     /// Constructed list exceeds the maximum allowed length during type-checking.
     ConstructedListTooLarge,
 
@@ -202,9 +310,6 @@ pub enum CheckErrorKind {
     /// Expected type does not match the actual type during analysis.
     /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.
     TypeError(Box<TypeSignature>, Box<TypeSignature>),
-    /// Value does not match the expected type during type-checking.
-    /// The `Box<TypeSignature>` wraps the expected type, and the `Box<Value>` wraps the invalid value.
-    TypeValueError(Box<TypeSignature>, Box<Value>),
 
     /// Type description is invalid or malformed, preventing proper type-checking.
     InvalidTypeDescription,
@@ -216,10 +321,6 @@ pub enum CheckErrorKind {
     /// Type does not belong to the expected union of types during analysis.
     /// The `Vec<TypeSignature>` represents the expected types, and the `Box<TypeSignature>` wraps the actual type.
     UnionTypeError(Vec<TypeSignature>, Box<TypeSignature>),
-    /// Value does not belong to the expected union of types during type-checking.
-    /// The `Vec<TypeSignature>` represents the expected types, and the `Box<Value>` wraps the invalid value.
-    UnionTypeValueError(Vec<TypeSignature>, Box<Value>),
-
     /// Expected an optional type but found a different type.
     /// The `Box<TypeSignature>` wraps the actual type provided.
     ExpectedOptionalType(Box<TypeSignature>),
@@ -229,15 +330,6 @@ pub enum CheckErrorKind {
     /// Expected an optional or response type but found a different type.
     /// The `Box<TypeSignature>` wraps the actual type provided.
     ExpectedOptionalOrResponseType(Box<TypeSignature>),
-    /// Expected an optional value but found a different value.
-    /// The `Box<Value>` wraps the actual value provided.
-    ExpectedOptionalValue(Box<Value>),
-    /// Expected a response value but found a different value.
-    /// The `Box<Value>` wraps the actual value provided.
-    ExpectedResponseValue(Box<Value>),
-    /// Expected an optional or response value but found a different value.
-    /// The `Box<Value>` wraps the actual value provided.
-    ExpectedOptionalOrResponseValue(Box<Value>),
     /// Could not determine the type of the `ok` branch in a response type.
     CouldNotDetermineResponseOkType,
     /// Could not determine the type of the `err` branch in a response type.
@@ -246,9 +338,6 @@ pub enum CheckErrorKind {
     CouldNotDetermineSerializationType,
     /// Intermediary response types were not properly checked, risking type safety.
     UncheckedIntermediaryResponses,
-    /// Expected a contract principal value but found a different value.
-    /// The `Box<Value>` wraps the actual value provided.
-    ExpectedContractPrincipalValue(Box<Value>),
 
     // Match type errors
     /// Could not determine the types for a match expression’s branches.
@@ -273,18 +362,6 @@ pub enum CheckErrorKind {
     /// Referenced fungible token (FT) does not exist.
     /// The `String` wraps the non-existent token name.
     NoSuchFT(String),
-
-    // Transfer and asset operation errors
-    /// Invalid arguments provided to a `stx-transfer?` function.
-    BadTransferSTXArguments,
-    /// Invalid arguments provided to a fungible token transfer function.
-    BadTransferFTArguments,
-    /// Invalid arguments provided to a non-fungible token transfer function.
-    BadTransferNFTArguments,
-    /// Invalid arguments provided to a fungible token mint function.
-    BadMintFTArguments,
-    /// Invalid arguments provided to a fungible token burn function.
-    BadBurnFTArguments,
 
     // Tuples
     /// Tuple field name is invalid or violates naming rules.
@@ -329,10 +406,6 @@ pub enum CheckErrorKind {
     /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.
     ReturnTypesMustMatch(Box<TypeSignature>, Box<TypeSignature>),
 
-    /// Circular reference detected in interdependent function definitions.
-    /// The `Vec<String>` represents the list of referenced names forming the cycle.
-    CircularReference(Vec<String>),
-
     // Contract-call errors
     /// Referenced contract does not exist.
     /// The `String` wraps the non-existent contract name.
@@ -340,9 +413,6 @@ pub enum CheckErrorKind {
     /// Referenced public function does not exist in the specified contract.
     /// The first `String` wraps the contract name, and the second wraps the function name.
     NoSuchPublicFunction(String, String),
-    /// Public function is not read-only when expected to be.
-    /// The first `String` wraps the contract name, and the second wraps the function name.
-    PublicFunctionNotReadOnly(String, String),
     /// Attempt to define a contract with a name that already exists.
     /// The `String` wraps the conflicting contract name.
     ContractAlreadyExists(String),
@@ -356,9 +426,6 @@ pub enum CheckErrorKind {
     /// Referenced block info property does not exist.
     /// The `String` wraps the non-existent property name.
     NoSuchBlockInfoProperty(String),
-    /// Referenced burn block info property does not exist.
-    /// The `String` wraps the non-existent property name.
-    NoSuchBurnBlockInfoProperty(String),
     /// Referenced Stacks block info property does not exist.
     /// The `String` wraps the non-existent property name.
     NoSuchStacksBlockInfoProperty(String),
@@ -403,9 +470,6 @@ pub enum CheckErrorKind {
 
     /// Maximum context depth for type-checking has been reached.
     MaxContextDepthReached,
-    /// Referenced function is not defined in the current scope.
-    /// The `String` wraps the non-existent function name.
-    UndefinedFunction(String),
     /// Referenced variable is not defined in the current scope.
     /// The `String` wraps the non-existent variable name.
     UndefinedVariable(String),
@@ -451,8 +515,6 @@ pub enum CheckErrorKind {
     TraitMethodUnknown(String, String),
     /// Expected a trait identifier (e.g., `.trait-name`) but found an invalid token.
     ExpectedTraitIdentifier,
-    /// Trait reference is not allowed in the current context (e.g., storage).
-    TraitReferenceNotAllowed,
     /// Invalid implementation of a trait method.
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
@@ -463,8 +525,6 @@ pub enum CheckErrorKind {
     DefineTraitDuplicateMethod(String),
     /// Unexpected use of a trait or field reference in a non-trait context.
     UnexpectedTraitOrFieldReference,
-    /// Trait-based contract call used in a read-only context, which is prohibited.
-    TraitBasedContractCallInReadOnly,
     /// `contract-of` expects a trait type but found a different type.
     ContractOfExpectsTrait,
     /// Trait implementation is incompatible with the expected trait definition.
@@ -473,16 +533,6 @@ pub enum CheckErrorKind {
     /// Too many trait methods specified.
     /// The first `usize` represents the number of methods found, the second the maximum allowed.
     TraitTooManyMethods(usize, usize),
-
-    // Strings
-    /// String contains invalid or disallowed characters (e.g., non-ASCII in ASCII strings).
-    InvalidCharactersDetected,
-    /// String contains invalid UTF-8 encoding.
-    InvalidUTF8Encoding,
-
-    // secp256k1 signature
-    /// Invalid secp256k1 signature provided in an expression.
-    InvalidSecp65k1Signature,
 
     /// Attempt to write to contract state in a read-only function.
     WriteAttemptedInReadOnly,
@@ -512,32 +562,323 @@ pub enum CheckErrorKind {
     TooManyAllowances(usize, usize),
 }
 
+/// An error that occurs during the runtime analysis of a smart contract at runtime. Could be returnd by:
+/// - a contract initialization execution
+/// - a contract call execution
+///
+/// These errors are found when a contract is executed. They represent dynamic conditions
+/// that cannot be determined by static analysis, such as:
+/// - Failures based on runtime arguments or state changes.
+/// - Value-level type mismatches.
 #[derive(Debug, PartialEq)]
-/// Represents an error encountered during Clarity's type-checking and semantic analysis phase.
-/// Wraps a `CheckErrorKind` variant, optionally includes the expressions causing the error,
-/// and provides diagnostic information for debugging.
+pub enum RuntimeCheckErrorKind {
+    // Cost checker errors
+    /// Arithmetic overflow in cost computation during type-checking, exceeding the maximum threshold.
+    CostOverflow,
+    /// Cumulative type-checking cost exceeds the allocated budget, indicating budget depletion.
+    /// The first `ExecutionCost` represents the total consumed cost, and the second represents the budget limit.
+    CostBalanceExceeded(ExecutionCost, ExecutionCost),
+    /// Memory usage during type-checking exceeds the allocated budget.
+    /// The first `u64` represents the total consumed memory, and the second represents the memory limit.
+    MemoryBalanceExceeded(u64, u64),
+    /// Failure in cost-tracking due to an unexpected condition or invalid state.
+    /// The `String` wraps the specific reason for the failure.
+    CostComputationFailed(String),
+    // Time checker errors
+    /// Type-checking time exceeds the allowed budget, halting analysis to ensure responsiveness.
+    ExecutionTimeExpired,
+
+    /// Value exceeds the maximum allowed size for type-checking or serialization.
+    ValueTooLarge,
+    /// Value is outside the acceptable range for its type (e.g., integer bounds).
+    ValueOutOfBounds,
+    /// Type signature nesting depth exceeds the allowed limit during analysis.
+    TypeSignatureTooDeep,
+    /// Expected a name (e.g., variable, function) but found an invalid or missing token.
+    ExpectedName,
+    /// Supertype (e.g., trait or union) exceeds the maximum allowed size or complexity.
+    SupertypeTooLarge,
+
+    // Unexpected interpreter behavior
+    /// Unexpected condition or failure in the type-checker, indicating a catastrophic bug or invalid state.
+    ExpectsRejectable(String),
+    /// Unexpected condition or failure in the type-checker, indicating a noncatastrophic bug or invalid state.
+    ExpectsAcceptable(String),
+
+    // Match expression errors
+    /// Invalid syntax in an `option` match expression.
+    /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
+    BadMatchOptionSyntax(Box<RuntimeCheckErrorKind>),
+    /// Invalid syntax in a `response` match expression.
+    /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
+    BadMatchResponseSyntax(Box<RuntimeCheckErrorKind>),
+    /// Input to a `match` expression does not conform to the expected type (e.g., `Option` or `Response`).
+    /// The `Box<TypeSignature>` wraps the actual type of the provided input.
+    BadMatchInput(Box<TypeSignature>),
+
+    // List typing errors
+    /// List elements have mismatched types, violating type consistency.
+    ListTypesMustMatch,
+
+    // Type mismatch errors
+    /// Expected type does not match the actual type during analysis.
+    /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.
+    TypeError(Box<TypeSignature>, Box<TypeSignature>),
+    /// Value does not match the expected type during type-checking.
+    /// The `Box<TypeSignature>` wraps the expected type, and the `Box<Value>` wraps the invalid value.
+    TypeValueError(Box<TypeSignature>, Box<Value>),
+
+    /// Type description is invalid or malformed, preventing proper type-checking.
+    InvalidTypeDescription,
+    /// Referenced type name does not exist or is undefined.
+    /// The `String` wraps the non-existent type name.
+    UnknownTypeName(String),
+
+    // Union type mismatch
+    /// Type does not belong to the expected union of types during analysis.
+    /// The `Vec<TypeSignature>` represents the expected types, and the `Box<TypeSignature>` wraps the actual type.
+    UnionTypeError(Vec<TypeSignature>, Box<TypeSignature>),
+    /// Value does not belong to the expected union of types during type-checking.
+    /// The `Vec<TypeSignature>` represents the expected types, and the `Box<Value>` wraps the invalid value.
+    UnionTypeValueError(Vec<TypeSignature>, Box<Value>),
+
+    /// Expected an optional value but found a different value.
+    /// The `Box<Value>` wraps the actual value provided.
+    ExpectedOptionalValue(Box<Value>),
+    /// Expected a response value but found a different value.
+    /// The `Box<Value>` wraps the actual value provided.
+    ExpectedResponseValue(Box<Value>),
+    /// Expected an optional or response value but found a different value.
+    /// The `Box<Value>` wraps the actual value provided.
+    ExpectedOptionalOrResponseValue(Box<Value>),
+    /// Expected a contract principal value but found a different value.
+    /// The `Box<Value>` wraps the actual value provided.
+    ExpectedContractPrincipalValue(Box<Value>),
+
+    // Match type errors
+    /// Could not determine the type of an expression during analysis.
+    CouldNotDetermineType,
+
+    // Assets
+    /// Expected a token name as an argument but found an invalid token.
+    BadTokenName,
+    /// Referenced non-fungible token (NFT) does not exist.
+    /// The `String` wraps the non-existent token name.
+    NoSuchNFT(String),
+    /// Referenced fungible token (FT) does not exist.
+    /// The `String` wraps the non-existent token name.
+    NoSuchFT(String),
+
+    // Transfer and asset operation errors
+    /// Invalid arguments provided to a `stx-transfer?` function.
+    BadTransferSTXArguments,
+    /// Invalid arguments provided to a fungible token transfer function.
+    BadTransferFTArguments,
+    /// Invalid arguments provided to a non-fungible token transfer function.
+    BadTransferNFTArguments,
+    /// Invalid arguments provided to a fungible token mint function.
+    BadMintFTArguments,
+    /// Invalid arguments provided to a fungible token burn function.
+    BadBurnFTArguments,
+
+    // Tuples
+    /// Expected a tuple type but found a different type.
+    /// The `Box<TypeSignature>` wraps the actual type provided.
+    ExpectedTuple(Box<TypeSignature>),
+    /// Referenced tuple field does not exist in the tuple type.
+    /// The `String` wraps the requested field name, and the `TupleTypeSignature` wraps the tuple’s type.
+    NoSuchTupleField(String, TupleTypeSignature),
+    /// Empty tuple is not allowed in Clarity.
+    EmptyTuplesNotAllowed,
+
+    // Variables
+    /// Referenced data variable does not exist in scope.
+    /// The `String` wraps the non-existent variable name.
+    NoSuchDataVariable(String),
+
+    // Data map
+    /// Referenced data map does not exist in scope.
+    /// The `String` wraps the non-existent map name.
+    NoSuchMap(String),
+
+    // Defines
+    /// Invalid or malformed signature in a function definition.
+    DefineFunctionBadSignature,
+    /// Function name is invalid or violates naming rules.
+    BadFunctionName,
+    /// Public function must return a response type, but found a different type.
+    /// The `Box<TypeSignature>` wraps the actual return type.
+    PublicFunctionMustReturnResponse(Box<TypeSignature>),
+    /// Return types of function branches do not match the expected type.
+    /// The first `Box<TypeSignature>` wraps the expected type, and the second wraps the actual type.
+    ReturnTypesMustMatch(Box<TypeSignature>, Box<TypeSignature>),
+
+    /// Circular reference detected in interdependent function definitions.
+    /// The `Vec<String>` represents the list of referenced names forming the cycle.
+    CircularReference(Vec<String>),
+
+    // Contract-call errors
+    /// Referenced contract does not exist.
+    /// The `String` wraps the non-existent contract name.
+    NoSuchContract(String),
+    /// Referenced public function does not exist in the specified contract.
+    /// The first `String` wraps the contract name, and the second wraps the function name.
+    NoSuchPublicFunction(String, String),
+    /// Public function is not read-only when expected to be.
+    /// The first `String` wraps the contract name, and the second wraps the function name.
+    PublicFunctionNotReadOnly(String, String),
+    /// Attempt to define a contract with a name that already exists.
+    /// The `String` wraps the conflicting contract name.
+    ContractAlreadyExists(String),
+    /// Expected a contract name in a `contract-call?` expression but found an invalid token.
+    ContractCallExpectName,
+
+    // get-block-info? errors
+    /// Referenced burn block info property does not exist.
+    /// The `String` wraps the non-existent property name.
+    NoSuchBurnBlockInfoProperty(String),
+    /// Referenced Stacks block info property does not exist.
+    /// The `String` wraps the non-existent property name.
+    NoSuchStacksBlockInfoProperty(String),
+    /// Expected a block info property name but found an invalid token.
+    GetBlockInfoExpectPropertyName,
+    /// Expected a Stacks block info property name but found an invalid token.
+    GetStacksBlockInfoExpectPropertyName,
+    /// Expected a tenure info property name but found an invalid token.
+    GetTenureInfoExpectPropertyName,
+
+    /// Name (e.g., variable, function) is already in use within the same scope.
+    /// The `String` wraps the conflicting name.
+    NameAlreadyUsed(String),
+
+    // Expect a function, or applying a function to a list
+    /// Attempt to apply a non-function value as a function.
+    NonFunctionApplication,
+    /// Expected a list application but found a different expression.
+    ExpectedListApplication,
+    /// Expected a sequence type (e.g., list, buffer) but encountered a non-sequence value.
+    ///
+    /// The boxed [`TypeSignature`] represents the **actual type provided**, if known.
+    /// If the type could not be determined, this will be [`TypeSignature::NoType`].
+    ExpectedSequence(Box<TypeSignature>),
+
+    // Let syntax
+    /// Invalid syntax in a `let` expression, violating binding or structure rules.
+    BadLetSyntax,
+
+    // Generic binding syntax
+    /// Invalid binding syntax in a generic construct (e.g., `let`, `match`).
+    /// The `SyntaxBindingError` wraps the specific binding error.
+    BadSyntaxBinding(SyntaxBindingError),
+
+    /// Referenced function is not defined in the current scope.
+    /// The `String` wraps the non-existent function name.
+    UndefinedFunction(String),
+    /// Referenced variable is not defined in the current scope.
+    /// The `String` wraps the non-existent variable name.
+    UndefinedVariable(String),
+
+    // Argument counts
+    /// Function requires at least the specified number of arguments, but fewer were provided.
+    /// The first `usize` represents the minimum required, and the second represents the actual count.
+    RequiresAtLeastArguments(usize, usize),
+    /// Function requires at most the specified number of arguments, but more were provided.
+    /// The first `usize` represents the maximum allowed, and the second represents the actual count.
+    RequiresAtMostArguments(usize, usize),
+    /// Incorrect number of arguments provided to a function.
+    /// The first `usize` represents the expected count, and the second represents the actual count.
+    IncorrectArgumentCount(usize, usize),
+    /// Too many function parameters specified.
+    /// The first `usize` represents the number of parameters found, the second represents the maximum allowed.
+    TooManyFunctionParameters(usize, usize),
+
+    // Traits
+    /// Referenced trait is not defined or cannot be found.
+    /// The `String` wraps the non-existent trait name.
+    TraitReferenceUnknown(String),
+    /// Referenced method does not exist in the specified trait.
+    /// The first `String` wraps the trait name, and the second wraps the method name.
+    TraitMethodUnknown(String, String),
+    /// Expected a trait identifier (e.g., `.trait-name`) but found an invalid token.
+    ExpectedTraitIdentifier,
+    /// Invalid implementation of a trait method.
+    /// The first `String` wraps the trait name, and the second wraps the method name.
+    BadTraitImplementation(String, String),
+    /// Invalid or malformed signature in a `(define-trait ...)` expression.
+    DefineTraitBadSignature,
+    /// Trait definition contains duplicate method names.
+    /// The `String` wraps the duplicate method name.
+    DefineTraitDuplicateMethod(String),
+
+    /// Trait-based contract call used in a read-only context, which is prohibited.
+    TraitBasedContractCallInReadOnly,
+    /// `contract-of` expects a trait type but found a different type.
+    ContractOfExpectsTrait,
+    /// Too many trait methods specified.
+    /// The first `usize` represents the number of methods found, the second the maximum allowed.
+    TraitTooManyMethods(usize, usize),
+
+    // Strings
+    /// String contains invalid or disallowed characters (e.g., non-ASCII in ASCII strings).
+    InvalidCharactersDetected,
+    /// String contains invalid UTF-8 encoding.
+    InvalidUTF8Encoding,
+
+    /// Attempt to write to contract state in a read-only function.
+    WriteAttemptedInReadOnly,
+
+    // contract post-conditions
+    /// Post-condition expects a list of asset allowances but received invalid input.
+    /// The first `String` wraps the function name, and the second `i32` wraps the argument number.
+    ExpectedListOfAllowances(String, i32),
+    /// Allowance expressions are only allowed in specific contexts (`restrict-assets?` or `as-contract?`).
+    AllowanceExprNotAllowed,
+    /// Expected an allowance expression but found invalid input.
+    /// The `String` wraps the unexpected input.
+    ExpectedAllowanceExpr(String),
+    /// Too many allowances specified in post-condition.
+    /// The first `usize` represents the maximum allowed, and the second represents the actual count.
+    TooManyAllowances(usize, usize),
+}
+
+#[derive(Debug, PartialEq)]
+/// A complete static analysis error, combining the error with diagnostic information.
+///
+/// This struct wraps a [`StaticCheckErrorKind`] variant with its source location
+/// (like line and column numbers) and the code expression that caused the error.
+/// It provides the full context needed to report a clear, actionable error to a
+/// developer during contract deployment.
 pub struct StaticCheckError {
     /// The specific type-checking or semantic error that occurred.
-    pub err: Box<CheckErrorKind>,
+    pub err: Box<StaticCheckErrorKind>,
     /// Optional vector of expressions related to the error, if available.
     pub expressions: Option<Vec<SymbolicExpression>>,
     /// Diagnostic details (e.g., line/column numbers, error message, suggestions) around the error.
     pub diagnostic: Diagnostic,
 }
 
-impl CheckErrorKind {
-    /// Does this check error indicate that the transaction should be
-    /// rejected?
+impl RuntimeCheckErrorKind {
+    /// This check indicates that the transaction should be rejected.
     pub fn rejectable(&self) -> bool {
         matches!(
             self,
-            CheckErrorKind::SupertypeTooLarge | CheckErrorKind::Expects(_)
+            RuntimeCheckErrorKind::SupertypeTooLarge | RuntimeCheckErrorKind::ExpectsRejectable(_)
+        )
+    }
+}
+
+impl StaticCheckErrorKind {
+    /// This check indicates that the transaction should be rejected.
+    pub fn rejectable(&self) -> bool {
+        matches!(
+            self,
+            StaticCheckErrorKind::SupertypeTooLarge | StaticCheckErrorKind::ExpectsRejectable(_)
         )
     }
 }
 
 impl StaticCheckError {
-    pub fn new(err: CheckErrorKind) -> StaticCheckError {
+    pub fn new(err: StaticCheckErrorKind) -> StaticCheckError {
         let diagnostic = Diagnostic::err(&err);
         StaticCheckError {
             err: Box::new(err),
@@ -560,34 +901,194 @@ impl StaticCheckError {
         self.expressions.replace(exprs.to_vec());
     }
 
-    pub fn with_expression(err: CheckErrorKind, expr: &SymbolicExpression) -> Self {
+    pub fn with_expression(err: StaticCheckErrorKind, expr: &SymbolicExpression) -> Self {
         let mut r = Self::new(err);
         r.set_expression(expr);
         r
     }
 }
 
+impl From<ClarityTypeError> for StaticCheckErrorKind {
+    fn from(err: ClarityTypeError) -> Self {
+        match err {
+            ClarityTypeError::ValueTooLarge => Self::ValueTooLarge,
+            ClarityTypeError::TypeSignatureTooDeep => Self::TypeSignatureTooDeep,
+            ClarityTypeError::ValueOutOfBounds => Self::ValueOutOfBounds,
+            ClarityTypeError::DuplicateTupleField(name) => Self::NameAlreadyUsed(name),
+            ClarityTypeError::NoSuchTupleField(field, tuple_sig) => {
+                Self::NoSuchTupleField(field, tuple_sig)
+            }
+            ClarityTypeError::TypeMismatch(expected, found) => Self::TypeError(expected, found),
+            ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
+            ClarityTypeError::SupertypeTooLarge => Self::SupertypeTooLarge,
+            ClarityTypeError::InvalidTypeDescription => Self::InvalidTypeDescription,
+            ClarityTypeError::InvalidUrlString(_)
+            | ClarityTypeError::InvalidClarityName(_)
+            | ClarityTypeError::InvalidContractName(_)
+            | ClarityTypeError::QualifiedContractEmptyIssuer
+            | ClarityTypeError::QualifiedContractMissingDot
+            | ClarityTypeError::InvalidPrincipalEncoding(_)
+            | ClarityTypeError::InvalidPrincipalLength(_)
+            | ClarityTypeError::ListTypeMismatch
+            | ClarityTypeError::SequenceElementArityMismatch { .. }
+            | ClarityTypeError::ExpectedSequenceValue
+            | ClarityTypeError::TypeMismatchValue(_, _)
+            | ClarityTypeError::ResponseTypeMismatch { .. }
+            | ClarityTypeError::InvalidAsciiCharacter(_)
+            | ClarityTypeError::InvalidUtf8Encoding => Self::ExpectsAcceptable(format!(
+                "Unexpected error type during static analysis: {err}"
+            )),
+            ClarityTypeError::InvariantViolation(_)
+            | ClarityTypeError::InvalidPrincipalVersion(_) => Self::ExpectsRejectable(format!(
+                "Unexpected error type during static analysis: {err}"
+            )),
+            ClarityTypeError::CouldNotDetermineSerializationType => {
+                Self::CouldNotDetermineSerializationType
+            }
+            ClarityTypeError::CouldNotDetermineType => Self::CouldNotDetermineType,
+            ClarityTypeError::UnsupportedTypeInEpoch(ty, epoch) => {
+                Self::ExpectsRejectable(format!("{ty} should not be used in {epoch}"))
+            }
+            ClarityTypeError::UnsupportedEpoch(epoch) => {
+                Self::ExpectsRejectable(format!("{epoch} is not supported"))
+            }
+        }
+    }
+}
+
+impl From<ClarityTypeError> for StaticCheckError {
+    fn from(err: ClarityTypeError) -> Self {
+        StaticCheckErrorKind::from(err).into()
+    }
+}
+
+impl From<(CommonCheckErrorKind, &SymbolicExpression)> for StaticCheckError {
+    fn from(e: (CommonCheckErrorKind, &SymbolicExpression)) -> Self {
+        Self::with_expression(e.0.into(), e.1)
+    }
+}
+
 impl From<(SyntaxBindingError, &SymbolicExpression)> for StaticCheckError {
     fn from(e: (SyntaxBindingError, &SymbolicExpression)) -> Self {
-        Self::with_expression(CheckErrorKind::BadSyntaxBinding(e.0), e.1)
+        Self::with_expression(StaticCheckErrorKind::BadSyntaxBinding(e.0), e.1)
     }
 }
 
-impl From<(CheckErrorKind, &SymbolicExpression)> for StaticCheckError {
-    fn from(e: (CheckErrorKind, &SymbolicExpression)) -> Self {
-        let mut ce = Self::new(e.0);
-        ce.set_expression(e.1);
-        ce
-    }
-}
-
-impl From<(CheckErrorKind, &SymbolicExpression)> for CheckErrorKind {
-    fn from(e: (CheckErrorKind, &SymbolicExpression)) -> Self {
+impl From<(CommonCheckErrorKind, &SymbolicExpression)> for CommonCheckErrorKind {
+    fn from(e: (CommonCheckErrorKind, &SymbolicExpression)) -> Self {
         e.0
     }
 }
 
-impl fmt::Display for CheckErrorKind {
+impl From<(CommonCheckErrorKind, &SymbolicExpression)> for RuntimeCheckErrorKind {
+    fn from(e: (CommonCheckErrorKind, &SymbolicExpression)) -> Self {
+        e.0.into()
+    }
+}
+
+impl From<ClarityTypeError> for RuntimeCheckErrorKind {
+    fn from(err: ClarityTypeError) -> Self {
+        match err {
+            ClarityTypeError::ValueTooLarge => Self::ValueTooLarge,
+            ClarityTypeError::TypeSignatureTooDeep => Self::TypeSignatureTooDeep,
+            ClarityTypeError::ValueOutOfBounds => Self::ValueOutOfBounds,
+            ClarityTypeError::DuplicateTupleField(name) => Self::NameAlreadyUsed(name),
+            ClarityTypeError::NoSuchTupleField(field, tuple_sig) => {
+                Self::NoSuchTupleField(field, tuple_sig)
+            }
+            ClarityTypeError::TypeMismatchValue(ty, value) => Self::TypeValueError(ty, value),
+            ClarityTypeError::TypeMismatch(expected, found) => Self::TypeError(expected, found),
+            ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
+            ClarityTypeError::SupertypeTooLarge => Self::SupertypeTooLarge,
+            ClarityTypeError::InvalidTypeDescription => Self::InvalidTypeDescription,
+            ClarityTypeError::ListTypeMismatch => Self::ListTypesMustMatch,
+            ClarityTypeError::InvalidAsciiCharacter(_) => Self::InvalidCharactersDetected,
+            ClarityTypeError::InvalidUtf8Encoding => Self::InvalidUTF8Encoding,
+            ClarityTypeError::ExpectedSequenceValue
+            | ClarityTypeError::SequenceElementArityMismatch { .. }
+            | ClarityTypeError::CouldNotDetermineSerializationType
+            | ClarityTypeError::InvalidUrlString(_)
+            | ClarityTypeError::InvalidClarityName(_)
+            | ClarityTypeError::InvalidContractName(_)
+            | ClarityTypeError::QualifiedContractEmptyIssuer
+            | ClarityTypeError::QualifiedContractMissingDot
+            | ClarityTypeError::InvalidPrincipalEncoding(_)
+            | ClarityTypeError::InvalidPrincipalLength(_)
+            | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
+                "Unexpected error type during runtime analysis: {err}"
+            )),
+            ClarityTypeError::InvariantViolation(_)
+            | ClarityTypeError::InvalidPrincipalVersion(_) => Self::ExpectsRejectable(format!(
+                "Unexpected error type during runtime analysis: {err}"
+            )),
+            ClarityTypeError::CouldNotDetermineType => Self::CouldNotDetermineType,
+            ClarityTypeError::UnsupportedTypeInEpoch(ty, epoch) => {
+                Self::ExpectsRejectable(format!("{ty} should not be used in {epoch}"))
+            }
+            ClarityTypeError::UnsupportedEpoch(epoch) => {
+                Self::ExpectsRejectable(format!("{epoch} is not supported"))
+            }
+        }
+    }
+}
+
+impl From<ClarityTypeError> for CommonCheckErrorKind {
+    fn from(err: ClarityTypeError) -> Self {
+        match err {
+            ClarityTypeError::ValueTooLarge => Self::ValueTooLarge,
+            ClarityTypeError::TypeSignatureTooDeep => Self::TypeSignatureTooDeep,
+            ClarityTypeError::ValueOutOfBounds => Self::ValueOutOfBounds,
+            ClarityTypeError::DuplicateTupleField(name) => Self::NameAlreadyUsed(name),
+            ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
+            ClarityTypeError::InvalidTypeDescription => Self::InvalidTypeDescription,
+            ClarityTypeError::CouldNotDetermineType => Self::CouldNotDetermineType,
+            ClarityTypeError::ListTypeMismatch
+            | ClarityTypeError::TypeMismatch(_, _)
+            | ClarityTypeError::SequenceElementArityMismatch { .. }
+            | ClarityTypeError::ExpectedSequenceValue
+            | ClarityTypeError::InvalidAsciiCharacter(_)
+            | ClarityTypeError::InvalidUtf8Encoding
+            | ClarityTypeError::NoSuchTupleField(_, _)
+            | ClarityTypeError::TypeMismatchValue(_, _)
+            | ClarityTypeError::CouldNotDetermineSerializationType
+            | ClarityTypeError::InvalidUrlString(_)
+            | ClarityTypeError::InvalidClarityName(_)
+            | ClarityTypeError::InvalidContractName(_)
+            | ClarityTypeError::QualifiedContractEmptyIssuer
+            | ClarityTypeError::QualifiedContractMissingDot
+            | ClarityTypeError::InvalidPrincipalEncoding(_)
+            | ClarityTypeError::InvalidPrincipalLength(_)
+            | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
+                "Unexpected but acceptable error type during analysis: {err}"
+            )),
+            ClarityTypeError::SupertypeTooLarge
+            | ClarityTypeError::InvariantViolation(_)
+            | ClarityTypeError::InvalidPrincipalVersion(_) => Self::ExpectsRejectable(format!(
+                "Unexpected and unacceptable error type during analysis: {err}"
+            )),
+            ClarityTypeError::UnsupportedTypeInEpoch(ty, epoch) => {
+                Self::ExpectsRejectable(format!("{ty} should not be used in {epoch}"))
+            }
+            ClarityTypeError::UnsupportedEpoch(epoch) => {
+                Self::ExpectsRejectable(format!("{epoch} is not supported"))
+            }
+        }
+    }
+}
+
+impl fmt::Display for CommonCheckErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+impl fmt::Display for RuntimeCheckErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{self:?}")
+    }
+}
+
+impl fmt::Display for StaticCheckErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{self:?}")
     }
@@ -607,26 +1108,82 @@ impl fmt::Display for StaticCheckError {
 
 impl From<CostErrors> for StaticCheckError {
     fn from(err: CostErrors) -> Self {
-        StaticCheckError::from(CheckErrorKind::from(err))
+        StaticCheckError::from(StaticCheckErrorKind::from(err))
     }
 }
 
-impl From<CostErrors> for CheckErrorKind {
+impl From<CostErrors> for StaticCheckErrorKind {
     fn from(err: CostErrors) -> Self {
         match err {
-            CostErrors::CostOverflow => CheckErrorKind::CostOverflow,
-            CostErrors::CostBalanceExceeded(a, b) => CheckErrorKind::CostBalanceExceeded(a, b),
-            CostErrors::MemoryBalanceExceeded(a, b) => CheckErrorKind::MemoryBalanceExceeded(a, b),
-            CostErrors::CostComputationFailed(s) => CheckErrorKind::CostComputationFailed(s),
+            CostErrors::CostOverflow => StaticCheckErrorKind::CostOverflow,
+            CostErrors::CostBalanceExceeded(a, b) => {
+                StaticCheckErrorKind::CostBalanceExceeded(a, b)
+            }
+            CostErrors::MemoryBalanceExceeded(a, b) => {
+                StaticCheckErrorKind::MemoryBalanceExceeded(a, b)
+            }
+            CostErrors::CostComputationFailed(s) => StaticCheckErrorKind::CostComputationFailed(s),
             CostErrors::CostContractLoadFailure => {
-                CheckErrorKind::CostComputationFailed("Failed to load cost contract".into())
+                StaticCheckErrorKind::CostComputationFailed("Failed to load cost contract".into())
             }
-            CostErrors::InterpreterFailure => {
-                CheckErrorKind::Expects("Unexpected interpreter failure in cost computation".into())
-            }
-            CostErrors::Expect(s) => CheckErrorKind::Expects(s),
-            CostErrors::ExecutionTimeExpired => CheckErrorKind::ExecutionTimeExpired,
+            CostErrors::InterpreterFailure => StaticCheckErrorKind::ExpectsRejectable(
+                "Unexpected interpreter failure in cost computation".into(),
+            ),
+            CostErrors::Expect(s) => StaticCheckErrorKind::ExpectsRejectable(s),
+            CostErrors::ExecutionTimeExpired => StaticCheckErrorKind::ExecutionTimeExpired,
         }
+    }
+}
+
+impl From<CostErrors> for RuntimeCheckErrorKind {
+    fn from(err: CostErrors) -> Self {
+        match err {
+            CostErrors::CostOverflow => RuntimeCheckErrorKind::CostOverflow,
+            CostErrors::CostBalanceExceeded(a, b) => {
+                RuntimeCheckErrorKind::CostBalanceExceeded(a, b)
+            }
+            CostErrors::MemoryBalanceExceeded(a, b) => {
+                RuntimeCheckErrorKind::MemoryBalanceExceeded(a, b)
+            }
+            CostErrors::CostComputationFailed(s) => RuntimeCheckErrorKind::CostComputationFailed(s),
+            CostErrors::CostContractLoadFailure => {
+                RuntimeCheckErrorKind::CostComputationFailed("Failed to load cost contract".into())
+            }
+            CostErrors::InterpreterFailure => RuntimeCheckErrorKind::ExpectsRejectable(
+                "Unexpected interpreter failure in cost computation".into(),
+            ),
+            CostErrors::Expect(s) => RuntimeCheckErrorKind::ExpectsRejectable(s),
+            CostErrors::ExecutionTimeExpired => RuntimeCheckErrorKind::ExecutionTimeExpired,
+        }
+    }
+}
+
+impl From<CostErrors> for CommonCheckErrorKind {
+    fn from(err: CostErrors) -> Self {
+        match err {
+            CostErrors::CostOverflow => CommonCheckErrorKind::CostOverflow,
+            CostErrors::CostBalanceExceeded(a, b) => {
+                CommonCheckErrorKind::CostBalanceExceeded(a, b)
+            }
+            CostErrors::MemoryBalanceExceeded(a, b) => {
+                CommonCheckErrorKind::MemoryBalanceExceeded(a, b)
+            }
+            CostErrors::CostComputationFailed(s) => CommonCheckErrorKind::CostComputationFailed(s),
+            CostErrors::CostContractLoadFailure => {
+                CommonCheckErrorKind::CostComputationFailed("Failed to load cost contract".into())
+            }
+            CostErrors::InterpreterFailure => CommonCheckErrorKind::ExpectsRejectable(
+                "Unexpected interpreter failure in cost computation".into(),
+            ),
+            CostErrors::Expect(s) => CommonCheckErrorKind::ExpectsRejectable(s),
+            CostErrors::ExecutionTimeExpired => CommonCheckErrorKind::ExecutionTimeExpired,
+        }
+    }
+}
+
+impl error::Error for CommonCheckErrorKind {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        None
     }
 }
 
@@ -636,36 +1193,186 @@ impl error::Error for StaticCheckError {
     }
 }
 
-impl error::Error for CheckErrorKind {
+impl error::Error for RuntimeCheckErrorKind {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         None
     }
 }
 
-impl From<CheckErrorKind> for StaticCheckError {
-    fn from(err: CheckErrorKind) -> Self {
+impl From<StaticCheckErrorKind> for StaticCheckError {
+    fn from(err: StaticCheckErrorKind) -> Self {
         StaticCheckError::new(err)
     }
 }
 
+impl From<CommonCheckErrorKind> for StaticCheckError {
+    fn from(err: CommonCheckErrorKind) -> Self {
+        StaticCheckError::new(StaticCheckErrorKind::from(err))
+    }
+}
+
+impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
+    fn from(err: CommonCheckErrorKind) -> Self {
+        match err {
+            CommonCheckErrorKind::CostOverflow => RuntimeCheckErrorKind::CostOverflow,
+            CommonCheckErrorKind::CostBalanceExceeded(a, b) => {
+                RuntimeCheckErrorKind::CostBalanceExceeded(a, b)
+            }
+            CommonCheckErrorKind::MemoryBalanceExceeded(a, b) => {
+                RuntimeCheckErrorKind::MemoryBalanceExceeded(a, b)
+            }
+            CommonCheckErrorKind::CostComputationFailed(s) => {
+                RuntimeCheckErrorKind::CostComputationFailed(s)
+            }
+            CommonCheckErrorKind::ExecutionTimeExpired => {
+                RuntimeCheckErrorKind::ExecutionTimeExpired
+            }
+            CommonCheckErrorKind::IncorrectArgumentCount(expected, args) => {
+                RuntimeCheckErrorKind::IncorrectArgumentCount(expected, args)
+            }
+            CommonCheckErrorKind::RequiresAtLeastArguments(expected, args) => {
+                RuntimeCheckErrorKind::RequiresAtLeastArguments(expected, args)
+            }
+            CommonCheckErrorKind::RequiresAtMostArguments(expected, args) => {
+                RuntimeCheckErrorKind::RequiresAtMostArguments(expected, args)
+            }
+            CommonCheckErrorKind::TooManyFunctionParameters(found, allowed) => {
+                RuntimeCheckErrorKind::TooManyFunctionParameters(found, allowed)
+            }
+            CommonCheckErrorKind::ExpectedName => RuntimeCheckErrorKind::ExpectedName,
+            CommonCheckErrorKind::DefineFunctionBadSignature => {
+                RuntimeCheckErrorKind::DefineFunctionBadSignature
+            }
+            CommonCheckErrorKind::ExpectedTraitIdentifier => {
+                RuntimeCheckErrorKind::ExpectedTraitIdentifier
+            }
+            CommonCheckErrorKind::CouldNotDetermineType => {
+                RuntimeCheckErrorKind::CouldNotDetermineType
+            }
+            CommonCheckErrorKind::ValueTooLarge => RuntimeCheckErrorKind::ValueTooLarge,
+            CommonCheckErrorKind::TypeSignatureTooDeep => {
+                RuntimeCheckErrorKind::TypeSignatureTooDeep
+            }
+            CommonCheckErrorKind::ExpectsRejectable(s) => {
+                RuntimeCheckErrorKind::ExpectsRejectable(s)
+            }
+            CommonCheckErrorKind::ExpectsAcceptable(s) => {
+                RuntimeCheckErrorKind::ExpectsAcceptable(s)
+            }
+            CommonCheckErrorKind::DefineTraitDuplicateMethod(s) => {
+                RuntimeCheckErrorKind::DefineTraitDuplicateMethod(s)
+            }
+            CommonCheckErrorKind::TraitTooManyMethods(found, allowed) => {
+                RuntimeCheckErrorKind::TraitTooManyMethods(found, allowed)
+            }
+            CommonCheckErrorKind::DefineTraitBadSignature => {
+                RuntimeCheckErrorKind::DefineTraitBadSignature
+            }
+            CommonCheckErrorKind::InvalidTypeDescription => {
+                RuntimeCheckErrorKind::InvalidTypeDescription
+            }
+            CommonCheckErrorKind::BadSyntaxBinding(e) => RuntimeCheckErrorKind::BadSyntaxBinding(e),
+            CommonCheckErrorKind::ValueOutOfBounds => RuntimeCheckErrorKind::ValueOutOfBounds,
+            CommonCheckErrorKind::EmptyTuplesNotAllowed => {
+                RuntimeCheckErrorKind::EmptyTuplesNotAllowed
+            }
+            CommonCheckErrorKind::NameAlreadyUsed(name) => {
+                RuntimeCheckErrorKind::NameAlreadyUsed(name)
+            }
+            CommonCheckErrorKind::UnknownTypeName(name) => {
+                RuntimeCheckErrorKind::UnknownTypeName(name)
+            }
+        }
+    }
+}
+
+impl From<CommonCheckErrorKind> for StaticCheckErrorKind {
+    fn from(err: CommonCheckErrorKind) -> Self {
+        match err {
+            CommonCheckErrorKind::CostOverflow => StaticCheckErrorKind::CostOverflow,
+            CommonCheckErrorKind::CostBalanceExceeded(a, b) => {
+                StaticCheckErrorKind::CostBalanceExceeded(a, b)
+            }
+            CommonCheckErrorKind::MemoryBalanceExceeded(a, b) => {
+                StaticCheckErrorKind::MemoryBalanceExceeded(a, b)
+            }
+            CommonCheckErrorKind::CostComputationFailed(s) => {
+                StaticCheckErrorKind::CostComputationFailed(s)
+            }
+            CommonCheckErrorKind::ExecutionTimeExpired => {
+                StaticCheckErrorKind::ExecutionTimeExpired
+            }
+            CommonCheckErrorKind::IncorrectArgumentCount(expected, args) => {
+                StaticCheckErrorKind::IncorrectArgumentCount(expected, args)
+            }
+            CommonCheckErrorKind::RequiresAtLeastArguments(expected, args) => {
+                StaticCheckErrorKind::RequiresAtLeastArguments(expected, args)
+            }
+            CommonCheckErrorKind::RequiresAtMostArguments(expected, args) => {
+                StaticCheckErrorKind::RequiresAtMostArguments(expected, args)
+            }
+            CommonCheckErrorKind::TooManyFunctionParameters(found, allowed) => {
+                StaticCheckErrorKind::TooManyFunctionParameters(found, allowed)
+            }
+            CommonCheckErrorKind::ExpectedName => StaticCheckErrorKind::ExpectedName,
+            CommonCheckErrorKind::DefineFunctionBadSignature => {
+                StaticCheckErrorKind::DefineFunctionBadSignature
+            }
+            CommonCheckErrorKind::ExpectedTraitIdentifier => {
+                StaticCheckErrorKind::ExpectedTraitIdentifier
+            }
+            CommonCheckErrorKind::ExpectsRejectable(s) => {
+                StaticCheckErrorKind::ExpectsRejectable(s)
+            }
+            CommonCheckErrorKind::ExpectsAcceptable(s) => {
+                StaticCheckErrorKind::ExpectsAcceptable(s)
+            }
+            CommonCheckErrorKind::CouldNotDetermineType => {
+                StaticCheckErrorKind::CouldNotDetermineType
+            }
+            CommonCheckErrorKind::ValueTooLarge => StaticCheckErrorKind::ValueTooLarge,
+            CommonCheckErrorKind::TypeSignatureTooDeep => {
+                StaticCheckErrorKind::TypeSignatureTooDeep
+            }
+            CommonCheckErrorKind::DefineTraitDuplicateMethod(s) => {
+                StaticCheckErrorKind::DefineTraitDuplicateMethod(s)
+            }
+            CommonCheckErrorKind::DefineTraitBadSignature => {
+                StaticCheckErrorKind::DefineTraitBadSignature
+            }
+            CommonCheckErrorKind::TraitTooManyMethods(found, allowed) => {
+                StaticCheckErrorKind::TraitTooManyMethods(found, allowed)
+            }
+            CommonCheckErrorKind::InvalidTypeDescription => {
+                StaticCheckErrorKind::InvalidTypeDescription
+            }
+            CommonCheckErrorKind::BadSyntaxBinding(e) => StaticCheckErrorKind::BadSyntaxBinding(e),
+            CommonCheckErrorKind::ValueOutOfBounds => StaticCheckErrorKind::ValueOutOfBounds,
+            CommonCheckErrorKind::EmptyTuplesNotAllowed => {
+                StaticCheckErrorKind::EmptyTuplesNotAllowed
+            }
+            CommonCheckErrorKind::NameAlreadyUsed(name) => {
+                StaticCheckErrorKind::NameAlreadyUsed(name)
+            }
+            CommonCheckErrorKind::UnknownTypeName(name) => {
+                StaticCheckErrorKind::UnknownTypeName(name)
+            }
+        }
+    }
+}
+
+/// This conversion is provided to support tests in
+/// `clarity/src/vm/analysis/type_checker/v2_1/tests/contracts.rs`.
 #[cfg(any(test, feature = "testing"))]
-impl From<CheckErrorKind> for String {
-    fn from(o: CheckErrorKind) -> Self {
+impl From<StaticCheckErrorKind> for String {
+    fn from(o: StaticCheckErrorKind) -> Self {
         o.to_string()
     }
 }
 
-pub fn check_argument_count<T>(expected: usize, args: &[T]) -> Result<(), CheckErrorKind> {
+pub fn check_argument_count<T>(expected: usize, args: &[T]) -> Result<(), CommonCheckErrorKind> {
     if args.len() != expected {
-        Err(CheckErrorKind::IncorrectArgumentCount(expected, args.len()))
-    } else {
-        Ok(())
-    }
-}
-
-pub fn check_arguments_at_least<T>(expected: usize, args: &[T]) -> Result<(), CheckErrorKind> {
-    if args.len() < expected {
-        Err(CheckErrorKind::RequiresAtLeastArguments(
+        Err(CommonCheckErrorKind::IncorrectArgumentCount(
             expected,
             args.len(),
         ))
@@ -674,9 +1381,23 @@ pub fn check_arguments_at_least<T>(expected: usize, args: &[T]) -> Result<(), Ch
     }
 }
 
-pub fn check_arguments_at_most<T>(expected: usize, args: &[T]) -> Result<(), CheckErrorKind> {
+pub fn check_arguments_at_least<T>(
+    expected: usize,
+    args: &[T],
+) -> Result<(), CommonCheckErrorKind> {
+    if args.len() < expected {
+        Err(CommonCheckErrorKind::RequiresAtLeastArguments(
+            expected,
+            args.len(),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+pub fn check_arguments_at_most<T>(expected: usize, args: &[T]) -> Result<(), CommonCheckErrorKind> {
     if args.len() > expected {
-        Err(CheckErrorKind::RequiresAtMostArguments(
+        Err(CommonCheckErrorKind::RequiresAtMostArguments(
             expected,
             args.len(),
         ))
@@ -700,149 +1421,129 @@ fn formatted_expected_types(expected_types: &[TypeSignature]) -> String {
     expected_types_joined
 }
 
-impl DiagnosableError for CheckErrorKind {
+impl DiagnosableError for StaticCheckErrorKind {
     fn message(&self) -> String {
         match &self {
-            CheckErrorKind::SupertypeTooLarge => "supertype of two types is too large".into(),
-            CheckErrorKind::Expects(s) => format!("unexpected interpreter behavior: {s}"),
-            CheckErrorKind::BadMatchOptionSyntax(source) =>
+            StaticCheckErrorKind::SupertypeTooLarge => "supertype of two types is too large".into(),
+            StaticCheckErrorKind::ExpectsRejectable(s) => format!("unexpected and unacceptable interpreter behavior: {s}"),
+            StaticCheckErrorKind::ExpectsAcceptable(s) => format!("unexpected but acceptable interpreter behaviour: {s}"),
+            StaticCheckErrorKind::BadMatchOptionSyntax(source) =>
                 format!("match on a optional type uses the following syntax: (match input some-name if-some-expression if-none-expression). Caused by: {}",
                         source.message()),
-            CheckErrorKind::BadMatchResponseSyntax(source) =>
+            StaticCheckErrorKind::BadMatchResponseSyntax(source) =>
                 format!("match on a result type uses the following syntax: (match input ok-name if-ok-expression err-name if-err-expression). Caused by: {}",
                         source.message()),
-            CheckErrorKind::BadMatchInput(t) =>
+            StaticCheckErrorKind::BadMatchInput(t) =>
                 format!("match requires an input of either a response or optional, found input: '{t}'"),
-            CheckErrorKind::CostOverflow => "contract execution cost overflowed cost counter".into(),
-            CheckErrorKind::CostBalanceExceeded(a, b) => format!("contract execution cost exceeded budget: {a:?} > {b:?}"),
-            CheckErrorKind::MemoryBalanceExceeded(a, b) => format!("contract execution cost exceeded memory budget: {a:?} > {b:?}"),
-            CheckErrorKind::InvalidTypeDescription => "supplied type description is invalid".into(),
-            CheckErrorKind::EmptyTuplesNotAllowed => "tuple types may not be empty".into(),
-            CheckErrorKind::UnknownTypeName(name) => format!("failed to parse type: '{name}'"),
-            CheckErrorKind::ValueTooLarge => "created a type which was greater than maximum allowed value size".into(),
-            CheckErrorKind::ValueOutOfBounds => "created a type which value size was out of defined bounds".into(),
-            CheckErrorKind::TypeSignatureTooDeep => "created a type which was deeper than maximum allowed type depth".into(),
-            CheckErrorKind::ExpectedName => "expected a name argument to this function".into(),
-            CheckErrorKind::ListTypesMustMatch => "expecting elements of same type in a list".into(),
-            CheckErrorKind::ConstructedListTooLarge => "reached limit of elements in a sequence".into(),
-            CheckErrorKind::TypeError(expected_type, found_type) => format!("expecting expression of type '{expected_type}', found '{found_type}'"),
-            CheckErrorKind::TypeValueError(expected_type, found_value) => format!("expecting expression of type '{expected_type}', found '{found_value}'"),
-            CheckErrorKind::UnionTypeError(expected_types, found_type) => format!("expecting expression of type {}, found '{}'", formatted_expected_types(expected_types), found_type),
-            CheckErrorKind::UnionTypeValueError(expected_types, found_type) => format!("expecting expression of type {}, found '{}'", formatted_expected_types(expected_types), found_type),
-            CheckErrorKind::ExpectedOptionalType(found_type) => format!("expecting expression of type 'optional', found '{found_type}'"),
-            CheckErrorKind::ExpectedOptionalOrResponseType(found_type) => format!("expecting expression of type 'optional' or 'response', found '{found_type}'"),
-            CheckErrorKind::ExpectedOptionalOrResponseValue(found_value) =>  format!("expecting expression of type 'optional' or 'response', found '{found_value}'"),
-            CheckErrorKind::ExpectedResponseType(found_type) => format!("expecting expression of type 'response', found '{found_type}'"),
-            CheckErrorKind::ExpectedOptionalValue(found_value) => format!("expecting expression of type 'optional', found '{found_value}'"),
-            CheckErrorKind::ExpectedResponseValue(found_value) => format!("expecting expression of type 'response', found '{found_value}'"),
-            CheckErrorKind::ExpectedContractPrincipalValue(found_value) => format!("expecting contract principal value, found '{found_value}'"),
-            CheckErrorKind::CouldNotDetermineResponseOkType => "attempted to obtain 'ok' value from response, but 'ok' type is indeterminate".into(),
-            CheckErrorKind::CouldNotDetermineResponseErrType => "attempted to obtain 'err' value from response, but 'err' type is indeterminate".into(),
-            CheckErrorKind::CouldNotDetermineMatchTypes => "attempted to match on an (optional) or (response) type where either the some, ok, or err type is indeterminate. you may wish to use unwrap-panic or unwrap-err-panic instead.".into(),
-            CheckErrorKind::CouldNotDetermineType => "type of expression cannot be determined".into(),
-            CheckErrorKind::BadTupleFieldName => "invalid tuple field name".into(),
-            CheckErrorKind::ExpectedTuple(type_signature) => format!("expecting tuple, found '{type_signature}'"),
-            CheckErrorKind::NoSuchTupleField(field_name, tuple_signature) => format!("cannot find field '{field_name}' in tuple '{tuple_signature}'"),
-            CheckErrorKind::BadTupleConstruction(message) => format!("invalid tuple syntax: {message}"),
-            CheckErrorKind::NoSuchDataVariable(var_name) => format!("use of unresolved persisted variable '{var_name}'"),
-            CheckErrorKind::BadTransferSTXArguments => "STX transfer expects an int amount, from principal, to principal".into(),
-            CheckErrorKind::BadTransferFTArguments => "transfer expects an int amount, from principal, to principal".into(),
-            CheckErrorKind::BadTransferNFTArguments => "transfer expects an asset, from principal, to principal".into(),
-            CheckErrorKind::BadMintFTArguments => "mint expects a uint amount and from principal".into(),
-            CheckErrorKind::BadBurnFTArguments => "burn expects a uint amount and from principal".into(),
-            CheckErrorKind::BadMapName => "invalid map name".into(),
-            CheckErrorKind::NoSuchMap(map_name) => format!("use of unresolved map '{map_name}'"),
-            CheckErrorKind::DefineFunctionBadSignature => "invalid function definition".into(),
-            CheckErrorKind::BadFunctionName => "invalid function name".into(),
-            CheckErrorKind::BadMapTypeDefinition => "invalid map definition".into(),
-            CheckErrorKind::PublicFunctionMustReturnResponse(found_type) => format!("public functions must return an expression of type 'response', found '{found_type}'"),
-            CheckErrorKind::DefineVariableBadSignature => "invalid variable definition".into(),
-            CheckErrorKind::ReturnTypesMustMatch(type_1, type_2) => format!("detected two execution paths, returning two different expression types (got '{type_1}' and '{type_2}')"),
-            CheckErrorKind::NoSuchContract(contract_identifier) => format!("use of unresolved contract '{contract_identifier}'"),
-            CheckErrorKind::NoSuchPublicFunction(contract_identifier, function_name) => format!("contract '{contract_identifier}' has no public function '{function_name}'"),
-            CheckErrorKind::PublicFunctionNotReadOnly(contract_identifier, function_name) => format!("function '{contract_identifier}' in '{function_name}' is not read-only"),
-            CheckErrorKind::ContractAlreadyExists(contract_identifier) => format!("contract name '{contract_identifier}' conflicts with existing contract"),
-            CheckErrorKind::ContractCallExpectName => "missing contract name for call".into(),
-            CheckErrorKind::ExpectedCallableType(found_type) => format!("expected a callable contract, found {found_type}"),
-            CheckErrorKind::NoSuchBlockInfoProperty(property_name) => format!("use of block unknown property '{property_name}'"),
-            CheckErrorKind::NoSuchBurnBlockInfoProperty(property_name) => format!("use of burn block unknown property '{property_name}'"),
-            CheckErrorKind::NoSuchStacksBlockInfoProperty(property_name) => format!("use of unknown stacks block property '{property_name}'"),
-            CheckErrorKind::NoSuchTenureInfoProperty(property_name) => format!("use of unknown tenure property '{property_name}'"),
-            CheckErrorKind::GetBlockInfoExpectPropertyName => "missing property name for block info introspection".into(),
-            CheckErrorKind::GetBurnBlockInfoExpectPropertyName => "missing property name for burn block info introspection".into(),
-            CheckErrorKind::GetStacksBlockInfoExpectPropertyName => "missing property name for stacks block info introspection".into(),
-            CheckErrorKind::GetTenureInfoExpectPropertyName => "missing property name for tenure info introspection".into(),
-            CheckErrorKind::NameAlreadyUsed(name) => format!("defining '{name}' conflicts with previous value"),
-            CheckErrorKind::ReservedWord(name) => format!("{name} is a reserved word"),
-            CheckErrorKind::NonFunctionApplication => "expecting expression of type function".into(),
-            CheckErrorKind::ExpectedListApplication => "expecting expression of type list".into(),
-            CheckErrorKind::ExpectedSequence(found_type) => format!("expecting expression of type 'list', 'buff', 'string-ascii' or 'string-utf8' - found '{found_type}'"),
-            CheckErrorKind::MaxLengthOverflow => format!("expecting a value <= {}", u32::MAX),
-            CheckErrorKind::BadLetSyntax => "invalid syntax of 'let'".into(),
-            CheckErrorKind::CircularReference(references) => format!("detected circular reference: ({})", references.join(", ")),
-            CheckErrorKind::BadSyntaxBinding(binding_error) => format!("invalid syntax binding: {}", &binding_error.message()),
-            CheckErrorKind::MaxContextDepthReached => "reached depth limit".into(),
-            CheckErrorKind::UndefinedVariable(var_name) => format!("use of unresolved variable '{var_name}'"),
-            CheckErrorKind::UndefinedFunction(var_name) => format!("use of unresolved function '{var_name}'"),
-            CheckErrorKind::RequiresAtLeastArguments(expected, found) => format!("expecting >= {expected} arguments, got {found}"),
-            CheckErrorKind::RequiresAtMostArguments(expected, found) => format!("expecting < {expected} arguments, got {found}"),
-            CheckErrorKind::IncorrectArgumentCount(expected_count, found_count) => format!("expecting {expected_count} arguments, got {found_count}"),
-            CheckErrorKind::IfArmsMustMatch(type_1, type_2) => format!("expression types returned by the arms of 'if' must match (got '{type_1}' and '{type_2}')"),
-            CheckErrorKind::MatchArmsMustMatch(type_1, type_2) => format!("expression types returned by the arms of 'match' must match (got '{type_1}' and '{type_2}')"),
-            CheckErrorKind::DefaultTypesMustMatch(type_1, type_2) => format!("expression types passed in 'default-to' must match (got '{type_1}' and '{type_2}')"),
-            CheckErrorKind::IllegalOrUnknownFunctionApplication(function_name) => format!("use of illegal / unresolved function '{function_name}"),
-            CheckErrorKind::UnknownFunction(function_name) => format!("use of unresolved function '{function_name}'"),
-            CheckErrorKind::TooManyFunctionParameters(found, allowed) => format!("too many function parameters specified: found {found}, the maximum is {allowed}"),
-            CheckErrorKind::TraitBasedContractCallInReadOnly => "use of trait based contract calls are not allowed in read-only context".into(),
-            CheckErrorKind::WriteAttemptedInReadOnly => "expecting read-only statements, detected a writing operation".into(),
-            CheckErrorKind::AtBlockClosureMustBeReadOnly => "(at-block ...) closures expect read-only statements, but detected a writing operation".into(),
-            CheckErrorKind::BadTokenName => "expecting an token name as an argument".into(),
-            CheckErrorKind::DefineNFTBadSignature => "(define-asset ...) expects an asset name and an asset identifier type signature as arguments".into(),
-            CheckErrorKind::NoSuchNFT(asset_name) => format!("tried to use asset function with a undefined asset ('{asset_name}')"),
-            CheckErrorKind::NoSuchFT(asset_name) => format!("tried to use token function with a undefined token ('{asset_name}')"),
-            CheckErrorKind::NoSuchTrait(contract_name, trait_name) => format!("use of unresolved trait {contract_name}.{trait_name}"),
-            CheckErrorKind::TraitReferenceUnknown(trait_name) => format!("use of undeclared trait <{trait_name}>"),
-            CheckErrorKind::TraitMethodUnknown(trait_name, func_name) => format!("method '{func_name}' unspecified in trait <{trait_name}>"),
-            CheckErrorKind::BadTraitImplementation(trait_name, func_name) => format!("invalid signature for method '{func_name}' regarding trait's specification <{trait_name}>"),
-            CheckErrorKind::ExpectedTraitIdentifier => "expecting expression of type trait identifier".into(),
-            CheckErrorKind::UnexpectedTraitOrFieldReference => "unexpected use of trait reference or field".into(),
-            CheckErrorKind::DefineTraitBadSignature => "invalid trait definition".into(),
-            CheckErrorKind::DefineTraitDuplicateMethod(method_name) => format!("duplicate method name '{method_name}' in trait definition"),
-            CheckErrorKind::TraitReferenceNotAllowed => "trait references can not be stored".into(),
-            CheckErrorKind::ContractOfExpectsTrait => "trait reference expected".into(),
-            CheckErrorKind::IncompatibleTrait(expected_trait, actual_trait) => format!("trait '{actual_trait}' is not a compatible with expected trait, '{expected_trait}'"),
-            CheckErrorKind::TraitTooManyMethods(found, allowed) => format!("too many trait methods specified: found {found}, the maximum is {allowed}"),
-            CheckErrorKind::InvalidCharactersDetected => "invalid characters detected".into(),
-            CheckErrorKind::InvalidUTF8Encoding => "invalid UTF8 encoding".into(),
-            CheckErrorKind::InvalidSecp65k1Signature => "invalid seckp256k1 signature".into(),
-            CheckErrorKind::TypeAlreadyAnnotatedFailure | CheckErrorKind::CheckerImplementationFailure => {
+            StaticCheckErrorKind::CostOverflow => "contract execution cost overflowed cost counter".into(),
+            StaticCheckErrorKind::CostBalanceExceeded(a, b) => format!("contract execution cost exceeded budget: {a:?} > {b:?}"),
+            StaticCheckErrorKind::MemoryBalanceExceeded(a, b) => format!("contract execution cost exceeded memory budget: {a:?} > {b:?}"),
+            StaticCheckErrorKind::CostComputationFailed(s) => format!("contract cost computation failed: {s}"),
+            StaticCheckErrorKind::ExecutionTimeExpired => "execution time expired".into(),
+            StaticCheckErrorKind::InvalidTypeDescription => "supplied type description is invalid".into(),
+            StaticCheckErrorKind::EmptyTuplesNotAllowed => "tuple types may not be empty".into(),
+            StaticCheckErrorKind::UnknownTypeName(name) => format!("failed to parse type: '{name}'"),
+            StaticCheckErrorKind::ValueTooLarge => "created a type which was greater than maximum allowed value size".into(),
+            StaticCheckErrorKind::ValueOutOfBounds => "created a type which value size was out of defined bounds".into(),
+            StaticCheckErrorKind::TypeSignatureTooDeep => "created a type which was deeper than maximum allowed type depth".into(),
+            StaticCheckErrorKind::ExpectedName => "expected a name argument to this function".into(),
+            StaticCheckErrorKind::ConstructedListTooLarge => "reached limit of elements in a sequence".into(),
+            StaticCheckErrorKind::TypeError(expected_type, found_type) => format!("expecting expression of type '{expected_type}', found '{found_type}'"),
+            StaticCheckErrorKind::UnionTypeError(expected_types, found_type) => format!("expecting expression of type {}, found '{}'", formatted_expected_types(expected_types), found_type),
+            StaticCheckErrorKind::ExpectedOptionalType(found_type) => format!("expecting expression of type 'optional', found '{found_type}'"),
+            StaticCheckErrorKind::ExpectedOptionalOrResponseType(found_type) => format!("expecting expression of type 'optional' or 'response', found '{found_type}'"),
+            StaticCheckErrorKind::ExpectedResponseType(found_type) => format!("expecting expression of type 'response', found '{found_type}'"),
+            StaticCheckErrorKind::CouldNotDetermineResponseOkType => "attempted to obtain 'ok' value from response, but 'ok' type is indeterminate".into(),
+            StaticCheckErrorKind::CouldNotDetermineResponseErrType => "attempted to obtain 'err' value from response, but 'err' type is indeterminate".into(),
+            StaticCheckErrorKind::CouldNotDetermineMatchTypes => "attempted to match on an (optional) or (response) type where either the some, ok, or err type is indeterminate. you may wish to use unwrap-panic or unwrap-err-panic instead.".into(),
+            StaticCheckErrorKind::CouldNotDetermineType => "type of expression cannot be determined".into(),
+            StaticCheckErrorKind::BadTupleFieldName => "invalid tuple field name".into(),
+            StaticCheckErrorKind::ExpectedTuple(type_signature) => format!("expecting tuple, found '{type_signature}'"),
+            StaticCheckErrorKind::NoSuchTupleField(field_name, tuple_signature) => format!("cannot find field '{field_name}' in tuple '{tuple_signature}'"),
+            StaticCheckErrorKind::BadTupleConstruction(message) => format!("invalid tuple syntax: {message}"),
+            StaticCheckErrorKind::NoSuchDataVariable(var_name) => format!("use of unresolved persisted variable '{var_name}'"),
+            StaticCheckErrorKind::BadMapName => "invalid map name".into(),
+            StaticCheckErrorKind::NoSuchMap(map_name) => format!("use of unresolved map '{map_name}'"),
+            StaticCheckErrorKind::DefineFunctionBadSignature => "invalid function definition".into(),
+            StaticCheckErrorKind::BadFunctionName => "invalid function name".into(),
+            StaticCheckErrorKind::BadMapTypeDefinition => "invalid map definition".into(),
+            StaticCheckErrorKind::PublicFunctionMustReturnResponse(found_type) => format!("public functions must return an expression of type 'response', found '{found_type}'"),
+            StaticCheckErrorKind::DefineVariableBadSignature => "invalid variable definition".into(),
+            StaticCheckErrorKind::ReturnTypesMustMatch(type_1, type_2) => format!("detected two execution paths, returning two different expression types (got '{type_1}' and '{type_2}')"),
+            StaticCheckErrorKind::NoSuchContract(contract_identifier) => format!("use of unresolved contract '{contract_identifier}'"),
+            StaticCheckErrorKind::NoSuchPublicFunction(contract_identifier, function_name) => format!("contract '{contract_identifier}' has no public function '{function_name}'"),
+            StaticCheckErrorKind::ContractAlreadyExists(contract_identifier) => format!("contract name '{contract_identifier}' conflicts with existing contract"),
+            StaticCheckErrorKind::ContractCallExpectName => "missing contract name for call".into(),
+            StaticCheckErrorKind::ExpectedCallableType(found_type) => format!("expected a callable contract, found {found_type}"),
+            StaticCheckErrorKind::NoSuchBlockInfoProperty(property_name) => format!("use of block unknown property '{property_name}'"),
+            StaticCheckErrorKind::NoSuchStacksBlockInfoProperty(property_name) => format!("use of unknown stacks block property '{property_name}'"),
+            StaticCheckErrorKind::NoSuchTenureInfoProperty(property_name) => format!("use of unknown tenure property '{property_name}'"),
+            StaticCheckErrorKind::GetBlockInfoExpectPropertyName => "missing property name for block info introspection".into(),
+            StaticCheckErrorKind::GetBurnBlockInfoExpectPropertyName => "missing property name for burn block info introspection".into(),
+            StaticCheckErrorKind::GetStacksBlockInfoExpectPropertyName => "missing property name for stacks block info introspection".into(),
+            StaticCheckErrorKind::GetTenureInfoExpectPropertyName => "missing property name for tenure info introspection".into(),
+            StaticCheckErrorKind::NameAlreadyUsed(name) => format!("defining '{name}' conflicts with previous value"),
+            StaticCheckErrorKind::ReservedWord(name) => format!("{name} is a reserved word"),
+            StaticCheckErrorKind::NonFunctionApplication => "expecting expression of type function".into(),
+            StaticCheckErrorKind::ExpectedListApplication => "expecting expression of type list".into(),
+            StaticCheckErrorKind::ExpectedSequence(found_type) => format!("expecting expression of type 'list', 'buff', 'string-ascii' or 'string-utf8' - found '{found_type}'"),
+            StaticCheckErrorKind::MaxLengthOverflow => format!("expecting a value <= {}", u32::MAX),
+            StaticCheckErrorKind::BadLetSyntax => "invalid syntax of 'let'".into(),
+            StaticCheckErrorKind::BadSyntaxBinding(binding_error) => format!("invalid syntax binding: {}", &binding_error.message()),
+            StaticCheckErrorKind::MaxContextDepthReached => "reached depth limit".into(),
+            StaticCheckErrorKind::UndefinedVariable(var_name) => format!("use of unresolved variable '{var_name}'"),
+            StaticCheckErrorKind::RequiresAtLeastArguments(expected, found) => format!("expecting >= {expected} arguments, got {found}"),
+            StaticCheckErrorKind::RequiresAtMostArguments(expected, found) => format!("expecting < {expected} arguments, got {found}"),
+            StaticCheckErrorKind::IncorrectArgumentCount(expected_count, found_count) => format!("expecting {expected_count} arguments, got {found_count}"),
+            StaticCheckErrorKind::IfArmsMustMatch(type_1, type_2) => format!("expression types returned by the arms of 'if' must match (got '{type_1}' and '{type_2}')"),
+            StaticCheckErrorKind::MatchArmsMustMatch(type_1, type_2) => format!("expression types returned by the arms of 'match' must match (got '{type_1}' and '{type_2}')"),
+            StaticCheckErrorKind::DefaultTypesMustMatch(type_1, type_2) => format!("expression types passed in 'default-to' must match (got '{type_1}' and '{type_2}')"),
+            StaticCheckErrorKind::IllegalOrUnknownFunctionApplication(function_name) => format!("use of illegal / unresolved function '{function_name}"),
+            StaticCheckErrorKind::UnknownFunction(function_name) => format!("use of unresolved function '{function_name}'"),
+            StaticCheckErrorKind::TooManyFunctionParameters(found, allowed) => format!("too many function parameters specified: found {found}, the maximum is {allowed}"),
+            StaticCheckErrorKind::WriteAttemptedInReadOnly => "expecting read-only statements, detected a writing operation".into(),
+            StaticCheckErrorKind::AtBlockClosureMustBeReadOnly => "(at-block ...) closures expect read-only statements, but detected a writing operation".into(),
+            StaticCheckErrorKind::BadTokenName => "expecting an token name as an argument".into(),
+            StaticCheckErrorKind::DefineNFTBadSignature => "(define-asset ...) expects an asset name and an asset identifier type signature as arguments".into(),
+            StaticCheckErrorKind::NoSuchNFT(asset_name) => format!("tried to use asset function with a undefined asset ('{asset_name}')"),
+            StaticCheckErrorKind::NoSuchFT(asset_name) => format!("tried to use token function with a undefined token ('{asset_name}')"),
+            StaticCheckErrorKind::NoSuchTrait(contract_name, trait_name) => format!("use of unresolved trait {contract_name}.{trait_name}"),
+            StaticCheckErrorKind::TraitReferenceUnknown(trait_name) => format!("use of undeclared trait <{trait_name}>"),
+            StaticCheckErrorKind::TraitMethodUnknown(trait_name, func_name) => format!("method '{func_name}' unspecified in trait <{trait_name}>"),
+            StaticCheckErrorKind::BadTraitImplementation(trait_name, func_name) => format!("invalid signature for method '{func_name}' regarding trait's specification <{trait_name}>"),
+            StaticCheckErrorKind::ExpectedTraitIdentifier => "expecting expression of type trait identifier".into(),
+            StaticCheckErrorKind::UnexpectedTraitOrFieldReference => "unexpected use of trait reference or field".into(),
+            StaticCheckErrorKind::DefineTraitBadSignature => "invalid trait definition".into(),
+            StaticCheckErrorKind::DefineTraitDuplicateMethod(method_name) => format!("duplicate method name '{method_name}' in trait definition"),
+            StaticCheckErrorKind::ContractOfExpectsTrait => "trait reference expected".into(),
+            StaticCheckErrorKind::IncompatibleTrait(expected_trait, actual_trait) => format!("trait '{actual_trait}' is not a compatible with expected trait, '{expected_trait}'"),
+            StaticCheckErrorKind::TraitTooManyMethods(found, allowed) => format!("too many trait methods specified: found {found}, the maximum is {allowed}"),
+            StaticCheckErrorKind::TypeAlreadyAnnotatedFailure | StaticCheckErrorKind::CheckerImplementationFailure => {
                 "internal error - please file an issue on https://github.com/stacks-network/stacks-blockchain".into()
             },
-            CheckErrorKind::UncheckedIntermediaryResponses => "intermediary responses in consecutive statements must be checked".into(),
-            CheckErrorKind::CostComputationFailed(s) => format!("contract cost computation failed: {s}"),
-            CheckErrorKind::CouldNotDetermineSerializationType => "could not determine the input type for the serialization function".into(),
-            CheckErrorKind::ExecutionTimeExpired => "execution time expired".into(),
-            CheckErrorKind::ExpectedListOfAllowances(fn_name, arg_num) => format!("{fn_name} expects a list of asset allowances as argument {arg_num}"),
-            CheckErrorKind::AllowanceExprNotAllowed => "allowance expressions are only allowed in the context of a `restrict-assets?` or `as-contract?`".into(),
-            CheckErrorKind::ExpectedAllowanceExpr(got_name) => format!("expected an allowance expression, got: {got_name}"),
-            CheckErrorKind::WithAllAllowanceNotAllowed => "with-all-assets-unsafe is not allowed here, only in the allowance list for `as-contract?`".into(),
-            CheckErrorKind::WithAllAllowanceNotAlone => "with-all-assets-unsafe must not be used along with other allowances".into(),
-            CheckErrorKind::WithNftExpectedListOfIdentifiers => "with-nft allowance must include a list of asset identifiers".into(),
-            CheckErrorKind::MaxIdentifierLengthExceeded(max_len, len) => format!("with-nft allowance identifiers list must not exceed {max_len} elements, got {len}"),
-            CheckErrorKind::TooManyAllowances(max_allowed, found) => format!("too many allowances specified, the maximum is {max_allowed}, found {found}"),
+            StaticCheckErrorKind::UncheckedIntermediaryResponses => "intermediary responses in consecutive statements must be checked".into(),
+            StaticCheckErrorKind::CouldNotDetermineSerializationType => "could not determine the input type for the serialization function".into(),
+            StaticCheckErrorKind::ExpectedListOfAllowances(fn_name, arg_num) => format!("{fn_name} expects a list of asset allowances as argument {arg_num}"),
+            StaticCheckErrorKind::AllowanceExprNotAllowed => "allowance expressions are only allowed in the context of a `restrict-assets?` or `as-contract?`".into(),
+            StaticCheckErrorKind::ExpectedAllowanceExpr(got_name) => format!("expected an allowance expression, got: {got_name}"),
+            StaticCheckErrorKind::WithAllAllowanceNotAllowed => "with-all-assets-unsafe is not allowed here, only in the allowance list for `as-contract?`".into(),
+            StaticCheckErrorKind::WithAllAllowanceNotAlone => "with-all-assets-unsafe must not be used along with other allowances".into(),
+            StaticCheckErrorKind::WithNftExpectedListOfIdentifiers => "with-nft allowance must include a list of asset identifiers".into(),
+            StaticCheckErrorKind::MaxIdentifierLengthExceeded(max_len, len) => format!("with-nft allowance identifiers list must not exceed {max_len} elements, got {len}"),
+            StaticCheckErrorKind::TooManyAllowances(max_allowed, found) => format!("too many allowances specified, the maximum is {max_allowed}, found {found}"),
         }
     }
 
     fn suggestion(&self) -> Option<String> {
         match &self {
-            CheckErrorKind::BadLetSyntax => Some(
+            StaticCheckErrorKind::BadLetSyntax => Some(
                 "'let' syntax example: (let ((supply 1000) (ttl 60)) <next-expression>)".into(),
             ),
-            CheckErrorKind::TraitReferenceUnknown(_) => Some(
+            StaticCheckErrorKind::TraitReferenceUnknown(_) => Some(
                 "traits should be either defined, with define-trait, or imported, with use-trait."
                     .into(),
             ),
-            CheckErrorKind::NoSuchBlockInfoProperty(_) => Some(
+            StaticCheckErrorKind::NoSuchBlockInfoProperty(_) => Some(
                 "properties available: time, header-hash, burnchain-header-hash, vrf-seed".into(),
             ),
             _ => None,

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Stacks Open Internet Foundation
+// Copyright (C) 2025-2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,17 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use clarity_types::errors::CheckErrorKind;
+use clarity_types::errors::analysis::StaticCheckErrorKind;
 use clarity_types::representations::MAX_STRING_LEN;
 use clarity_types::types::TypeSignature;
 use stacks_common::types::StacksEpochId;
 
+use crate::vm::ClarityVersion;
 use crate::vm::analysis::type_checker::v2_1::natives::post_conditions::{
     MAX_ALLOWANCES, MAX_NFT_IDENTIFIERS,
 };
 use crate::vm::analysis::type_checker::v2_1::tests::type_check_helper_version;
 use crate::vm::tests::test_clarity_versions;
-use crate::vm::ClarityVersion;
 
 /// Test type-checking for `restrict-assets?` expressions
 #[apply(test_clarity_versions)]
@@ -32,60 +32,60 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
         // simple
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // literal asset owner
         (
             "(restrict-assets? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4 ((with-stx u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // literal asset owner with contract id
         (
             "(restrict-assets? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token ((with-stx u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // variable asset owner
         (
             "(let ((p tx-sender))
                 (restrict-assets? p ((with-stx u1000)) true))",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // no allowances
         (
             "(restrict-assets? tx-sender () true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // multiple allowances
         (
             "(restrict-assets? tx-sender ((with-stx u1000) (with-ft .token \"foo\" u5000) (with-nft .token \"foo\" (list 0x01)) (with-stacking u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // multiple body expressions
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) (+ u1 u2) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
     ];
     let bad = [
         // with-all-assets-unsafe
         (
             "(restrict-assets? tx-sender ((with-all-assets-unsafe)) true)",
-            CheckErrorKind::WithAllAllowanceNotAllowed,
+            StaticCheckErrorKind::WithAllAllowanceNotAllowed,
         ),
         // no asset-owner
         (
             "(restrict-assets? ((with-stx u5000)) true)",
-            CheckErrorKind::RequiresAtLeastArguments(3, 2),
+            StaticCheckErrorKind::RequiresAtLeastArguments(3, 2),
         ),
         // no asset-owner, 3 args
         (
             "(restrict-assets? ((with-stx u5000)) true true)",
-            CheckErrorKind::NonFunctionApplication,
+            StaticCheckErrorKind::NonFunctionApplication,
         ),
         // bad asset-owner type
         (
             "(restrict-assets? u100 ((with-stx u5000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::PrincipalType.into(),
                 TypeSignature::UIntType.into(),
             ),
@@ -93,57 +93,57 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
         // no allowances
         (
             "(restrict-assets? tx-sender true)",
-            CheckErrorKind::RequiresAtLeastArguments(3, 2),
+            StaticCheckErrorKind::RequiresAtLeastArguments(3, 2),
         ),
         // allowance not in list
         (
             "(restrict-assets? tx-sender (with-stx u1) true)",
-            CheckErrorKind::ExpectedListApplication,
+            StaticCheckErrorKind::ExpectedListApplication,
         ),
         // other value in place of allowance list
         (
             "(restrict-assets? tx-sender u1 true)",
-            CheckErrorKind::ExpectedListOfAllowances("restrict-assets?".into(), 2),
+            StaticCheckErrorKind::ExpectedListOfAllowances("restrict-assets?".into(), 2),
         ),
         // non-allowance in allowance list
         (
             "(restrict-assets? tx-sender (u1) true)",
-            CheckErrorKind::ExpectedListApplication,
+            StaticCheckErrorKind::ExpectedListApplication,
         ),
         // empty list in allowance list
         (
             "(restrict-assets? tx-sender (()) true)",
-            CheckErrorKind::NonFunctionApplication,
+            StaticCheckErrorKind::NonFunctionApplication,
         ),
         // list with literal in allowance list
         (
             "(restrict-assets? tx-sender ((123)) true)",
-            CheckErrorKind::NonFunctionApplication,
+            StaticCheckErrorKind::NonFunctionApplication,
         ),
         // non-allowance function in allowance list
         (
             "(restrict-assets? tx-sender ((foo)) true)",
-            CheckErrorKind::UnknownFunction("foo".into()),
+            StaticCheckErrorKind::UnknownFunction("foo".into()),
         ),
         // no body expressions
         (
             "(restrict-assets? tx-sender ((with-stx u5000)))",
-            CheckErrorKind::RequiresAtLeastArguments(3, 2),
+            StaticCheckErrorKind::RequiresAtLeastArguments(3, 2),
         ),
         // unhandled response in only body expression
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) (err u1))",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // unhandled response in last body expression
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) true (err u1))",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // unhandled response in other body expression
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) (err u1) true)",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // too many allowances
         (
@@ -153,7 +153,7 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
                     .collect::<Vec<_>>()
                     .join(" ")
             ),
-            CheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, 130),
+            StaticCheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, 130),
         ),
         // different error types thrown from body expressions
         (
@@ -164,7 +164,7 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
                 u0
                )
             )",
-            CheckErrorKind::ReturnTypesMustMatch(
+            StaticCheckErrorKind::ReturnTypesMustMatch(
                 TypeSignature::new_response(TypeSignature::NoType, TypeSignature::UIntType)
                     .unwrap()
                     .into(),
@@ -179,7 +179,7 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
         if version < ClarityVersion::Clarity4 {
             // restrict-assets? is only available in Clarity 4+
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -198,7 +198,7 @@ fn test_restrict_assets(#[case] version: ClarityVersion, #[case] epoch: StacksEp
         if version < ClarityVersion::Clarity4 {
             // restrict-assets? is only available in Clarity 4+
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -224,95 +224,94 @@ fn test_as_contract(#[case] version: ClarityVersion, #[case] epoch: StacksEpochI
         // simple
         (
             "(as-contract? ((with-stx u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // no allowances
         (
             "(as-contract? () true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // multiple allowances
         (
             "(as-contract? ((with-stx u1000) (with-ft .token \"foo\" u5000) (with-nft .token \"foo\" (list 0x01)) (with-stacking u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // multiple body expressions
         (
             "(as-contract? ((with-stx u1000)) (+ u1 u2) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // with-all-assets-unsafe
         (
             "(as-contract? ((with-all-assets-unsafe)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
-
     ];
     let bad = [
         // no allowances
         (
             "(as-contract? true)",
-            CheckErrorKind::RequiresAtLeastArguments(2, 1),
+            StaticCheckErrorKind::RequiresAtLeastArguments(2, 1),
         ),
         // allowance not in list
         (
             "(as-contract? (with-stx u1) true)",
-            CheckErrorKind::ExpectedListApplication,
+            StaticCheckErrorKind::ExpectedListApplication,
         ),
         // other value in place of allowance list
         (
             "(as-contract? u1 true)",
-            CheckErrorKind::ExpectedListOfAllowances("as-contract?".into(), 1),
+            StaticCheckErrorKind::ExpectedListOfAllowances("as-contract?".into(), 1),
         ),
         // non-allowance in allowance list
         (
             "(as-contract? (u1) true)",
-            CheckErrorKind::ExpectedListApplication,
+            StaticCheckErrorKind::ExpectedListApplication,
         ),
         // empty list in allowance list
         (
             "(as-contract? (()) true)",
-            CheckErrorKind::NonFunctionApplication,
+            StaticCheckErrorKind::NonFunctionApplication,
         ),
         // list with literal in allowance list
         (
             "(as-contract? ((123)) true)",
-            CheckErrorKind::NonFunctionApplication,
+            StaticCheckErrorKind::NonFunctionApplication,
         ),
         // non-allowance function in allowance list
         (
             "(as-contract? ((foo)) true)",
-            CheckErrorKind::UnknownFunction("foo".into()),
+            StaticCheckErrorKind::UnknownFunction("foo".into()),
         ),
         // no body expressions
         (
             "(as-contract? ((with-stx u5000)))",
-            CheckErrorKind::RequiresAtLeastArguments(2, 1),
+            StaticCheckErrorKind::RequiresAtLeastArguments(2, 1),
         ),
         // unhandled response in only body expression
         (
             "(as-contract? ((with-stx u1000)) (err u1))",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // unhandled response in last body expression
         (
             "(as-contract? ((with-stx u1000)) true (err u1))",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // unhandled response in other body expression
         (
             "(as-contract? ((with-stx u1000)) (err u1) true)",
-            CheckErrorKind::UncheckedIntermediaryResponses,
+            StaticCheckErrorKind::UncheckedIntermediaryResponses,
         ),
         // other allowances together with with-all-assets-unsafe (first)
         (
             "(as-contract? ((with-all-assets-unsafe) (with-stx u1000)) true)",
-            CheckErrorKind::WithAllAllowanceNotAlone,
+            StaticCheckErrorKind::WithAllAllowanceNotAlone,
         ),
         // other allowances together with with-all-assets-unsafe (second)
         (
             "(as-contract? ((with-stx u1000) (with-all-assets-unsafe)) true)",
-            CheckErrorKind::WithAllAllowanceNotAlone,
+            StaticCheckErrorKind::WithAllAllowanceNotAlone,
         ),
         // too many allowances
         (
@@ -322,7 +321,7 @@ fn test_as_contract(#[case] version: ClarityVersion, #[case] epoch: StacksEpochI
                     .collect::<Vec<_>>()
                     .join(" ")
             ),
-            CheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, 130),
+            StaticCheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, 130),
         ),
         // different error types thrown from body expressions
         (
@@ -333,7 +332,7 @@ fn test_as_contract(#[case] version: ClarityVersion, #[case] epoch: StacksEpochI
                 u0
                )
             )",
-            CheckErrorKind::ReturnTypesMustMatch(
+            StaticCheckErrorKind::ReturnTypesMustMatch(
                 TypeSignature::new_response(TypeSignature::NoType, TypeSignature::UIntType)
                     .unwrap()
                     .into(),
@@ -348,7 +347,7 @@ fn test_as_contract(#[case] version: ClarityVersion, #[case] epoch: StacksEpochI
         if version < ClarityVersion::Clarity4 {
             // as-contract? is only available in Clarity 4+
             assert_eq!(
-                CheckErrorKind::UnknownFunction("as-contract?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("as-contract?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -367,7 +366,7 @@ fn test_as_contract(#[case] version: ClarityVersion, #[case] epoch: StacksEpochI
         if version < ClarityVersion::Clarity4 {
             // as-contract? is only available in Clarity 4+
             assert_eq!(
-                CheckErrorKind::UnknownFunction("as-contract?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("as-contract?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -393,22 +392,22 @@ fn test_with_stx_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // basic usage
         (
             "(restrict-assets? tx-sender ((with-stx u1000)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // zero amount
         (
             "(restrict-assets? tx-sender ((with-stx u0)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // large amount
         (
             "(restrict-assets? tx-sender ((with-stx u340282366920938463463374607431768211455)) true)",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
         // variable amount
         (
             "(let ((amount u1000)) (restrict-assets? tx-sender ((with-stx amount)) true))",
-            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap()
+            TypeSignature::new_response(TypeSignature::BoolType, TypeSignature::UIntType).unwrap(),
         ),
     ];
 
@@ -416,17 +415,17 @@ fn test_with_stx_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // no arguments
         (
             "(restrict-assets? tx-sender ((with-stx)) true)",
-            CheckErrorKind::IncorrectArgumentCount(1, 0),
+            StaticCheckErrorKind::IncorrectArgumentCount(1, 0),
         ),
         // too many arguments
         (
             "(restrict-assets? tx-sender ((with-stx u1000 u2000)) true)",
-            CheckErrorKind::IncorrectArgumentCount(1, 2),
+            StaticCheckErrorKind::IncorrectArgumentCount(1, 2),
         ),
         // wrong type - string instead of uint
         (
             r#"(restrict-assets? tx-sender ((with-stx "1000")) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::new_ascii_type_checked(4).into(),
             ),
@@ -434,7 +433,7 @@ fn test_with_stx_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // wrong type - int instead of uint
         (
             "(restrict-assets? tx-sender ((with-stx 1000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::IntType.into(),
             ),
@@ -444,7 +443,7 @@ fn test_with_stx_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
     for (code, expected_type) in &good {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -462,7 +461,7 @@ fn test_with_stx_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
     for (code, expected_err) in &bad {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -526,27 +525,27 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
         // no arguments
         (
             "(restrict-assets? tx-sender ((with-ft)) true)",
-            CheckErrorKind::IncorrectArgumentCount(3, 0),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 0),
         ),
         // one argument
         (
             "(restrict-assets? tx-sender ((with-ft .token)) true)",
-            CheckErrorKind::IncorrectArgumentCount(3, 1),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 1),
         ),
         // two arguments
         (
             r#"(restrict-assets? tx-sender ((with-ft .token "token-name")) true)"#,
-            CheckErrorKind::IncorrectArgumentCount(3, 2),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 2),
         ),
         // too many arguments
         (
             r#"(restrict-assets? tx-sender ((with-ft .token "token-name" u1000 u2000)) true)"#,
-            CheckErrorKind::IncorrectArgumentCount(3, 4),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 4),
         ),
         // wrong type for contract-id - uint instead of principal
         (
             r#"(restrict-assets? tx-sender ((with-ft u123 "token-name" u1000)) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::PrincipalType.into(),
                 TypeSignature::UIntType.into(),
             ),
@@ -554,7 +553,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
         // wrong type for token-name - uint instead of string
         (
             "(restrict-assets? tx-sender ((with-ft .token u123 u1000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::new_ascii_type_checked(MAX_STRING_LEN as u32).into(),
                 TypeSignature::UIntType.into(),
             ),
@@ -562,7 +561,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
         // wrong type for amount - string instead of uint
         (
             r#"(restrict-assets? tx-sender ((with-ft .token "token-name" "1000")) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::new_ascii_type_checked(4).into(),
             ),
@@ -570,7 +569,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
         // wrong type for amount - int instead of uint
         (
             r#"(restrict-assets? tx-sender ((with-ft .token "token-name" 1000)) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::IntType.into(),
             ),
@@ -578,7 +577,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
         // too long token name (longer than 128 chars)
         (
             "(restrict-assets? tx-sender ((with-ft .token \"this-token-name-is-way-too-long-to-be-valid-because-it-has-more-than-one-hundred-and-twenty-eight-characters-in-it-so-it-is-not-a-valid-token-name\" u1000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::new_ascii_type_checked(MAX_STRING_LEN as u32).into(),
                 TypeSignature::new_ascii_type_checked(146u32).into(),
             ),
@@ -588,7 +587,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
     for (code, expected_type) in &good {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -606,7 +605,7 @@ fn test_with_ft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stacks
     for (code, expected_err) in &bad {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -680,27 +679,27 @@ fn test_with_nft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // no arguments
         (
             "(restrict-assets? tx-sender ((with-nft)) true)",
-            CheckErrorKind::IncorrectArgumentCount(3, 0),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 0),
         ),
         // one argument
         (
             "(restrict-assets? tx-sender ((with-nft .token)) true)",
-            CheckErrorKind::IncorrectArgumentCount(3, 1),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 1),
         ),
         // two arguments
         (
             r#"(restrict-assets? tx-sender ((with-nft .token "token-name")) true)"#,
-            CheckErrorKind::IncorrectArgumentCount(3, 2),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 2),
         ),
         // too many arguments
         (
             r#"(restrict-assets? tx-sender ((with-nft .token "token-name" (list u123) (list u456))) true)"#,
-            CheckErrorKind::IncorrectArgumentCount(3, 4),
+            StaticCheckErrorKind::IncorrectArgumentCount(3, 4),
         ),
         // wrong type for contract-id - uint instead of principal
         (
             r#"(restrict-assets? tx-sender ((with-nft u123 "token-name" (list u456))) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::PrincipalType.into(),
                 TypeSignature::UIntType.into(),
             ),
@@ -708,7 +707,7 @@ fn test_with_nft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // wrong type for token-name - uint instead of string
         (
             "(restrict-assets? tx-sender ((with-nft .token u123 (list u456))) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::new_ascii_type_checked(MAX_STRING_LEN as u32).into(),
                 TypeSignature::UIntType.into(),
             ),
@@ -716,7 +715,7 @@ fn test_with_nft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         // too long token name (longer than 128 chars)
         (
             "(restrict-assets? tx-sender ((with-ft .token \"this-token-name-is-way-too-long-to-be-valid-because-it-has-more-than-one-hundred-and-twenty-eight-characters-in-it-so-it-is-not-a-valid-token-name\" u1000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::new_ascii_type_checked(MAX_STRING_LEN as u32).into(),
                 TypeSignature::new_ascii_type_checked(146u32).into(),
             ),
@@ -725,18 +724,16 @@ fn test_with_nft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
         (
             &format!(
                 "(restrict-assets? tx-sender ((with-nft .token \"token-name\" (list {}))) true)",
-                std::iter::repeat_n("u1", 130)
-                    .collect::<Vec<_>>()
-                    .join(" ")
+                std::iter::repeat_n("u1", 130).collect::<Vec<_>>().join(" ")
             ),
-            CheckErrorKind::MaxIdentifierLengthExceeded(MAX_NFT_IDENTIFIERS, 130),
+            StaticCheckErrorKind::MaxIdentifierLengthExceeded(MAX_NFT_IDENTIFIERS, 130),
         ),
     ];
 
     for (code, expected_type) in &good {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -754,7 +751,7 @@ fn test_with_nft_allowance(#[case] version: ClarityVersion, #[case] epoch: Stack
     for (code, expected_err) in &bad {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -798,17 +795,17 @@ fn test_with_stacking_allowance(#[case] version: ClarityVersion, #[case] epoch: 
         // no arguments
         (
             "(restrict-assets? tx-sender ((with-stacking)) true)",
-            CheckErrorKind::IncorrectArgumentCount(1, 0),
+            StaticCheckErrorKind::IncorrectArgumentCount(1, 0),
         ),
         // too many arguments
         (
             "(restrict-assets? tx-sender ((with-stacking u1000 u2000)) true)",
-            CheckErrorKind::IncorrectArgumentCount(1, 2),
+            StaticCheckErrorKind::IncorrectArgumentCount(1, 2),
         ),
         // wrong type - string instead of uint
         (
             r#"(restrict-assets? tx-sender ((with-stacking "1000")) true)"#,
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::new_ascii_type_checked(4).into(),
             ),
@@ -816,7 +813,7 @@ fn test_with_stacking_allowance(#[case] version: ClarityVersion, #[case] epoch: 
         // wrong type - int instead of uint
         (
             "(restrict-assets? tx-sender ((with-stacking 1000)) true)",
-            CheckErrorKind::TypeError(
+            StaticCheckErrorKind::TypeError(
                 TypeSignature::UIntType.into(),
                 TypeSignature::IntType.into(),
             ),
@@ -826,7 +823,7 @@ fn test_with_stacking_allowance(#[case] version: ClarityVersion, #[case] epoch: 
     for (code, expected_type) in &good {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -844,7 +841,7 @@ fn test_with_stacking_allowance(#[case] version: ClarityVersion, #[case] epoch: 
     for (code, expected_err) in &bad {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -881,19 +878,19 @@ fn test_with_all_assets_unsafe_allowance(
         // with-all-assets-unsafe in restrict-assets? (not allowed)
         (
             "(restrict-assets? tx-sender ((with-all-assets-unsafe)) true)",
-            CheckErrorKind::WithAllAllowanceNotAllowed,
+            StaticCheckErrorKind::WithAllAllowanceNotAllowed,
         ),
         // with-all-assets-unsafe with arguments (should take 0)
         (
             "(restrict-assets? tx-sender ((with-all-assets-unsafe u123)) true)",
-            CheckErrorKind::IncorrectArgumentCount(0, 1),
+            StaticCheckErrorKind::IncorrectArgumentCount(0, 1),
         ),
     ];
 
     for (code, expected_type) in &good {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("as-contract?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("as-contract?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
@@ -911,7 +908,7 @@ fn test_with_all_assets_unsafe_allowance(
     for (code, expected_err) in &bad {
         if version < ClarityVersion::Clarity4 {
             assert_eq!(
-                CheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
+                StaticCheckErrorKind::UnknownFunction("restrict-assets?".to_string()),
                 *type_check_helper_version(code, version, epoch)
                     .unwrap_err()
                     .err,
