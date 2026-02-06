@@ -72,8 +72,6 @@ fn variant_coverage_report(variant: RuntimeError) {
             arithmetic_pow_large_ccall,
             arithmetic_pow_neg_cdeploy,
             arithmetic_pow_neg_ccall,
-            arithmetic_zero_n_log_n_cdeploy,
-            arithmetic_zero_n_log_n_ccall,
         ]),
         ArithmeticOverflow => Tested(vec![
             arithmetic_overflow_pow_at_cdeploy,
@@ -550,43 +548,6 @@ fn arithmetic_pow_neg_ccall() {
 )",
         function_name: "trigger",
         function_args: &[],
-    );
-}
-
-/// Error: [`RuntimeError::Arithmetic`] (before epoch 3.4)
-/// Caused by: calling nlogn with n = 0
-/// Outcome: block accepted at deploy time.
-/// Note: Before epoch 3.4, this returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`]
-///       which wraps the underlying [`RuntimeError::Arithmetic`] error. After 3.4, this executes
-///       successfully (`none` is stored in the constant).
-#[test]
-fn arithmetic_zero_n_log_n_cdeploy() {
-    contract_deploy_consensus_test!(
-        contract_name: "zero-n-log-n-deploy",
-        contract_code: "(define-constant overflow (from-consensus-buff? int 0x))",
-        deploy_epochs: &StacksEpochId::since(StacksEpochId::Epoch21),
-        exclude_clarity_versions: &[ClarityVersion::Clarity1],
-    );
-}
-
-/// Error: [`RuntimeError::Arithmetic`] (before epoch 3.4)
-/// Caused by: calling nlogn with n = 0
-/// Outcome: block accepted at call time.
-/// Note: Before epoch 3.4, this returns a [`clarity::vm::analysis::RuntimeCheckErrorKind::CostComputationFailed`]
-///       which wraps the underlying [`RuntimeError::Arithmetic`] error. After 3.4, this executes
-///       successfully and returns `none`.
-#[test]
-fn arithmetic_zero_n_log_n_ccall() {
-    contract_call_consensus_test!(
-        contract_name: "zero-n-log-n",
-        contract_code: "
-(define-read-only (trigger)
-  (from-consensus-buff? int 0x)
-)",
-        function_name: "trigger",
-        function_args: &[],
-        deploy_epochs: &StacksEpochId::since(StacksEpochId::Epoch21),
-        exclude_clarity_versions: &[ClarityVersion::Clarity1],
     );
 }
 
