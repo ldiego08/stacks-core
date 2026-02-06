@@ -1,4 +1,4 @@
-// Copyright (C) 2025-2026 Stacks Open Internet Foundation
+// Copyright (C) 2026 Stacks Open Internet Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
 use clap::{Args, Parser, Subcommand};
 
-// Structs for commands that call helper functions
+/// Structs for commands that call helper functions
 #[derive(Args, Debug, Clone)]
 pub struct TryMineArgs {
     /// Path to chainstate directory
