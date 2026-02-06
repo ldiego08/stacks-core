@@ -437,9 +437,9 @@ fn check_allowances(
     epoch: StacksEpochId,
 ) -> Result<Option<u128>, VmExecutionError> {
     let mut earliest_violation: Option<u128> = None;
-    let mut record_violation = |candidate: u128| {
-        if earliest_violation.is_none_or(|current| candidate < current) {
-            earliest_violation = Some(candidate);
+    let record_violation = |earliest: &mut Option<u128>, candidate: u128| {
+        if earliest.is_none_or(|current| candidate < current) {
+            *earliest = Some(candidate);
         }
     };
 
@@ -485,54 +485,35 @@ fn check_allowances(
         }
     }
 
-    // Check STX movements and burns
+    // Check the movement and burn of STX separately first for backward compatibility with
+    // pre-epoch 3.4 behavior. The combined check is done after all other checks.
+
+    // Check STX movements
     let amount_moved = assets.get_stx(owner);
-    let amount_burned = assets.get_stx_burned(owner);
-    let total_stx_change = amount_moved
-        .unwrap_or(0)
-        .checked_add(amount_burned.unwrap_or(0))
-        .ok_or(VmInternalError::Expect(
-            "STX movement and burn overflowed u128".into(),
-        ))?;
-
-    // If this epoch doesn't support the combined check, we handle STX movement and
-    // burn separately below
-    if !epoch.handles_with_stx_combined_check() {
-        if let Some(stx_moved) = amount_moved {
-            if stx_allowances.is_empty() {
-                // If there are no allowances for STX, any movement is a violation
-                record_violation(MAX_ALLOWANCES as u128);
-            } else {
-                for (index, allowance) in &stx_allowances {
-                    if stx_moved > *allowance {
-                        record_violation(*index as u128);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if let Some(stx_burned) = amount_burned {
-            if stx_allowances.is_empty() {
-                // If there are no allowances for STX, any burn is a violation
-                record_violation(MAX_ALLOWANCES as u128);
-            } else {
-                for (index, allowance) in &stx_allowances {
-                    if stx_burned > *allowance {
-                        record_violation(*index as u128);
-                        break;
-                    }
-                }
-            }
-        }
-    } else if total_stx_change > 0 {
+    if let Some(stx_moved) = amount_moved {
         if stx_allowances.is_empty() {
             // If there are no allowances for STX, any movement is a violation
-            record_violation(MAX_ALLOWANCES as u128);
+            record_violation(&mut earliest_violation, MAX_ALLOWANCES as u128);
         } else {
             for (index, allowance) in &stx_allowances {
-                if total_stx_change > *allowance {
-                    record_violation(*index as u128);
+                if stx_moved > *allowance {
+                    record_violation(&mut earliest_violation, *index as u128);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Check STX burns
+    let amount_burned = assets.get_stx_burned(owner);
+    if let Some(stx_burned) = amount_burned {
+        if stx_allowances.is_empty() {
+            // If there are no allowances for STX, any burn is a violation
+            record_violation(&mut earliest_violation, MAX_ALLOWANCES as u128);
+        } else {
+            for (index, allowance) in &stx_allowances {
+                if stx_burned > *allowance {
+                    record_violation(&mut earliest_violation, *index as u128);
                     break;
                 }
             }
@@ -558,13 +539,13 @@ fn check_allowances(
 
             if merged.is_empty() {
                 // No allowance for this asset, any movement is a violation
-                record_violation(MAX_ALLOWANCES as u128);
+                record_violation(&mut earliest_violation, MAX_ALLOWANCES as u128);
                 continue;
             }
 
             for (index, allowance) in merged {
                 if *amount_moved > allowance {
-                    record_violation(index as u128);
+                    record_violation(&mut earliest_violation, index as u128);
                 }
             }
         }
@@ -587,13 +568,13 @@ fn check_allowances(
 
             if merged.is_empty() {
                 // No allowance for this asset, any movement is a violation
-                record_violation(MAX_ALLOWANCES as u128);
+                record_violation(&mut earliest_violation, MAX_ALLOWANCES as u128);
                 continue;
             }
 
             for (index, allowance_vec) in merged {
                 if ids_moved.iter().any(|id| !allowance_vec.contains(id)) {
-                    record_violation(index as u128);
+                    record_violation(&mut earliest_violation, index as u128);
                 }
             }
         }
@@ -603,26 +584,33 @@ fn check_allowances(
     if let Some(stx_stacked) = assets.get_stacking(owner) {
         // If there are no allowances for stacking, any stacking is a violation
         if stacking_allowances.is_empty() {
-            record_violation(MAX_ALLOWANCES as u128);
+            record_violation(&mut earliest_violation, MAX_ALLOWANCES as u128);
         } else {
             for (index, allowance) in &stacking_allowances {
                 if stx_stacked > *allowance {
-                    record_violation(*index as u128);
+                    record_violation(&mut earliest_violation, *index as u128);
                     break;
                 }
             }
         }
     }
 
-    // Check combined STX movements and burns in epochs that don't support the combined check
-    // This happens after all other checks to ensure that we only need to reach this rejectable
+    // Check combined STX movements and burns. In epochs that don't support the combined check,
+    // this happens after all other checks to ensure that we only need to reach this rejectable
     // error if there are no other errors already reached.
-    if !epoch.handles_with_stx_combined_check() && earliest_violation.is_none() {
-        // If the total STX moved exceeds any allowance, emit an error that
-        // makes this transaction invalid.
-        if total_stx_change > 0 {
-            for (_, allowance) in &stx_allowances {
-                if total_stx_change > *allowance {
+    let total_stx_change = amount_moved
+        .unwrap_or(0)
+        .checked_add(amount_burned.unwrap_or(0))
+        .ok_or(VmInternalError::Expect(
+            "STX movement and burn overflowed u128".into(),
+        ))?;
+    if total_stx_change > 0 {
+        for (index, allowance) in &stx_allowances {
+            if total_stx_change > *allowance {
+                if epoch.handles_with_stx_combined_check() {
+                    record_violation(&mut earliest_violation, *index as u128);
+                    break;
+                } else if earliest_violation.is_none() {
                     return Err(VmExecutionError::Internal(VmInternalError::Expect(
                         "Total STX movement and burn exceeds allowance".into(),
                     )));
