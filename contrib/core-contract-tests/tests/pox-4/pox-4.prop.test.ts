@@ -1628,7 +1628,7 @@ describe("test pox-4 contract read only functions", () => {
           );
           // Assert
           assert(isClarityType(actual, ClarityType.Buffer));
-          expect(actual.value).toEqual(bytesToHex(signer_key_message_hash));
+          expect(actual).toBeBuff(signer_key_message_hash);
         }
       )
     );
