@@ -28,14 +28,13 @@ const AST_CALL_STACK_DEPTH_BUFFER: u64 = 5;
 /// Bundles related stack depth limits for parsing and AST checks.
 #[derive(Clone, Copy, Debug)]
 pub struct StackDepthLimits {
-    max_call_stack_depth: usize,
+    max_call_stack_depth: u64,
     max_nesting_depth: u64,
 }
 
 impl StackDepthLimits {
-    pub fn new(max_call_stack_depth: usize) -> Self {
-        let max_nesting_depth =
-            AST_CALL_STACK_DEPTH_BUFFER.saturating_add(max_call_stack_depth as u64);
+    pub fn new(max_call_stack_depth: u64) -> Self {
+        let max_nesting_depth = AST_CALL_STACK_DEPTH_BUFFER.saturating_add(max_call_stack_depth);
         Self {
             max_call_stack_depth,
             max_nesting_depth,
@@ -44,7 +43,7 @@ impl StackDepthLimits {
 
     pub fn no_limit() -> Self {
         Self {
-            max_call_stack_depth: usize::MAX,
+            max_call_stack_depth: u64::MAX,
             max_nesting_depth: u64::MAX,
         }
     }
@@ -53,7 +52,7 @@ impl StackDepthLimits {
         Self::new(max_call_stack_depth_for_epoch(epoch))
     }
 
-    pub fn max_call_stack_depth(&self) -> usize {
+    pub fn max_call_stack_depth(&self) -> u64 {
         self.max_call_stack_depth
     }
 

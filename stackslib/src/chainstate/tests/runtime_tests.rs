@@ -593,8 +593,8 @@ fn arithmetic_zero_n_log_n_ccall() {
 fn stack_depth_too_deep_call_chain_cdeploy() {
     // Build a chain of private functions foo-0 → ... → foo-(limit-1)
     // Each foo-i calls foo-(i-1), so calling foo-(limit-1) triggers `limit` nested calls.
-    fn build_contract(limit: usize) -> String {
-        let mut defs = Vec::with_capacity(limit + 2);
+    fn build_contract(limit: u64) -> String {
+        let mut defs = Vec::with_capacity(limit as usize + 2);
         defs.push("(define-private (foo-0 (x int)) (+ 1 x))".to_string());
         for i in 1..limit {
             defs.push(format!(
@@ -635,8 +635,8 @@ fn stack_depth_too_deep_call_chain_cdeploy() {
 fn stack_depth_too_deep_call_chain_ccall() {
     // Build `limit + 1` private functions: foo-0 → foo-limit.
     // The public entrypoint calls foo-limit to exceed the runtime stack depth.
-    fn build_contract(limit: usize) -> String {
-        let mut defs = Vec::with_capacity(limit + 3);
+    fn build_contract(limit: u64) -> String {
+        let mut defs = Vec::with_capacity(limit as usize + 3);
         defs.push("(define-private (foo-0 (x int)) (let ((y (+ x 1))) y))".to_string());
         for i in 1..=limit {
             let prev = i - 1;

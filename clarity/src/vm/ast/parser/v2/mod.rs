@@ -829,7 +829,7 @@ impl<'a> Parser<'a> {
         // because even though this function only returns a single node, that single node may contain others.
         let mut parse_stack = vec![];
         let mut first_run = true;
-        let max_nesting_depth = self.depth_limits.max_nesting_depth() + 1;
+        let max_nesting_depth = self.depth_limits.max_nesting_depth().saturating_add(1);
         // do-while loop until there are no more nodes waiting for children nodes
         while first_run || !parse_stack.is_empty() {
             first_run = false;

@@ -1082,7 +1082,7 @@ fn test_cc_stack_depth(
 
     // The `unwrap-panic` adds 1 stack frame, the `contract-call?` adds 2, and the `ok` adds one
     // more for a total of 4, so we use all but 3 to test just over the limit.
-    let nested_plus = build_nested_plus("1", max_call_stack_depth_for_epoch(epoch) - 3);
+    let nested_plus = build_nested_plus("1", (max_call_stack_depth_for_epoch(epoch) - 3) as usize);
     let contract_one = format!(
         "(define-public (foo)
             (ok {nested_plus}))"
@@ -1116,7 +1116,7 @@ fn test_cc_trait_stack_depth(
     // The call to bar adds 1 stack frame, `unwrap-panic` adds another, the `contract-call?`
     // adds 2, and the `ok` adds one more for a total of 5, so we use all but 4 to test just over
     // the limit.
-    let nested_plus = build_nested_plus("1", max_call_stack_depth_for_epoch(epoch) - 4);
+    let nested_plus = build_nested_plus("1", (max_call_stack_depth_for_epoch(epoch) - 4) as usize);
     let contract_one = format!(
         "(define-trait trait-1 (
         (foo () (response int int))))

@@ -50,7 +50,7 @@ use crate::vm::types::{
 use crate::vm::version::ClarityVersion;
 use crate::vm::{ast, eval, is_reserved, stx_transfer_consolidated};
 
-pub const MAX_CONTEXT_DEPTH: u16 = 256;
+pub const MAX_CONTEXT_DEPTH: u64 = 256;
 pub const MAX_EVENTS_BATCH: u64 = 50 * 1024 * 1024;
 
 // TODO:
@@ -261,13 +261,13 @@ pub struct LocalContext<'a> {
     pub parent: Option<&'a LocalContext<'a>>,
     pub variables: HashMap<ClarityName, Value>,
     pub callable_contracts: HashMap<ClarityName, CallableData>,
-    depth: u16,
+    depth: u64,
 }
 
 pub struct CallStack {
     stack: Vec<FunctionIdentifier>,
     set: HashSet<FunctionIdentifier>,
-    apply_depth: usize,
+    apply_depth: u64,
 }
 
 pub const TRANSIENT_CONTRACT_NAME: &str = "__transient";
@@ -1986,7 +1986,7 @@ impl<'a> LocalContext<'a> {
         }
     }
 
-    pub fn depth(&self) -> u16 {
+    pub fn depth(&self) -> u64 {
         self.depth
     }
 
@@ -2055,8 +2055,9 @@ impl CallStack {
         }
     }
 
-    pub fn depth(&self) -> usize {
-        self.stack.len() + self.apply_depth
+    pub fn depth(&self) -> u64 {
+        let stack_len = u64::try_from(self.stack.len()).unwrap_or(u64::MAX);
+        stack_len.saturating_add(self.apply_depth)
     }
 
     pub fn contains(&self, function: &FunctionIdentifier) -> bool {

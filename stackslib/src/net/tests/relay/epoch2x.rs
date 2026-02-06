@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use clarity::vm::ast::stack_depth_checker::StackDepthLimits;
 use clarity::vm::costs::ExecutionCost;
 use clarity::vm::types::{QualifiedContractIdentifier, StacksAddressExtensions};
-use clarity::vm::{max_call_stack_depth_for_epoch, ClarityVersion};
+use clarity::vm::ClarityVersion;
 use rand::{thread_rng, Rng};
 use stacks_common::address::AddressHashMode;
 use stacks_common::types::chainstate::{BlockHeaderHash, StacksBlockId};
@@ -2621,7 +2621,6 @@ fn setup_deep_txs(epoch_id: StacksEpochId) -> DeepTransactions {
     let spender_sk_2 = StacksPrivateKey::random();
     let spender_sk_3 = StacksPrivateKey::random();
 
-    let max_call_stack_depth = max_call_stack_depth_for_epoch(epoch_id);
     let edge_repeat_factor = StackDepthLimits::for_epoch(epoch_id).max_nesting_depth() - 1;
     let tx_edge_body_start = "{ a : ".repeat(edge_repeat_factor as usize);
     let tx_edge_body_end = "} ".repeat(edge_repeat_factor as usize);

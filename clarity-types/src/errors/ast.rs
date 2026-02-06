@@ -45,9 +45,9 @@ pub enum ParseErrorKind {
     /// Number of expressions exceeds the maximum allowed limit.
     TooManyExpressions,
     /// Nesting depth of expressions exceeds the maximum allowed stack depth.
-    ExpressionStackDepthTooDeep { max_depth: usize },
+    ExpressionStackDepthTooDeep { max_depth: u64 },
     /// Nesting depth of expressions exceeds the maximum allowed stack depth.
-    VaryExpressionStackDepthTooDeep { max_depth: usize },
+    VaryExpressionStackDepthTooDeep { max_depth: u64 },
 
     // Semantic errors
     /// Failed to parse a string into an integer literal.
