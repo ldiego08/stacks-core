@@ -132,10 +132,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
         BadTraitImplementation(_, _) => Tested(vec![bad_trait_implementation_mismatched_args]),
-        DefineTraitDuplicateMethod(_) => Unreachable_Functionally(
-            "Trait definitions are fully validated during deployment; \
-             malformed trait signatures never reach runtime.",
-        ),
         TraitBasedContractCallInReadOnly => Unreachable_Functionally(
             "Read-only contract-call restrictions are enforced during static analysis; \
              write-capable calls cannot exist in executable read-only code.",

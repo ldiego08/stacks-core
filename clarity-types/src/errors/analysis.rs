@@ -672,9 +672,6 @@ pub enum RuntimeCheckErrorKind {
     /// Invalid implementation of a trait method.
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
-    /// Trait definition contains duplicate method names.
-    /// The `String` wraps the duplicate method name.
-    DefineTraitDuplicateMethod(String),
 
     /// Trait-based contract call used in a read-only context, which is prohibited.
     TraitBasedContractCallInReadOnly,
@@ -1134,7 +1131,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::ExpectsAcceptable(s)
             }
             CommonCheckErrorKind::DefineTraitDuplicateMethod(s) => {
-                RuntimeCheckErrorKind::DefineTraitDuplicateMethod(s)
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Define trait duplicate method: {s}"
+                ))
             }
             CommonCheckErrorKind::TraitTooManyMethods(found, allowed) => {
                 RuntimeCheckErrorKind::TraitTooManyMethods(found, allowed)
