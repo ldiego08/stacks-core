@@ -602,9 +602,9 @@ mod test {
         let err = handle_define_trait(&"bad-trait".into(), &trait_body, &mut env).unwrap_err();
 
         assert_eq!(
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
-                "Too many function params: 257 allowed 256"
-            ))),
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Too many function params: 257 allowed 256".to_string()
+            )),
             err
         );
     }
