@@ -1769,7 +1769,7 @@ impl Relayer {
         tx: &StacksTransaction,
     ) -> Result<(), Error> {
         debug!("Check {} to see if it is problematic", &tx.txid(),);
-        if !epoch_id.rejects_parse_depth_errors() {
+        if epoch_id.rejects_parse_depth_errors() {
             if let TransactionPayload::SmartContract(ref smart_contract, ref clarity_version_opt) =
                 tx.payload
             {
