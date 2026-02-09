@@ -128,10 +128,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_name_already_used_ccall
         ]),
         UndefinedFunction(_) => Tested(vec![runtime_check_error_kind_undefined_function_ccall]),
-        RequiresAtMostArguments(_, _) => Unreachable_Functionally(
-            "Maximum arity requirements are enforced during static analysis; \
-             calls with too many arguments cannot reach execution.",
-        ),
         IncorrectArgumentCount(_, _) => {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
