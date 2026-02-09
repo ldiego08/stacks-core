@@ -123,10 +123,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_contract_call_expect_name_cdeploy,
             runtime_check_error_kind_contract_call_expect_name_ccall
         ]),
-        GetTenureInfoExpectPropertyName => Unreachable_Functionally(
-            "`get-tenure-info?` requires a literal property name; \
-             non-atom arguments are rejected during static analysis.",
-        ),
         NameAlreadyUsed(_) => Tested(vec![
             runtime_check_error_kind_name_already_used_cdeploy,
             runtime_check_error_kind_name_already_used_ccall

@@ -655,10 +655,6 @@ pub enum RuntimeCheckErrorKind {
     /// Expected a contract name in a `contract-call?` expression but found an invalid token.
     ContractCallExpectName,
 
-    // get-block-info? errors
-    /// Expected a tenure info property name but found an invalid token.
-    GetTenureInfoExpectPropertyName,
-
     /// Name (e.g., variable, function) is already in use within the same scope.
     /// The `String` wraps the conflicting name.
     NameAlreadyUsed(String),

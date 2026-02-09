@@ -1061,7 +1061,9 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::GetTenureInfoExpectPropertyName)
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Get tenure info expect property name".to_string()
+            ))
         );
     }
 

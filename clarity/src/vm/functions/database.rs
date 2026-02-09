@@ -1145,10 +1145,15 @@ pub fn special_get_tenure_info(
     // Handle the block property name input arg.
     let property_name = args[0]
         .match_atom()
-        .ok_or(RuntimeCheckErrorKind::GetTenureInfoExpectPropertyName)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get tenure info expect property name".to_string(),
+        ))?;
 
-    let block_info_prop = TenureInfoProperty::lookup_by_name(property_name)
-        .ok_or(RuntimeCheckErrorKind::GetTenureInfoExpectPropertyName)?;
+    let block_info_prop = TenureInfoProperty::lookup_by_name(property_name).ok_or(
+        RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Get tenure info expect property name".to_string(),
+        ),
+    )?;
 
     // Handle the block-height input arg.
     let height_eval = eval(&args[1], env, context)?;
