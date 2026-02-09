@@ -855,7 +855,12 @@ fn special_contract_of(
 
     let contract_ref = match &args[0].expr {
         SymbolicExpressionType::Atom(contract_ref) => contract_ref,
-        _ => return Err(RuntimeCheckErrorKind::ContractOfExpectsTrait.into()),
+        _ => {
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Contract of expects trait".to_string(),
+            )
+            .into());
+        }
     };
 
     let contract_identifier = match context.lookup_callable_contract(contract_ref) {
@@ -871,7 +876,12 @@ fn special_contract_of(
 
             &trait_data.contract_identifier
         }
-        _ => return Err(RuntimeCheckErrorKind::ContractOfExpectsTrait.into()),
+        _ => {
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Contract of expects trait".to_string(),
+            )
+            .into());
+        }
     };
 
     let contract_principal = Value::Principal(PrincipalData::Contract(contract_identifier.clone()));
@@ -936,7 +946,9 @@ mod test {
         let err = special_contract_of(&[non_atom], &mut env, &context).unwrap_err();
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ContractOfExpectsTrait)
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Contract of expects trait".to_string()
+            ))
         );
     }
 
@@ -979,7 +991,9 @@ mod test {
 
         assert_eq!(
             err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ContractOfExpectsTrait)
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Contract of expects trait".to_string()
+            ))
         );
     }
 

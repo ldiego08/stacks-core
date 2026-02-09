@@ -673,8 +673,6 @@ pub enum RuntimeCheckErrorKind {
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
 
-    /// `contract-of` expects a trait type but found a different type.
-    ContractOfExpectsTrait,
     /// Too many trait methods specified.
     /// The first `usize` represents the number of methods found, the second the maximum allowed.
     TraitTooManyMethods(usize, usize),

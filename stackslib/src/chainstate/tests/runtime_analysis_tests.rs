@@ -132,10 +132,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
         BadTraitImplementation(_, _) => Tested(vec![bad_trait_implementation_mismatched_args]),
-        ContractOfExpectsTrait => Unreachable_Functionally(
-            "`contract-of` only accepts statically-typed trait values; \
-             invalid inputs are rejected during analysis.",
-        ),
         TraitTooManyMethods(_, _) => Unreachable_Functionally(
             "Trait method count limits are enforced during deployment; \
              oversized traits cannot appear at runtime.",
