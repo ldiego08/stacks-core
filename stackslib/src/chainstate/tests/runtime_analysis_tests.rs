@@ -131,10 +131,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         IncorrectArgumentCount(_, _) => {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
-        TooManyFunctionParameters(_, _) => Unreachable_Functionally(
-            "Trait function parameter limits are enforced during trait parsing at deploy time; \
-             oversized signatures are rejected before execution.",
-        ),
         TraitReferenceUnknown(_) => Unreachable_Functionally(
             "All `use-trait` references are validated during static analysis; \
              unknown traits cannot appear at runtime.",

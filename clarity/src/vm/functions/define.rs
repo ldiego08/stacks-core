@@ -599,13 +599,13 @@ mod test {
             None,
         );
 
-        let result = handle_define_trait(&"bad-trait".into(), &trait_body, &mut env);
+        let err = handle_define_trait(&"bad-trait".into(), &trait_body, &mut env).unwrap_err();
 
-        assert!(matches!(
-            result,
-            Err(VmExecutionError::RuntimeCheck(
-                RuntimeCheckErrorKind::TooManyFunctionParameters(found, max)
-            ))
-        ));
+        assert_eq!(
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Too many function params: 257 allowed 256"
+            ))),
+            err
+        );
     }
 }

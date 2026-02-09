@@ -667,9 +667,6 @@ pub enum RuntimeCheckErrorKind {
     /// Incorrect number of arguments provided to a function.
     /// The first `usize` represents the expected count, and the second represents the actual count.
     IncorrectArgumentCount(usize, usize),
-    /// Too many function parameters specified.
-    /// The first `usize` represents the number of parameters found, the second represents the maximum allowed.
-    TooManyFunctionParameters(usize, usize),
 
     // Traits
     /// Referenced trait is not defined or cannot be found.
@@ -1118,7 +1115,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 ))
             }
             CommonCheckErrorKind::TooManyFunctionParameters(found, allowed) => {
-                RuntimeCheckErrorKind::TooManyFunctionParameters(found, allowed)
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Too many function params: {found} allowed {allowed}"
+                ))
             }
             CommonCheckErrorKind::ExpectedName => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string())
