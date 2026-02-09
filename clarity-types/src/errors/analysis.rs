@@ -660,8 +660,6 @@ pub enum RuntimeCheckErrorKind {
     NameAlreadyUsed(String),
 
     // Expect a function, or applying a function to a list
-    /// Expected a list application but found a different expression.
-    ExpectedListApplication,
     /// Expected a sequence type (e.g., list, buffer) but encountered a non-sequence value.
     ///
     /// The boxed [`TypeSignature`] represents the **actual type provided**, if known.

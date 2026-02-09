@@ -270,7 +270,10 @@ pub fn special_append(
                 )
             }
         }
-        _ => Err(RuntimeCheckErrorKind::ExpectedListApplication.into()),
+        _ => Err(
+            RuntimeCheckErrorKind::ExpectsAcceptable("Expected list application".to_string())
+                .into(),
+        ),
     }
 }
 

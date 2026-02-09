@@ -127,10 +127,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_name_already_used_cdeploy,
             runtime_check_error_kind_name_already_used_ccall
         ]),
-        ExpectedListApplication => Unreachable_Functionally(
-            "All `append` operations require a statically-checked list argument; \
-             non-list values are rejected during static analysis.",
-        ),
         ExpectedSequence(_) => Unreachable_Functionally(
             "Sequence operations are fully type-checked during analysis; \
              non-sequence values are rejected before execution.",
