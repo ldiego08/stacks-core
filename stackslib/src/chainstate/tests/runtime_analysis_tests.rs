@@ -131,10 +131,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         IncorrectArgumentCount(_, _) => {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
-        TraitReferenceUnknown(_) => Unreachable_Functionally(
-            "All `use-trait` references are validated during static analysis; \
-             unknown traits cannot appear at runtime.",
-        ),
         TraitMethodUnknown(_, _) => Unreachable_Functionally(
             "Trait method existence is verified during static analysis; \
              missing methods prevent deployment.",

@@ -176,9 +176,9 @@ pub fn special_contract_call(
                         // Retrieve the expected method signature
                         let constraining_trait = contract_context_defining_trait
                             .lookup_trait_definition(&trait_name)
-                            .ok_or(RuntimeCheckErrorKind::TraitReferenceUnknown(
-                                trait_name.clone(),
-                            ))?;
+                            .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                                "Trait reference unknown: {trait_name}"
+                            )))?;
                         let expected_sig = constraining_trait.get(function_name).ok_or(
                             RuntimeCheckErrorKind::TraitMethodUnknown(
                                 trait_name,
