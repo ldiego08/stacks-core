@@ -1714,8 +1714,10 @@ fn expected_allowance_expr_error_unhandled_native() {
 fn allowance_expr_not_allowed() {
     let snippet = "(with-stx u1)";
 
-    let expected: ClarityEvalError =
-        VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::AllowanceExprNotAllowed).into();
+    let expected: ClarityEvalError = VmExecutionError::RuntimeCheck(
+        RuntimeCheckErrorKind::ExpectsAcceptable("Allowance expr not allowed".to_string()),
+    )
+    .into();
 
     let err = execute(snippet).expect_err("execution unexpectedly succeeded");
 

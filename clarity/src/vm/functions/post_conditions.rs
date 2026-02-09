@@ -622,7 +622,7 @@ pub fn special_allowance(
     _env: &mut Environment,
     _context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
-    Err(RuntimeCheckErrorKind::AllowanceExprNotAllowed.into())
+    Err(RuntimeCheckErrorKind::ExpectsAcceptable("Allowance expr not allowed".to_string()).into())
 }
 
 #[cfg(test)]
