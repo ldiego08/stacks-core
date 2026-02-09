@@ -669,9 +669,6 @@ pub enum RuntimeCheckErrorKind {
     IncorrectArgumentCount(usize, usize),
 
     // Traits
-    /// Referenced method does not exist in the specified trait.
-    /// The first `String` wraps the trait name, and the second wraps the method name.
-    TraitMethodUnknown(String, String),
     /// Expected a trait identifier (e.g., `.trait-name`) but found an invalid token.
     ExpectedTraitIdentifier,
     /// Invalid implementation of a trait method.

@@ -180,10 +180,9 @@ pub fn special_contract_call(
                                 "Trait reference unknown: {trait_name}"
                             )))?;
                         let expected_sig = constraining_trait.get(function_name).ok_or(
-                            RuntimeCheckErrorKind::TraitMethodUnknown(
-                                trait_name,
-                                function_name.to_string(),
-                            ),
+                            RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                                "Trait method unknown: {trait_name}.{function_name}"
+                            )),
                         )?;
                         (
                             &trait_data.contract_identifier,
