@@ -89,10 +89,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
              values whose unified type wasn't accepted earlier."),
         ExpectsAcceptable(_) => Unreachable_ExpectLike,
         ExpectsRejectable(_) => Unreachable_ExpectLike,
-        BadMatchOptionSyntax(_) => Unreachable_Functionally(
-            "Both the analyzer and the runtime examine the exact same match AST slice.
-             The static pass invokes check_special_match_opt, which enforces the 3
-             argument structure and the some binding name before any code is accepted"),
         BadMatchResponseSyntax(_) => Unreachable_Functionally(
             "Both the analyzer and the runtime examine the exact same match AST slice.
              The static pass invokes check_special_match_resp, which enforces the 4

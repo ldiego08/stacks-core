@@ -604,9 +604,6 @@ pub enum RuntimeCheckErrorKind {
     ExpectsAcceptable(String),
 
     // Match expression errors
-    /// Invalid syntax in an `option` match expression.
-    /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
-    BadMatchOptionSyntax(Box<RuntimeCheckErrorKind>),
     /// Invalid syntax in a `response` match expression.
     /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
     BadMatchResponseSyntax(Box<RuntimeCheckErrorKind>),

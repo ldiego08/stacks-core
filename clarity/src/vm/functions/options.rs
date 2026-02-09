@@ -163,17 +163,18 @@ fn special_match_opt(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if args.len() != 3 {
-        Err(RuntimeCheckErrorKind::BadMatchOptionSyntax(Box::new(
-            RuntimeCheckErrorKind::IncorrectArgumentCount(4, args.len() + 1),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Bad match option syntax: args {} != 3",
+            args.len()
         )))?;
     }
 
     let bind_name = args[0]
         .match_atom()
         .ok_or_else(|| {
-            RuntimeCheckErrorKind::BadMatchOptionSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
-            ))
+            RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Bad match option syntax: expected name".to_string(),
+            )
         })?
         .clone();
     let some_branch = &args[1];
