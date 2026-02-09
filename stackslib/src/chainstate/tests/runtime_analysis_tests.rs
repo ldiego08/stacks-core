@@ -127,10 +127,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_name_already_used_cdeploy,
             runtime_check_error_kind_name_already_used_ccall
         ]),
-        BadLetSyntax => Unreachable_Functionally(
-            "`let` binding structure is fully validated during static analysis; \
-             malformed bindings never reach the runtime.",
-        ),
         BadSyntaxBinding(_) => Unreachable_Functionally(
             "Binding syntax errors are detected during parsing and analysis; \
              runtime never re-parses bindings.",

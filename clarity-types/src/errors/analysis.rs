@@ -659,10 +659,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `String` wraps the conflicting name.
     NameAlreadyUsed(String),
 
-    // Let syntax
-    /// Invalid syntax in a `let` expression, violating binding or structure rules.
-    BadLetSyntax,
-
     // Generic binding syntax
     /// Invalid binding syntax in a generic construct (e.g., `let`, `match`).
     /// The `SyntaxBindingError` wraps the specific binding error.

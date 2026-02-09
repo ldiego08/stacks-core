@@ -770,7 +770,9 @@ fn special_let(
     // parse and eval the bindings.
     let bindings = args[0]
         .match_list()
-        .ok_or(RuntimeCheckErrorKind::BadLetSyntax)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Bad let syntax".to_string(),
+        ))?;
 
     runtime_cost(ClarityCostFunction::Let, env, bindings.len())?;
 
@@ -1014,10 +1016,12 @@ mod test {
 
         let err = special_let(&args, &mut env, &context).unwrap_err();
 
-        assert!(matches!(
-            err,
-            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::BadLetSyntax)
-        ));
+        assert_eq!(
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Bad let syntax".to_string()
+            )),
+            err
+        );
     }
 
     #[apply(test_clarity_versions)]
