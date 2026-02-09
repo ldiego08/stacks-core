@@ -236,7 +236,8 @@ fn test_bad_variables() {
     assert_eq_err(expected, execute(test2).unwrap_err());
 
     let test4 = "()";
-    let expected = RuntimeCheckErrorKind::NonFunctionApplication;
+    let expected =
+        RuntimeCheckErrorKind::ExpectsAcceptable("Non functional application".to_string());
     assert_eq_err(expected, execute(test4).unwrap_err());
 }
 

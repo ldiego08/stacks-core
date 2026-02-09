@@ -348,9 +348,12 @@ pub fn eval(
             AtomValue(ref value) | LiteralValue(ref value) => Ok(value.clone()),
             Atom(ref value) => lookup_variable(value, context, env),
             List(ref children) => {
-                let (function_variable, rest) = children
-                    .split_first()
-                    .ok_or(RuntimeCheckErrorKind::NonFunctionApplication)?;
+                let (function_variable, rest) =
+                    children
+                        .split_first()
+                        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+                            "Non functional application".to_string(),
+                        ))?;
 
                 let function_name = function_variable.match_atom().ok_or(
                     RuntimeCheckErrorKind::ExpectsAcceptable("Bad function name".to_string()),

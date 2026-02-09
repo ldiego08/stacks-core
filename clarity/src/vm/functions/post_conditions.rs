@@ -31,24 +31,29 @@ use crate::vm::representations::SymbolicExpression;
 use crate::vm::types::Value;
 use crate::vm::{Environment, LocalContext, eval};
 
+#[derive(Debug)]
 pub struct StxAllowance {
     amount: u128,
 }
 
+#[derive(Debug)]
 pub struct FtAllowance {
     asset: AssetIdentifier,
     amount: u128,
 }
 
+#[derive(Debug)]
 pub struct NftAllowance {
     asset: AssetIdentifier,
     asset_ids: Vec<Value>,
 }
 
+#[derive(Debug)]
 pub struct StackingAllowance {
     amount: u128,
 }
 
+#[derive(Debug)]
 pub enum Allowance {
     Stx(StxAllowance),
     Ft(FtAllowance),
@@ -96,10 +101,14 @@ fn eval_allowance(
 ) -> Result<Allowance, VmExecutionError> {
     let list = allowance_expr
         .match_list()
-        .ok_or(RuntimeCheckErrorKind::NonFunctionApplication)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Non functional application".to_string(),
+        ))?;
     let (name_expr, rest) = list
         .split_first()
-        .ok_or(RuntimeCheckErrorKind::NonFunctionApplication)?;
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Non functional application".to_string(),
+        ))?;
     let name = name_expr
         .match_atom()
         .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
@@ -665,13 +674,13 @@ mod test {
             None,
         );
 
-        let result = eval_allowance(&allowance_expr, &mut env, &context);
+        let err = eval_allowance(&allowance_expr, &mut env, &context).unwrap_err();
 
-        assert!(matches!(
-            result,
-            Err(VmExecutionError::RuntimeCheck(
-                RuntimeCheckErrorKind::NonFunctionApplication
-            ))
-        ));
+        assert_eq!(
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Non functional application".to_string()
+            )),
+            err
+        );
     }
 }
