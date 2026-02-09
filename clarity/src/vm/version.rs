@@ -73,6 +73,16 @@ impl ClarityVersion {
             StacksEpochId::Epoch34 => ClarityVersion::Clarity5,
         }
     }
+
+    pub fn uses_secp256r1_double_hashing(&self) -> bool {
+        match self {
+            ClarityVersion::Clarity1
+            | ClarityVersion::Clarity2
+            | ClarityVersion::Clarity3
+            | ClarityVersion::Clarity4 => true,
+            ClarityVersion::Clarity5 => false,
+        }
+    }
 }
 
 impl FromStr for ClarityVersion {
