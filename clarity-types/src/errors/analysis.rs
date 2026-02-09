@@ -672,8 +672,6 @@ pub enum RuntimeCheckErrorKind {
     /// Invalid implementation of a trait method.
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
-    /// Invalid or malformed signature in a `(define-trait ...)` expression.
-    DefineTraitBadSignature,
     /// Trait definition contains duplicate method names.
     /// The `String` wraps the duplicate method name.
     DefineTraitDuplicateMethod(String),
@@ -1142,7 +1140,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::TraitTooManyMethods(found, allowed)
             }
             CommonCheckErrorKind::DefineTraitBadSignature => {
-                RuntimeCheckErrorKind::DefineTraitBadSignature
+                RuntimeCheckErrorKind::ExpectsAcceptable("Define trait bad signature".to_string())
             }
             CommonCheckErrorKind::InvalidTypeDescription => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Invalid type description".to_string())
