@@ -673,10 +673,6 @@ pub enum RuntimeCheckErrorKind {
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
 
-    /// Too many trait methods specified.
-    /// The first `usize` represents the number of methods found, the second the maximum allowed.
-    TraitTooManyMethods(usize, usize),
-
     // Strings
     /// String contains invalid or disallowed characters (e.g., non-ASCII in ASCII strings).
     InvalidCharactersDetected,
@@ -1132,7 +1128,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 ))
             }
             CommonCheckErrorKind::TraitTooManyMethods(found, allowed) => {
-                RuntimeCheckErrorKind::TraitTooManyMethods(found, allowed)
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Trait too many methods: {found} allowed {allowed}"
+                ))
             }
             CommonCheckErrorKind::DefineTraitBadSignature => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Define trait bad signature".to_string())

@@ -132,10 +132,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
         BadTraitImplementation(_, _) => Tested(vec![bad_trait_implementation_mismatched_args]),
-        TraitTooManyMethods(_, _) => Unreachable_Functionally(
-            "Trait method count limits are enforced during deployment; \
-             oversized traits cannot appear at runtime.",
-        ),
         InvalidCharactersDetected => Tested(vec![
             invalid_characters_detected_invalid_ascii,
             invalid_characters_detected_invalid_utf8
