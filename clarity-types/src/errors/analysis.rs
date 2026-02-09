@@ -664,9 +664,6 @@ pub enum RuntimeCheckErrorKind {
     UndefinedFunction(String),
 
     // Argument counts
-    /// Function requires at least the specified number of arguments, but fewer were provided.
-    /// The first `usize` represents the minimum required, and the second represents the actual count.
-    RequiresAtLeastArguments(usize, usize),
     /// Function requires at most the specified number of arguments, but more were provided.
     /// The first `usize` represents the maximum allowed, and the second represents the actual count.
     RequiresAtMostArguments(usize, usize),
@@ -1114,7 +1111,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 RuntimeCheckErrorKind::IncorrectArgumentCount(expected, args)
             }
             CommonCheckErrorKind::RequiresAtLeastArguments(expected, args) => {
-                RuntimeCheckErrorKind::RequiresAtLeastArguments(expected, args)
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Requires at least args: {expected} got {args}"
+                ))
             }
             CommonCheckErrorKind::RequiresAtMostArguments(expected, args) => {
                 RuntimeCheckErrorKind::RequiresAtMostArguments(expected, args)

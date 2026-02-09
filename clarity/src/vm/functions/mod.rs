@@ -629,7 +629,10 @@ fn native_eq(args: Vec<Value>, env: &mut Environment) -> Result<Value, VmExecuti
 fn native_begin(mut args: Vec<Value>) -> Result<Value, VmExecutionError> {
     match args.pop() {
         Some(v) => Ok(v),
-        None => Err(RuntimeCheckErrorKind::RequiresAtLeastArguments(1, 0).into()),
+        None => Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Requires at least args: 1 got 0".to_string(),
+        )
+        .into()),
     }
 }
 

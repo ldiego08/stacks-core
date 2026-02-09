@@ -448,7 +448,7 @@ fn test_define_fungible_token_arg_count() {
     let test3 = "(define-fungible-token foo u2 u3)";
 
     assert_eq_err(
-        RuntimeCheckErrorKind::RequiresAtLeastArguments(1, 0),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Requires at least args: 1 got 0".to_string()),
         execute(test0).unwrap_err(),
     );
     execute(test1).unwrap();
