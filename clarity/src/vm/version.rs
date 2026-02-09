@@ -74,6 +74,16 @@ impl ClarityVersion {
         }
     }
 
+    pub fn uses_secp256r1_double_hashing(&self) -> bool {
+        match self {
+            ClarityVersion::Clarity1
+            | ClarityVersion::Clarity2
+            | ClarityVersion::Clarity3
+            | ClarityVersion::Clarity4 => true,
+            ClarityVersion::Clarity5 => false,
+        }
+    }
+
     /// Beginning in Clarity 5, cost functions that call `logn` are ensured to
     /// always pass an argument greater than zero, to avoid hitting a runtime
     /// error during cost computation. After reviewing the usage, the only
