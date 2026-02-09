@@ -659,13 +659,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `String` wraps the conflicting name.
     NameAlreadyUsed(String),
 
-    // Expect a function, or applying a function to a list
-    /// Expected a sequence type (e.g., list, buffer) but encountered a non-sequence value.
-    ///
-    /// The boxed [`TypeSignature`] represents the **actual type provided**, if known.
-    /// If the type could not be determined, this will be [`TypeSignature::NoType`].
-    ExpectedSequence(Box<TypeSignature>),
-
     // Let syntax
     /// Invalid syntax in a `let` expression, violating binding or structure rules.
     BadLetSyntax,

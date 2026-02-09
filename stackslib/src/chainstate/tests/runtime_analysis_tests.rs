@@ -127,10 +127,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_name_already_used_cdeploy,
             runtime_check_error_kind_name_already_used_ccall
         ]),
-        ExpectedSequence(_) => Unreachable_Functionally(
-            "Sequence operations are fully type-checked during analysis; \
-             non-sequence values are rejected before execution.",
-        ),
         BadLetSyntax => Unreachable_Functionally(
             "`let` binding structure is fully validated during static analysis; \
              malformed bindings never reach the runtime.",

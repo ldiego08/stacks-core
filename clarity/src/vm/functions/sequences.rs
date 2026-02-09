@@ -96,12 +96,11 @@ pub fn special_filter(
                 })?;
         }
         _ => {
-            return Err(
-                RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(
-                    &sequence,
-                )?))
-                .into(),
-            );
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected sequence: {}",
+                TypeSignature::type_of(&sequence)?
+            ))
+            .into());
         }
     };
     Ok(sequence)
@@ -143,10 +142,11 @@ pub fn special_fold(
                     context,
                 )
             }),
-        _ => Err(
-            RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(&sequence)?))
-                .into(),
-        ),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {}",
+            TypeSignature::type_of(&sequence)?
+        ))
+        .into()),
     }
 }
 
@@ -197,8 +197,9 @@ pub fn special_map(
                 }
             }
             _ => {
-                return Err(RuntimeCheckErrorKind::ExpectedSequence(Box::new(
-                    TypeSignature::type_of(&sequence)?,
+                return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Expected sequence: {}",
+                    TypeSignature::type_of(&sequence)?
                 ))
                 .into());
             }
@@ -299,19 +300,19 @@ pub fn special_concat_v200(
         (Value::Sequence(seq), Value::Sequence(other_seq)) => seq.concat(env.epoch(), other_seq)?,
         (Value::Sequence(_), other_value) => {
             // The first value is a sequence, but the second is not
-            return Err(
-                RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(
-                    &other_value,
-                )?))
-                .into(),
-            );
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected sequence: {}",
+                TypeSignature::type_of(&other_value)?
+            ))
+            .into());
         }
         (value, _) => {
             // The first value is not a sequence (the other may not be as well, but just error on the first)
-            return Err(
-                RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(value)?))
-                    .into(),
-            );
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected sequence: {}",
+                TypeSignature::type_of(value)?
+            ))
+            .into());
         }
     };
 
@@ -348,9 +349,11 @@ pub fn special_concat_v205(
         }
         _ => {
             runtime_cost(ClarityCostFunction::Concat, env, 1)?;
-            return Err(
-                RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::NoType)).into(),
-            );
+            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                "Expected sequence: {}",
+                TypeSignature::NoType
+            ))
+            .into());
         }
     };
 
@@ -372,8 +375,9 @@ pub fn special_as_max_len(
         let sequence_len = match sequence {
             Value::Sequence(ref sequence_data) => sequence_data.len() as u128,
             _ => {
-                return Err(RuntimeCheckErrorKind::ExpectedSequence(Box::new(
-                    TypeSignature::type_of(&sequence)?,
+                return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+                    "Expected sequence: {}",
+                    TypeSignature::type_of(&sequence)?
                 ))
                 .into());
             }
@@ -399,10 +403,11 @@ pub fn special_as_max_len(
 pub fn native_len(sequence: Value) -> Result<Value, VmExecutionError> {
     match sequence {
         Value::Sequence(sequence_data) => Ok(Value::UInt(sequence_data.len() as u128)),
-        _ => Err(
-            RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(&sequence)?))
-                .into(),
-        ),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {}",
+            TypeSignature::type_of(&sequence)?
+        ))
+        .into()),
     }
 }
 
@@ -413,10 +418,11 @@ pub fn native_index_of(sequence: Value, to_find: Value) -> Result<Value, VmExecu
             None => Ok(Value::none()),
         }
     } else {
-        Err(
-            RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(&sequence)?))
-                .into(),
-        )
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {}",
+            TypeSignature::type_of(&sequence)?
+        ))
+        .into())
     }
 }
 
@@ -424,10 +430,11 @@ pub fn native_element_at(sequence: Value, index: Value) -> Result<Value, VmExecu
     let sequence_data = if let Value::Sequence(sequence_data) = sequence {
         sequence_data
     } else {
-        return Err(
-            RuntimeCheckErrorKind::ExpectedSequence(Box::new(TypeSignature::type_of(&sequence)?))
-                .into(),
-        );
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {}",
+            TypeSignature::type_of(&sequence)?
+        ))
+        .into());
     };
 
     let index = if let Value::UInt(index_u128) = index {
@@ -522,7 +529,10 @@ pub fn special_replace_at(
     let expected_elem_type = if let TypeSignature::SequenceType(seq_subtype) = &seq_type {
         seq_subtype.unit_type()
     } else {
-        return Err(RuntimeCheckErrorKind::ExpectedSequence(Box::new(seq_type)).into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {seq_type}"
+        ))
+        .into());
     };
     let index_val = eval(&args[1], env, context)?;
     let new_element = eval(&args[2], env, context)?;
@@ -552,7 +562,10 @@ pub fn special_replace_at(
     };
 
     let Value::Sequence(data) = seq else {
-        return Err(RuntimeCheckErrorKind::ExpectedSequence(Box::new(seq_type)).into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected sequence: {seq_type}"
+        ))
+        .into());
     };
     let seq_len = data.len();
     if index >= seq_len {
