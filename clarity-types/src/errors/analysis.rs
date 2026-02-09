@@ -680,9 +680,6 @@ pub enum RuntimeCheckErrorKind {
     InvalidUTF8Encoding,
 
     // contract post-conditions
-    /// Post-condition expects a list of asset allowances but received invalid input.
-    /// The first `String` wraps the function name, and the second `i32` wraps the argument number.
-    ExpectedListOfAllowances(String, i32),
     /// Allowance expressions are only allowed in specific contexts (`restrict-assets?` or `as-contract?`).
     AllowanceExprNotAllowed,
     /// Expected an allowance expression but found invalid input.

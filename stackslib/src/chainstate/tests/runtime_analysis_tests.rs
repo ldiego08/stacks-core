@@ -139,8 +139,7 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         InvalidUTF8Encoding => {
             Ignored("Only reachable via legacy v1 parsing paths")
         }
-        ExpectedListOfAllowances(_, _)
-        | AllowanceExprNotAllowed
+        AllowanceExprNotAllowed
         | ExpectedAllowanceExpr(_)
         | TooManyAllowances(_, _) => Unreachable_Functionally(
             "Allowance expressions are purely syntactic and fully validated during analysis; \

@@ -1733,10 +1733,11 @@ fn restrict_assets_expected_list_of_allowances() {
             (ok u1)
         )
     "#;
-    let expected_error: ClarityEvalError = VmExecutionError::RuntimeCheck(
-        RuntimeCheckErrorKind::ExpectedListOfAllowances("restrict-assets?".into(), 2),
-    )
-    .into();
+    let expected_error: ClarityEvalError =
+        VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected list of allowances: restrict-assets? 2"
+        )))
+        .into();
 
     let err = execute(snippet).expect_err("execution passed unexpectedly");
     assert_eq!(err, expected_error);
@@ -1755,10 +1756,11 @@ fn as_contract_expected_list_of_allowances() {
     "#;
 
     // The argument is `u42` (not a list), so we expect this error
-    let expected_error: ClarityEvalError = VmExecutionError::RuntimeCheck(
-        RuntimeCheckErrorKind::ExpectedListOfAllowances("as-contract?".to_string(), 1),
-    )
-    .into();
+    let expected_error: ClarityEvalError =
+        VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected list of allowances: as-contract? 1"
+        )))
+        .into();
 
     let err = execute(snippet).expect_err("execution passed unexpectedly");
     assert_eq!(err, expected_error);

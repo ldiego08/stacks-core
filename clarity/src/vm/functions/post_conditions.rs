@@ -251,13 +251,11 @@ pub fn special_restrict_assets(
     check_arguments_at_least(3, args)?;
 
     let asset_owner_expr = &args[0];
-    let allowance_list =
-        args[1]
-            .match_list()
-            .ok_or(RuntimeCheckErrorKind::ExpectedListOfAllowances(
-                "restrict-assets?".into(),
-                2,
-            ))?;
+    let allowance_list = args[1]
+        .match_list()
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected list of allowances: restrict-assets? 2"
+        )))?;
     let body_exprs = &args[2..];
 
     let asset_owner = eval(asset_owner_expr, env, context)?;
@@ -344,13 +342,11 @@ pub fn special_as_contract(
     // arg2..n => body
     check_arguments_at_least(2, args)?;
 
-    let allowance_list =
-        args[0]
-            .match_list()
-            .ok_or(RuntimeCheckErrorKind::ExpectedListOfAllowances(
-                "as-contract?".into(),
-                1,
-            ))?;
+    let allowance_list = args[0]
+        .match_list()
+        .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected list of allowances: as-contract? 1"
+        )))?;
     let body_exprs = &args[1..];
 
     runtime_cost(
