@@ -116,10 +116,11 @@ pub fn special_contract_call(
 
                     // This error case indicates a bad implementation. Only traits should be
                     // added to callable_contracts.
-                    let trait_identifier = trait_data
-                        .trait_identifier
-                        .as_ref()
-                        .ok_or(RuntimeCheckErrorKind::ExpectedTraitIdentifier)?;
+                    let trait_identifier = trait_data.trait_identifier.as_ref().ok_or(
+                        RuntimeCheckErrorKind::ExpectsAcceptable(
+                            "Expected trait identifier".to_string(),
+                        ),
+                    )?;
 
                     // Attempt to short circuit the dynamic dispatch checks:
                     // If the contract is explicitely implementing the trait with `impl-trait`,

@@ -131,10 +131,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         IncorrectArgumentCount(_, _) => {
             Tested(vec![runtime_check_error_kind_incorrect_argument_count_ccall])
         }
-        ExpectedTraitIdentifier => Unreachable_Functionally(
-            "Callable trait values always include a trait identifier after analysis; \
-             the runtime never receives an untagged trait value.",
-        ),
         BadTraitImplementation(_, _) => Tested(vec![bad_trait_implementation_mismatched_args]),
         DefineTraitBadSignature | DefineTraitDuplicateMethod(_) => Unreachable_Functionally(
             "Trait definitions are fully validated during deployment; \

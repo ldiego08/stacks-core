@@ -669,8 +669,6 @@ pub enum RuntimeCheckErrorKind {
     IncorrectArgumentCount(usize, usize),
 
     // Traits
-    /// Expected a trait identifier (e.g., `.trait-name`) but found an invalid token.
-    ExpectedTraitIdentifier,
     /// Invalid implementation of a trait method.
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
@@ -1122,7 +1120,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
                 )
             }
             CommonCheckErrorKind::ExpectedTraitIdentifier => {
-                RuntimeCheckErrorKind::ExpectedTraitIdentifier
+                RuntimeCheckErrorKind::ExpectsAcceptable("Expected trait identifier".to_string())
             }
             CommonCheckErrorKind::CouldNotDetermineType => {
                 RuntimeCheckErrorKind::CouldNotDetermineType
