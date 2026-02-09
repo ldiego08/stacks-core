@@ -95,6 +95,7 @@ pub enum DefineFunctionsParsed<'a> {
     },
 }
 
+#[derive(Debug)]
 pub enum DefineResult {
     Variable(ClarityName, Value),
     Function(ClarityName, DefinedFunction),
@@ -538,14 +539,15 @@ mod test {
             None,
         );
 
-        let result = handle_define_function(&bad_signature, &body, &mut env, DefineType::Public);
+        let err = handle_define_function(&bad_signature, &body, &mut env, DefineType::Public)
+            .unwrap_err();
 
-        assert!(matches!(
-            result,
-            Err(VmExecutionError::RuntimeCheck(
-                RuntimeCheckErrorKind::BadSyntaxBinding(_)
-            ))
-        ));
+        assert_eq!(
+            VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Bad syntax binding: NotList(Eval, 0)".to_string()
+            )),
+            err,
+        );
     }
 
     #[apply(test_clarity_versions)]

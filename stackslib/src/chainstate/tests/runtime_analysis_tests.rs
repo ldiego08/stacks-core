@@ -127,10 +127,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_name_already_used_cdeploy,
             runtime_check_error_kind_name_already_used_ccall
         ]),
-        BadSyntaxBinding(_) => Unreachable_Functionally(
-            "Binding syntax errors are detected during parsing and analysis; \
-             runtime never re-parses bindings.",
-        ),
         UndefinedFunction(_) => Tested(vec![runtime_check_error_kind_undefined_function_ccall]),
         UndefinedVariable(_) => Unreachable_Functionally(
             "All variable references are resolved during static analysis; \

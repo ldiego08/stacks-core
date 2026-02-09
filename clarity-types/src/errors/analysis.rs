@@ -659,11 +659,6 @@ pub enum RuntimeCheckErrorKind {
     /// The `String` wraps the conflicting name.
     NameAlreadyUsed(String),
 
-    // Generic binding syntax
-    /// Invalid binding syntax in a generic construct (e.g., `let`, `match`).
-    /// The `SyntaxBindingError` wraps the specific binding error.
-    BadSyntaxBinding(SyntaxBindingError),
-
     /// Referenced function is not defined in the current scope.
     /// The `String` wraps the non-existent function name.
     UndefinedFunction(String),
@@ -1166,7 +1161,9 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             CommonCheckErrorKind::InvalidTypeDescription => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Invalid type description".to_string())
             }
-            CommonCheckErrorKind::BadSyntaxBinding(e) => RuntimeCheckErrorKind::BadSyntaxBinding(e),
+            CommonCheckErrorKind::BadSyntaxBinding(e) => {
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!("Bad syntax binding: {e}"))
+            }
             CommonCheckErrorKind::ValueOutOfBounds => RuntimeCheckErrorKind::ValueOutOfBounds,
             CommonCheckErrorKind::EmptyTuplesNotAllowed => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Empty tuples not allowed".to_string())
