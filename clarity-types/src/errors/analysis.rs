@@ -679,9 +679,6 @@ pub enum RuntimeCheckErrorKind {
     /// String contains invalid UTF-8 encoding.
     InvalidUTF8Encoding,
 
-    /// Attempt to write to contract state in a read-only function.
-    WriteAttemptedInReadOnly,
-
     // contract post-conditions
     /// Post-condition expects a list of asset allowances but received invalid input.
     /// The first `String` wraps the function name, and the second `i32` wraps the argument number.

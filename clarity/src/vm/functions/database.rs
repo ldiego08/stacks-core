@@ -308,7 +308,10 @@ pub fn special_set_variable_v200(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(2, args)?;
@@ -350,7 +353,10 @@ pub fn special_set_variable_v205(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(2, args)?;
@@ -498,7 +504,10 @@ pub fn special_set_entry_v200(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(3, args)?;
@@ -543,7 +552,10 @@ pub fn special_set_entry_v205(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(3, args)?;
@@ -588,7 +600,10 @@ pub fn special_insert_entry_v200(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(3, args)?;
@@ -634,7 +649,10 @@ pub fn special_insert_entry_v205(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(3, args)?;
@@ -679,7 +697,10 @@ pub fn special_delete_entry_v200(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(2, args)?;
@@ -721,7 +742,10 @@ pub fn special_delete_entry_v205(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if env.global_context.is_read_only() {
-        return Err(RuntimeCheckErrorKind::WriteAttemptedInReadOnly.into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+            "Write attempted in read-only".to_string(),
+        )
+        .into());
     }
 
     check_argument_count(2, args)?;

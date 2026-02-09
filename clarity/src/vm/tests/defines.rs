@@ -163,15 +163,15 @@ fn test_define_read_only() {
 
     assert_eq!(Ok(Some(Value::Int(1))), execute(test0));
     assert_eq_err(
-        RuntimeCheckErrorKind::WriteAttemptedInReadOnly,
+        RuntimeCheckErrorKind::ExpectsAcceptable("Write attempted in read-only".to_string()),
         execute(test1).unwrap_err(),
     );
     assert_eq_err(
-        RuntimeCheckErrorKind::WriteAttemptedInReadOnly,
+        RuntimeCheckErrorKind::ExpectsAcceptable("Write attempted in read-only".to_string()),
         execute(test2).unwrap_err(),
     );
     assert_eq_err(
-        RuntimeCheckErrorKind::WriteAttemptedInReadOnly,
+        RuntimeCheckErrorKind::ExpectsAcceptable("Write attempted in read-only".to_string()),
         execute(test3).unwrap_err(),
     );
 }
