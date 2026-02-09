@@ -1680,7 +1680,7 @@ fn expected_allowance_expr_error() {
     let snippet = "(restrict-assets? tx-sender ((bad-fn u1)) true)";
 
     let expected_error: ClarityEvalError = VmExecutionError::RuntimeCheck(
-        RuntimeCheckErrorKind::ExpectedAllowanceExpr("bad-fn".to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected allowance expr: bad-fn".to_string()),
     )
     .into();
 
@@ -1699,7 +1699,7 @@ fn expected_allowance_expr_error_unhandled_native() {
     let snippet = "(restrict-assets? tx-sender ((tx-sender u1)) true)";
 
     let expected_error: ClarityEvalError = VmExecutionError::RuntimeCheck(
-        RuntimeCheckErrorKind::ExpectedAllowanceExpr("tx-sender".to_string()),
+        RuntimeCheckErrorKind::ExpectsAcceptable("Expected allowance expr: tx-sender".to_string()),
     )
     .into();
 

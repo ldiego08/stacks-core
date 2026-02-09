@@ -118,7 +118,10 @@ fn eval_allowance(
         name,
         env.contract_context.get_clarity_version(),
     ) else {
-        return Err(RuntimeCheckErrorKind::ExpectedAllowanceExpr(name.to_string()).into());
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected allowance expr: {name}"
+        ))
+        .into());
     };
 
     match native_function {
@@ -234,7 +237,10 @@ fn eval_allowance(
             }
             Ok(Allowance::All)
         }
-        _ => Err(RuntimeCheckErrorKind::ExpectedAllowanceExpr(name.to_string()).into()),
+        _ => Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Expected allowance expr: {name}"
+        ))
+        .into()),
     }
 }
 

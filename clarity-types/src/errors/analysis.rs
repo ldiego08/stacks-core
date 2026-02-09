@@ -680,9 +680,6 @@ pub enum RuntimeCheckErrorKind {
     InvalidUTF8Encoding,
 
     // contract post-conditions
-    /// Expected an allowance expression but found invalid input.
-    /// The `String` wraps the unexpected input.
-    ExpectedAllowanceExpr(String),
     /// Too many allowances specified in post-condition.
     /// The first `usize` represents the maximum allowed, and the second represents the actual count.
     TooManyAllowances(usize, usize),
