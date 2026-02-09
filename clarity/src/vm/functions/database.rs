@@ -154,9 +154,10 @@ pub fn special_contract_call(
 
                         // Check read/write compatibility
                         if env.global_context.is_read_only() {
-                            return Err(
-                                RuntimeCheckErrorKind::TraitBasedContractCallInReadOnly.into()
-                            );
+                            return Err(RuntimeCheckErrorKind::ExpectsAcceptable(
+                                "Trait based contract call in read-only".to_string(),
+                            )
+                            .into());
                         }
 
                         // Check visibility

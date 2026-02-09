@@ -673,8 +673,6 @@ pub enum RuntimeCheckErrorKind {
     /// The first `String` wraps the trait name, and the second wraps the method name.
     BadTraitImplementation(String, String),
 
-    /// Trait-based contract call used in a read-only context, which is prohibited.
-    TraitBasedContractCallInReadOnly,
     /// `contract-of` expects a trait type but found a different type.
     ContractOfExpectsTrait,
     /// Too many trait methods specified.
