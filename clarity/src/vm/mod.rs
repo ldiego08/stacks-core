@@ -195,7 +195,10 @@ fn lookup_variable(
                 Ok(Value::CallableContract(callable_data.clone()))
             }
         } else {
-            Err(RuntimeCheckErrorKind::UndefinedVariable(name.to_string()).into())
+            Err(
+                RuntimeCheckErrorKind::ExpectsAcceptable(format!("Undefined variable: {name}"))
+                    .into(),
+            )
         }
     }
 }

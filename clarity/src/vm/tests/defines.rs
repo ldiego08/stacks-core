@@ -224,7 +224,7 @@ fn test_recursive_panic(#[case] version: ClarityVersion, #[case] epoch: StacksEp
 #[test]
 fn test_bad_variables() {
     let test0 = "(+ a 1)";
-    let expected = RuntimeCheckErrorKind::UndefinedVariable("a".to_string());
+    let expected = RuntimeCheckErrorKind::ExpectsAcceptable("Undefined variable: a".to_string());
     assert_eq_err(expected, execute(test0).unwrap_err());
 
     let test1 = "(foo 2 1)";

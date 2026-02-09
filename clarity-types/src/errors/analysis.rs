@@ -662,9 +662,6 @@ pub enum RuntimeCheckErrorKind {
     /// Referenced function is not defined in the current scope.
     /// The `String` wraps the non-existent function name.
     UndefinedFunction(String),
-    /// Referenced variable is not defined in the current scope.
-    /// The `String` wraps the non-existent variable name.
-    UndefinedVariable(String),
 
     // Argument counts
     /// Function requires at least the specified number of arguments, but fewer were provided.
