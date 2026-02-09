@@ -269,19 +269,17 @@ pub fn special_restrict_assets(
         .expect_principal()
         .map_err(|_| VmInternalError::Expect("Expected principal".into()))?;
 
-    runtime_cost(
-        ClarityCostFunction::RestrictAssets,
-        env,
-        allowance_list.len(),
-    )?;
+    let allowance_len = allowance_list.len();
+    runtime_cost(ClarityCostFunction::RestrictAssets, env, allowance_len)?;
 
-    if allowance_list.len() > MAX_ALLOWANCES {
-        return Err(
-            RuntimeCheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, allowance_list.len()).into(),
-        );
+    if allowance_len > MAX_ALLOWANCES {
+        return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Too many allowances: {allowance_len} allowed {MAX_ALLOWANCES}"
+        ))
+        .into());
     }
 
-    let mut allowances = Vec::with_capacity(allowance_list.len());
+    let mut allowances = Vec::with_capacity(allowance_len);
     for allowance in allowance_list {
         allowances.push(eval_allowance(allowance, env, context)?);
     }

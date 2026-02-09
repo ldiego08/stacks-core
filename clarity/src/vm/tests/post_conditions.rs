@@ -1663,10 +1663,12 @@ fn restrict_assets_too_many_allowances() {
             .collect::<Vec<_>>()
             .join(" ")
     );
-    let max_allowances_err: ClarityEvalError = VmExecutionError::RuntimeCheck(
-        RuntimeCheckErrorKind::TooManyAllowances(MAX_ALLOWANCES, MAX_ALLOWANCES + 1),
-    )
-    .into();
+    let max_allowances_err: ClarityEvalError =
+        VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Too many allowances: {} allowed {MAX_ALLOWANCES}",
+            MAX_ALLOWANCES + 1
+        )))
+        .into();
     let err = execute(&snippet).expect_err("execution passed unexpectedly");
     assert_eq!(err, max_allowances_err);
 }

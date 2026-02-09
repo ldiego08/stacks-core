@@ -138,11 +138,7 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
         ]),
         InvalidUTF8Encoding => {
             Ignored("Only reachable via legacy v1 parsing paths")
-        }
-        TooManyAllowances(_, _) => Unreachable_Functionally(
-            "Allowance expressions are purely syntactic and fully validated during analysis; \
-                 invalid constructions cannot be produced dynamically at runtime.",
-        ),
+        },
     };
 }
 

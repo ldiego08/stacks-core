@@ -678,11 +678,6 @@ pub enum RuntimeCheckErrorKind {
     InvalidCharactersDetected,
     /// String contains invalid UTF-8 encoding.
     InvalidUTF8Encoding,
-
-    // contract post-conditions
-    /// Too many allowances specified in post-condition.
-    /// The first `usize` represents the maximum allowed, and the second represents the actual count.
-    TooManyAllowances(usize, usize),
 }
 
 #[derive(Debug, PartialEq)]
