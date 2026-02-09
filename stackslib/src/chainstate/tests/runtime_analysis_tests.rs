@@ -83,10 +83,6 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_signature_too_deep_cdeploy,
             runtime_check_error_kind_type_signature_too_deep_ccall
         ]),
-        SupertypeTooLarge => Unreachable_Functionally(
-            "least_supertype checks already run in analysis, and runtime values are
-             sanitized to their declared signatures, so the VM never sees a pair of
-             values whose unified type wasn't accepted earlier."),
         ExpectsAcceptable(_) => Unreachable_ExpectLike,
         ExpectsRejectable(_) => Unreachable_ExpectLike,
         ListTypesMustMatch => Tested(vec![runtime_check_error_kind_list_types_must_match_cdeploy]),
