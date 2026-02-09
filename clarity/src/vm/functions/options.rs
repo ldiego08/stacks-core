@@ -193,26 +193,27 @@ fn special_match_resp(
     context: &LocalContext,
 ) -> Result<Value, VmExecutionError> {
     if args.len() != 4 {
-        Err(RuntimeCheckErrorKind::BadMatchResponseSyntax(Box::new(
-            RuntimeCheckErrorKind::IncorrectArgumentCount(5, args.len() + 1),
+        Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
+            "Bad match response syntax: args {} != 4",
+            args.len()
         )))?;
     }
 
     let ok_bind_name = args[0]
         .match_atom()
         .ok_or_else(|| {
-            RuntimeCheckErrorKind::BadMatchResponseSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
-            ))
+            RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Bad match response syntax: expected name".to_string(),
+            )
         })?
         .clone();
     let ok_branch = &args[1];
     let err_bind_name = args[2]
         .match_atom()
         .ok_or_else(|| {
-            RuntimeCheckErrorKind::BadMatchResponseSyntax(Box::new(
-                RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string()),
-            ))
+            RuntimeCheckErrorKind::ExpectsAcceptable(
+                "Bad match response syntax: expected name".to_string(),
+            )
         })?
         .clone();
     let err_branch = &args[3];

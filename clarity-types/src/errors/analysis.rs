@@ -603,11 +603,6 @@ pub enum RuntimeCheckErrorKind {
     /// Unexpected condition or failure in the type-checker, indicating a noncatastrophic bug or invalid state.
     ExpectsAcceptable(String),
 
-    // Match expression errors
-    /// Invalid syntax in a `response` match expression.
-    /// The `Box<RuntimeCheckErrorKind>` wraps the underlying error causing the syntax issue.
-    BadMatchResponseSyntax(Box<RuntimeCheckErrorKind>),
-
     // List typing errors
     /// List elements have mismatched types, violating type consistency.
     ListTypesMustMatch,
