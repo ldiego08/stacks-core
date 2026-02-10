@@ -1665,7 +1665,7 @@ fn restrict_assets_too_many_allowances() {
     );
     let max_allowances_err: ClarityEvalError =
         VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
-            "Too many allowances: {} allowed {MAX_ALLOWANCES}",
+            "Too many allowances: got {}, allowed {MAX_ALLOWANCES}",
             MAX_ALLOWANCES + 1
         )))
         .into();
@@ -1739,7 +1739,7 @@ fn restrict_assets_expected_list_of_allowances() {
     "#;
     let expected_error: ClarityEvalError =
         VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
-            "Expected list of allowances: restrict-assets? 2".to_string(),
+            "Expected list of allowances: for restrict-assets? as argument 2".to_string(),
         ))
         .into();
 
@@ -1762,7 +1762,7 @@ fn as_contract_expected_list_of_allowances() {
     // The argument is `u42` (not a list), so we expect this error
     let expected_error: ClarityEvalError =
         VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
-            "Expected list of allowances: as-contract? 1".to_string(),
+            "Expected list of allowances: for as-contract? as argument 1".to_string(),
         ))
         .into();
 

@@ -260,7 +260,7 @@ pub fn special_restrict_assets(
     let allowance_list = args[1]
         .match_list()
         .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
-            "Expected list of allowances: restrict-assets? 2".to_string(),
+            "Expected list of allowances: for restrict-assets? as argument 2".to_string(),
         ))?;
     let body_exprs = &args[2..];
 
@@ -274,7 +274,7 @@ pub fn special_restrict_assets(
 
     if allowance_len > MAX_ALLOWANCES {
         return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
-            "Too many allowances: {allowance_len} allowed {MAX_ALLOWANCES}"
+            "Too many allowances: got {allowance_len}, allowed {MAX_ALLOWANCES}"
         ))
         .into());
     }
@@ -349,7 +349,7 @@ pub fn special_as_contract(
     let allowance_list = args[0]
         .match_list()
         .ok_or(RuntimeCheckErrorKind::ExpectsAcceptable(
-            "Expected list of allowances: as-contract? 1".to_string(),
+            "Expected list of allowances: for as-contract? as argument 1".to_string(),
         ))?;
     let body_exprs = &args[1..];
 

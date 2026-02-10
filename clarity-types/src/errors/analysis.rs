@@ -1066,7 +1066,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             }
             CommonCheckErrorKind::TooManyFunctionParameters(found, allowed) => {
                 RuntimeCheckErrorKind::ExpectsAcceptable(format!(
-                    "Too many function params: {found} allowed {allowed}"
+                    "Too many function params: found {found}, allowed {allowed}"
                 ))
             }
             CommonCheckErrorKind::ExpectedName => {
@@ -1100,7 +1100,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             }
             CommonCheckErrorKind::TraitTooManyMethods(found, allowed) => {
                 RuntimeCheckErrorKind::ExpectsAcceptable(format!(
-                    "Trait too many methods: {found} allowed {allowed}"
+                    "Trait too many methods: found {found}, allowed {allowed}"
                 ))
             }
             CommonCheckErrorKind::DefineTraitBadSignature => {

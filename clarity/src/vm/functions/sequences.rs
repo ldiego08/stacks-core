@@ -351,7 +351,7 @@ pub fn special_concat_v205(
             runtime_cost(ClarityCostFunction::Concat, env, 1)?;
             return Err(RuntimeCheckErrorKind::ExpectsAcceptable(format!(
                 "Expected sequence: {}",
-                TypeSignature::NoType
+                TypeSignature::type_of(&wrapped_seq)?,
             ))
             .into());
         }

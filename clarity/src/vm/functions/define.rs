@@ -603,7 +603,7 @@ mod test {
 
         assert_eq!(
             VmExecutionError::RuntimeCheck(RuntimeCheckErrorKind::ExpectsAcceptable(
-                "Too many function params: 257 allowed 256".to_string()
+                "Too many function params: found 257, allowed 256".to_string()
             )),
             err
         );
