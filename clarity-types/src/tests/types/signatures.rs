@@ -14,14 +14,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 use std::collections::BTreeSet;
 
+use stacks_common::types::StacksEpochId;
+
+use crate::Value;
 use crate::errors::ClarityTypeError;
 use crate::representations::CONTRACT_MAX_NAME_LENGTH;
 use crate::types::TypeSignature::{BoolType, IntType, ListUnionType, UIntType};
 use crate::types::signatures::{CallableSubtype, TypeSignature};
 use crate::types::{
-    BufferLength, MAX_TO_ASCII_BUFFER_LEN, MAX_TO_ASCII_RESULT_LEN, MAX_TYPE_DEPTH,
+    BufferLength, CallableData, MAX_TO_ASCII_BUFFER_LEN, MAX_TO_ASCII_RESULT_LEN, MAX_TYPE_DEPTH,
     MAX_UTF8_VALUE_SIZE, MAX_VALUE_SIZE, QualifiedContractIdentifier, SequenceSubtype,
-    StringSubtype, StringUTF8Length, TraitIdentifier, TupleTypeSignature, WRAPPER_VALUE_SIZE,
+    StandardPrincipalData, StringSubtype, StringUTF8Length, TraitIdentifier, TupleData,
+    TupleTypeSignature, WRAPPER_VALUE_SIZE,
 };
 
 #[test]
@@ -373,9 +377,9 @@ fn test_type_min_size_optional() {
     let actual = TypeSignature::new_option(TypeSignature::IntType).unwrap();
     assert_eq!(17, actual.size().unwrap(), "size should be 17");
     assert_eq!(
-        17,
+        2,
         actual.min_size().unwrap(),
-        "min_size should be 17 (16 + 1 wrapper)"
+        "min_size should be 2 (`none` path = NoType + 1 wrapper)"
     );
 }
 
@@ -398,11 +402,11 @@ fn test_type_min_size_response() {
 #[test]
 fn test_type_min_size_list() {
     let actual = TypeSignature::list_of(TypeSignature::IntType, 10).unwrap();
-    assert!(actual.size().unwrap() > 5);
+    assert!(actual.size().unwrap() > 6);
     assert_eq!(
-        5,
+        6,
         actual.min_size().unwrap(),
-        "min_size should be 5 (type enum + max_len)"
+        "min_size should be 6 (entry type enum + list type enum + max_len)"
     );
 }
 
@@ -422,6 +426,123 @@ fn test_type_min_size_tuple() {
         "min_size should match tuple formula"
     );
     assert!(actual.min_size().unwrap() <= actual.size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_optional_matches_none_value() {
+    let declared_type = TypeSignature::new_option(TypeSignature::IntType).unwrap();
+    let min_value = Value::none();
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_response_matches_smallest_branch_value() {
+    let declared_type =
+        TypeSignature::new_response(TypeSignature::IntType, TypeSignature::BoolType).unwrap();
+    let min_value = Value::error(Value::Bool(true)).unwrap();
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_list_matches_empty_list_value() {
+    let declared_type = TypeSignature::list_of(TypeSignature::IntType, 10).unwrap();
+    let min_value = Value::cons_list_unsanitized(vec![]).unwrap();
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_principal_matches_minimum_value_kind() {
+    let declared_type = TypeSignature::PrincipalType;
+    let min_value = Value::from(StandardPrincipalData::transient());
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert_eq!(TypeSignature::PrincipalType, min_value_type);
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_callable_trait_matches_minimum_value_kind() {
+    let trait_id = TraitIdentifier {
+        name: "t".into(),
+        contract_identifier: QualifiedContractIdentifier::local("trait-def").unwrap(),
+    };
+    let declared_type = TypeSignature::CallableType(CallableSubtype::Trait(trait_id.clone()));
+    let min_value = Value::CallableContract(CallableData {
+        contract_identifier: QualifiedContractIdentifier::local("a").unwrap(),
+        trait_identifier: Some(trait_id.clone()),
+    });
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert_eq!(declared_type, min_value_type);
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
+}
+
+#[test]
+fn test_type_min_size_tuple_with_list_matches_minimum_value() {
+    let declared_type = TypeSignature::TupleType(
+        TupleTypeSignature::try_from(vec![
+            (
+                "items".into(),
+                TypeSignature::list_of(TypeSignature::IntType, 10).unwrap(),
+            ),
+            ("ok".into(), TypeSignature::BoolType),
+            (
+                "maybe".into(),
+                TypeSignature::new_option(TypeSignature::UIntType).unwrap(),
+            ),
+        ])
+        .unwrap(),
+    );
+    let min_value = Value::from(
+        TupleData::from_data(vec![
+            (
+                "items".into(),
+                Value::cons_list_unsanitized(vec![]).unwrap(),
+            ),
+            ("ok".into(), Value::Bool(false)),
+            ("maybe".into(), Value::none()),
+        ])
+        .unwrap(),
+    );
+    let min_value_type = TypeSignature::type_of(&min_value).unwrap();
+
+    assert!(
+        declared_type
+            .admits_type(&StacksEpochId::latest(), &min_value_type)
+            .unwrap()
+    );
+    assert_eq!(min_value.size().unwrap(), declared_type.min_size().unwrap());
 }
 
 #[test]
