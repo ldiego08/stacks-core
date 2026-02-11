@@ -2087,19 +2087,27 @@ fn test_trait_use_at_top_level_same_contract(
             (unwrap-panic (contract-call? F foo)))
         (bar .c-foo)";
 
-    let placeholder_context =
+    let mut placeholder_context =
         ContractContext::new(QualifiedContractIdentifier::transient(), version);
-    let mut env = owned_env.get_exec_environment(None, None, &placeholder_context);
+    let mut env = owned_env.get_exec_environment(None, None, &mut placeholder_context);
 
     env.initialize_contract(
         QualifiedContractIdentifier::local("c-foo").unwrap(),
         contract_foo,
+        ASTRules::PrecheckSize,
     )
     .unwrap();
 
-    env.initialize_contract(
+    let contract_init_result = env.initialize_contract(
         QualifiedContractIdentifier::local("c-bar").unwrap(),
         contract_bar,
-    )
-    .expect("should initialize successfully");
+        ASTRules::PrecheckSize,
+    );
+
+    if version.allows_local_trait_lookup() {
+        contract_init_result.expect("should initialize successfully");
+    } else {
+        contract_init_result
+            .expect_err("should fail in Clarity versions without local trait lookup");
+    }
 }
