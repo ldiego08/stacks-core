@@ -188,7 +188,7 @@ lazy_static! {
 /// `depth_limits.max_nesting_depth()`.
 fn inner_lex(input: &str, depth_limits: StackDepthLimits) -> ParseResult<Vec<(LexItem, u32, u32)>> {
     let mut context = LexContext::ExpectNothing;
-    let max_nesting = depth_limits.max_nesting_depth();
+    let max_nesting = depth_limits.max_nesting_depth().saturating_add(1);
     let max_call_stack_depth = depth_limits.max_call_stack_depth();
 
     let mut line_indices = get_lines_at(input);
@@ -262,7 +262,7 @@ fn inner_lex(input: &str, depth_limits: StackDepthLimits) -> ParseResult<Vec<(Le
                     TokenType::LParens => {
                         context = LexContext::ExpectNothing;
                         nesting_depth += 1;
-                        if nesting_depth >= max_nesting {
+                        if nesting_depth > max_nesting {
                             return Err(ParseError::new(
                                 ParseErrorKind::VaryExpressionStackDepthTooDeep {
                                     max_depth: max_call_stack_depth,
@@ -293,7 +293,7 @@ fn inner_lex(input: &str, depth_limits: StackDepthLimits) -> ParseResult<Vec<(Le
                     TokenType::LCurly => {
                         context = LexContext::ExpectNothing;
                         nesting_depth += 1;
-                        if nesting_depth >= max_nesting {
+                        if nesting_depth > max_nesting {
                             return Err(ParseError::new(
                                 ParseErrorKind::VaryExpressionStackDepthTooDeep {
                                     max_depth: max_call_stack_depth,
@@ -1059,7 +1059,7 @@ mod test {
         let string_with_multiple_slashes = r#"
         "hello\\\"world"
         "#;
-        let stack_limit = depth_limits.max_nesting_depth() as usize;
+        let stack_limit = depth_limits.max_nesting_depth() as usize + 1;
         let exceeds_stack_depth_tuple = format!(
             "{}u1 {}",
             "{ a : ".repeat(stack_limit + 1),
