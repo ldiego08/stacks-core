@@ -17,11 +17,12 @@
 use std::collections::HashMap;
 
 use clarity::util::get_epoch_time_secs;
+use clarity::vm::ast::errors::ParseErrorKind;
 use clarity::vm::ast::stack_depth_checker::StackDepthLimits;
 use clarity::vm::clarity::{ClarityConnection, TransactionConnection};
 use clarity::vm::contexts::OwnedEnvironment;
 use clarity::vm::database::HeadersDB;
-use clarity::vm::errors::VmExecutionError;
+use clarity::vm::errors::{StaticCheckErrorKind, VmExecutionError};
 use clarity::vm::test_util::*;
 use clarity::vm::tests::{test_clarity_versions, BurnStateDB};
 use clarity::vm::types::{
@@ -1283,12 +1284,17 @@ fn test_deep_tuples_ast_precheck() {
         });
 
         match error {
-            ClarityError::Interpreter(VmExecutionError::Runtime(r_e, _)) => {
-                eprintln!("Runtime error: {:?}", r_e);
+            ClarityError::Parse(ref parse_error) => {
+                assert!(
+                    matches!(
+                        *parse_error.err,
+                        ParseErrorKind::ExpressionStackDepthTooDeep { .. }
+                            | ParseErrorKind::VaryExpressionStackDepthTooDeep { .. }
+                    ),
+                    "Expected a stack depth parse error, got: {error:?}"
+                );
             }
-            other => {
-                eprintln!("Other error: {:?}", other);
-            }
+            other => panic!("Expected a parse error, got: {other:?}"),
         }
 
         block.rollback_block();
@@ -1352,12 +1358,16 @@ fn test_deep_type_nesting() {
         });
 
         match error {
-            ClarityError::Interpreter(VmExecutionError::Runtime(r_e, _)) => {
-                eprintln!("Runtime error: {:?}", r_e);
+            ClarityError::StaticCheck(ref check_error) => {
+                assert!(
+                    matches!(
+                        *check_error.err,
+                        StaticCheckErrorKind::BadTupleConstruction { .. }
+                    ),
+                    "Expected a bad tuple construction error, got: {error:?}"
+                );
             }
-            other => {
-                eprintln!("Other error: {:?}", other);
-            }
+            other => panic!("Expected a static check error, got: {other:?}"),
         }
         block.rollback_block();
     }
