@@ -1605,14 +1605,6 @@ fn deep_contract() {
         return;
     }
 
-    let stack_limit =
-        StackDepthLimits::for_epoch(StacksEpochId::latest()).max_nesting_depth() as usize;
-    let exceeds_stack_depth_list = format!(
-        "{}u1 {}",
-        "(list ".repeat(stack_limit + 1),
-        ")".repeat(stack_limit + 1)
-    );
-
     let spender_sk = StacksPrivateKey::random();
     let spender_addr = to_addr(&spender_sk);
     let spender_princ: PrincipalData = spender_addr.clone().into();
@@ -1628,6 +1620,14 @@ fn deep_contract() {
         address: spender_princ,
         amount: spender_bal,
     });
+
+    let epoch = conf.burnchain.get_epoch_list().last().unwrap().epoch_id;
+    let stack_limit = StackDepthLimits::for_epoch(epoch).max_nesting_depth() as usize + 1;
+    let exceeds_stack_depth_list = format!(
+        "{}u1 {}",
+        "(list ".repeat(stack_limit + 1),
+        ")".repeat(stack_limit + 1)
+    );
 
     let mut btcd_controller = BitcoinCoreController::from_stx_config(&conf);
     btcd_controller
