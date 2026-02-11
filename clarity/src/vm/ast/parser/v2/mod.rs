@@ -1196,7 +1196,7 @@ mod tests {
     use crate::vm::types::{ASCIIData, CharType, PrincipalData, SequenceData};
 
     fn depth_limits() -> StackDepthLimits {
-        StackDepthLimits::for_epoch(StacksEpochId::Epoch33)
+        StackDepthLimits::for_epoch(StacksEpochId::latest())
     }
 
     fn parse(input: &str) -> ParseResult<Vec<PreSymbolicExpression>> {
@@ -3696,9 +3696,9 @@ mod tests {
             diagnostics[0].spans[0],
             Span {
                 start_line: 1,
-                start_column: 421,
+                start_column: 805,
                 end_line: 1,
-                end_column: 421
+                end_column: 805
             }
         );
 
@@ -3722,9 +3722,9 @@ mod tests {
             diagnostics[0].spans[0],
             Span {
                 start_line: 1,
-                start_column: 211,
+                start_column: 403,
                 end_line: 1,
-                end_column: 211
+                end_column: 403
             }
         );
     }
