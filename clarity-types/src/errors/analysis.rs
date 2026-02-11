@@ -170,20 +170,7 @@ impl From<SyntaxBindingError> for CommonCheckErrorKind {
 #[derive(Debug, PartialEq)]
 pub enum CommonCheckErrorKind {
     // Cost checker errors
-    /// Arithmetic overflow in cost computation during type-checking, exceeding the maximum threshold.
-    CostOverflow,
-    /// Cumulative type-checking cost exceeds the allocated budget, indicating budget depletion.
-    /// The first `ExecutionCost` represents the total consumed cost, and the second represents the budget limit.
-    CostBalanceExceeded(ExecutionCost, ExecutionCost),
-    /// Memory usage during type-checking exceeds the allocated budget.
-    /// The first `u64` represents the total consumed memory, and the second represents the memory limit.
-    MemoryBalanceExceeded(u64, u64),
-    /// Failure in cost-tracking due to an unexpected condition or invalid state.
-    /// The `String` wraps the specific reason for the failure.
-    CostComputationFailed(String),
-    // Time checker errors
-    /// Type-checking time exceeds the allowed budget, halting analysis to ensure responsiveness.
-    ExecutionTimeExpired,
+    Cost(CostErrors),
 
     /// Value exceeds the maximum allowed size for type-checking or serialization.
     ValueTooLarge,
@@ -1160,24 +1147,7 @@ impl From<CostErrors> for RuntimeCheckErrorKind {
 
 impl From<CostErrors> for CommonCheckErrorKind {
     fn from(err: CostErrors) -> Self {
-        match err {
-            CostErrors::CostOverflow => CommonCheckErrorKind::CostOverflow,
-            CostErrors::CostBalanceExceeded(a, b) => {
-                CommonCheckErrorKind::CostBalanceExceeded(a, b)
-            }
-            CostErrors::MemoryBalanceExceeded(a, b) => {
-                CommonCheckErrorKind::MemoryBalanceExceeded(a, b)
-            }
-            CostErrors::CostComputationFailed(s) => CommonCheckErrorKind::CostComputationFailed(s),
-            CostErrors::CostContractLoadFailure => {
-                CommonCheckErrorKind::CostComputationFailed("Failed to load cost contract".into())
-            }
-            CostErrors::InterpreterFailure => CommonCheckErrorKind::ExpectsRejectable(
-                "Unexpected interpreter failure in cost computation".into(),
-            ),
-            CostErrors::Expect(s) => CommonCheckErrorKind::ExpectsRejectable(s),
-            CostErrors::ExecutionTimeExpired => CommonCheckErrorKind::ExecutionTimeExpired,
-        }
+        CommonCheckErrorKind::Cost(err)
     }
 }
 
@@ -1214,19 +1184,7 @@ impl From<CommonCheckErrorKind> for StaticCheckError {
 impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
     fn from(err: CommonCheckErrorKind) -> Self {
         match err {
-            CommonCheckErrorKind::CostOverflow => RuntimeCheckErrorKind::CostOverflow,
-            CommonCheckErrorKind::CostBalanceExceeded(a, b) => {
-                RuntimeCheckErrorKind::CostBalanceExceeded(a, b)
-            }
-            CommonCheckErrorKind::MemoryBalanceExceeded(a, b) => {
-                RuntimeCheckErrorKind::MemoryBalanceExceeded(a, b)
-            }
-            CommonCheckErrorKind::CostComputationFailed(s) => {
-                RuntimeCheckErrorKind::CostComputationFailed(s)
-            }
-            CommonCheckErrorKind::ExecutionTimeExpired => {
-                RuntimeCheckErrorKind::ExecutionTimeExpired
-            }
+            CommonCheckErrorKind::Cost(e) => e.into(),
             CommonCheckErrorKind::IncorrectArgumentCount(expected, args) => {
                 RuntimeCheckErrorKind::IncorrectArgumentCount(expected, args)
             }
@@ -1289,19 +1247,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
 impl From<CommonCheckErrorKind> for StaticCheckErrorKind {
     fn from(err: CommonCheckErrorKind) -> Self {
         match err {
-            CommonCheckErrorKind::CostOverflow => StaticCheckErrorKind::CostOverflow,
-            CommonCheckErrorKind::CostBalanceExceeded(a, b) => {
-                StaticCheckErrorKind::CostBalanceExceeded(a, b)
-            }
-            CommonCheckErrorKind::MemoryBalanceExceeded(a, b) => {
-                StaticCheckErrorKind::MemoryBalanceExceeded(a, b)
-            }
-            CommonCheckErrorKind::CostComputationFailed(s) => {
-                StaticCheckErrorKind::CostComputationFailed(s)
-            }
-            CommonCheckErrorKind::ExecutionTimeExpired => {
-                StaticCheckErrorKind::ExecutionTimeExpired
-            }
+            CommonCheckErrorKind::Cost(e) => e.into(),
             CommonCheckErrorKind::IncorrectArgumentCount(expected, args) => {
                 StaticCheckErrorKind::IncorrectArgumentCount(expected, args)
             }
