@@ -455,7 +455,7 @@ fn test_simple_map_append() {
 }
 
 #[test]
-fn test_append_supertype_too_large_runtime_check_error() {
+fn test_append_supertype_too_large_is_expects_acceptable() {
     let program = r#"
         (let (
             (b16 0x00112233445566778899aabbccddeeff)
@@ -479,10 +479,12 @@ fn test_append_supertype_too_large_runtime_check_error() {
                     (tuple (a small) (b b524288))))
     "#;
 
-    assert_eq!(
+    assert!(matches!(
         execute(program).unwrap_err(),
-        RuntimeCheckErrorKind::SupertypeTooLarge.into()
-    );
+        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
+            RuntimeCheckErrorKind::ExpectsAcceptable(_)
+        ))
+    ));
 }
 
 #[test]

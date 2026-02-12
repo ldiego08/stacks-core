@@ -370,10 +370,7 @@ pub enum ClarityRuntimeTxError {
     Rejectable(ClarityError),
 }
 
-pub fn handle_clarity_runtime_error(
-    error: ClarityError,
-    epoch: StacksEpochId,
-) -> ClarityRuntimeTxError {
+pub fn handle_clarity_runtime_error(error: ClarityError) -> ClarityRuntimeTxError {
     match error {
         // runtime errors are okay
         ClarityError::Interpreter(VmExecutionError::Runtime(_, _)) => {
@@ -389,7 +386,7 @@ pub fn handle_clarity_runtime_error(
             }
         }
         ClarityError::Interpreter(VmExecutionError::RuntimeCheck(runtime_check_err)) => {
-            if runtime_check_err.rejectable_in_epoch(epoch) {
+            if runtime_check_err.rejectable() {
                 ClarityRuntimeTxError::Rejectable(ClarityError::Interpreter(
                     VmExecutionError::RuntimeCheck(runtime_check_err),
                 ))
@@ -1135,7 +1132,7 @@ impl StacksChainState {
                               "cost" => ?total_cost);
                         (return_value, asset_map, events, None)
                     }
-                    Err(e) => match handle_clarity_runtime_error(e, clarity_tx.get_epoch()) {
+                    Err(e) => match handle_clarity_runtime_error(e) {
                         ClarityRuntimeTxError::Acceptable { error, err_type } => {
                             info!("Contract-call processed with {}", err_type;
                                       "txid" => %tx.txid(),
@@ -1362,7 +1359,7 @@ impl StacksChainState {
                             .expect("FATAL: failed to store contract analysis");
                         x
                     }
-                    Err(e) => match handle_clarity_runtime_error(e, clarity_tx.get_epoch()) {
+                    Err(e) => match handle_clarity_runtime_error(e) {
                         ClarityRuntimeTxError::Acceptable { error, err_type } => {
                             info!("Smart-contract processed with {}", err_type;
                                       "txid" => %tx.txid(),

@@ -650,7 +650,7 @@ impl TransactionResult {
         epoch_id: StacksEpochId,
     ) -> (bool, Error) {
         let error = match error {
-            Error::ClarityError(e) => match handle_clarity_runtime_error(e, epoch_id) {
+            Error::ClarityError(e) => match handle_clarity_runtime_error(e) {
                 ClarityRuntimeTxError::Rejectable(e) => {
                     // this transaction would invalidate the whole block, so don't re-consider it
                     info!("Problematic transaction would invalidate the block, so dropping from mempool"; "txid" => %tx.txid(), "error" => %e);

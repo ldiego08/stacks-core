@@ -266,8 +266,8 @@ pub fn special_append(
                         data,
                     })))
                 }
-                Err(ClarityTypeError::SupertypeTooLarge) => {
-                    Err(RuntimeCheckErrorKind::SupertypeTooLarge.into())
+                Err(err @ ClarityTypeError::SupertypeTooLarge) => {
+                    Err(RuntimeCheckErrorKind::from(err).into())
                 }
                 Err(_) => Err(RuntimeCheckErrorKind::TypeValueError(
                     Box::new(entry_type),
