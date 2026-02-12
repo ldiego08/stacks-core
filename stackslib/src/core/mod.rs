@@ -2693,47 +2693,7 @@ impl StacksEpochExtension for StacksEpoch {
             .expect("FATAL: expect at least one epoch");
 
         let check_epoch_id = peer_network_epoch_check_epoch_id();
-        #[cfg(any(test, feature = "testing"))]
-        if epochs_ref
-            .iter()
-            .find(|epoch| epoch.epoch_id == check_epoch_id)
-            .is_none()
-        {
-            // Some test-only epoch lists intentionally end before the release latest epoch.
-            assert!(
-                max_epoch.network_epoch as u32 <= PEER_NETWORK_EPOCH,
-                "stacks-blockchain static network epoch should be greater than or equal to the max epoch's"
-            );
-        } else {
-            let check_epoch = epochs_ref
-                .iter()
-                .find(|epoch| epoch.epoch_id == check_epoch_id)
-                .expect("FATAL: check epoch must exist");
-            assert_eq!(
-                u32::from(check_epoch.network_epoch),
-                PEER_NETWORK_EPOCH,
-                "stacks-blockchain static network epoch should match {:?}'s network_epoch",
-                check_epoch_id
-            );
-        }
-        #[cfg(not(any(test, feature = "testing")))]
-        {
-            let check_epoch = epochs_ref
-                .iter()
-                .find(|epoch| epoch.epoch_id == check_epoch_id)
-                .unwrap_or_else(|| {
-                    panic!(
-                        "FATAL: no {:?} defined in epoch list, cannot validate PEER_NETWORK_EPOCH",
-                        check_epoch_id
-                    )
-                });
-            assert_eq!(
-                u32::from(check_epoch.network_epoch),
-                PEER_NETWORK_EPOCH,
-                "stacks-blockchain static network epoch should match {:?}'s network_epoch",
-                check_epoch_id
-            );
-        }
+        assert_peer_network_epoch(epochs_ref, max_epoch, check_epoch_id);
 
         let latest_epoch_idx = StacksEpochId::ALL
             .iter()
@@ -2889,4 +2849,64 @@ impl StacksEpochExtension for StacksEpoch {
             burnchain.pox_constants
         );
     }
+}
+
+// Test/testing variant:
+// - Allows older epoch markers (`<= PEER_NETWORK_EPOCH`) to cover back-compat fixtures
+//   (e.g. the historical 3.3 release that advertised 3.2).
+// - Allows partial epoch lists used by unit tests that intentionally stop before
+//   `RELEASE_LATEST_EPOCH`.
+#[cfg(any(test, feature = "testing"))]
+fn assert_peer_network_epoch(
+    epochs_ref: &[StacksEpoch],
+    max_epoch: &StacksEpoch,
+    check_epoch_id: StacksEpochId,
+) {
+    if epochs_ref
+        .iter()
+        .find(|epoch| epoch.epoch_id == check_epoch_id)
+        .is_none()
+    {
+        // Some test-only epoch lists intentionally end before the release latest epoch.
+        assert!(
+            max_epoch.network_epoch as u32 <= PEER_NETWORK_EPOCH,
+            "stacks-blockchain static network epoch should be greater than or equal to the max epoch's"
+        );
+    } else {
+        let check_epoch = epochs_ref
+            .iter()
+            .find(|epoch| epoch.epoch_id == check_epoch_id)
+            .expect("FATAL: check epoch must exist");
+        assert!(
+            u32::from(check_epoch.network_epoch) <= PEER_NETWORK_EPOCH,
+            "stacks-blockchain static network epoch should match {:?}'s network_epoch",
+            check_epoch_id
+        );
+    }
+}
+
+// Runtime variant:
+// - Enforces strict equality between `PEER_NETWORK_EPOCH` and the release epoch marker.
+// - Requires the release epoch to be present in the configured epoch list.
+#[cfg(not(any(test, feature = "testing")))]
+fn assert_peer_network_epoch(
+    epochs_ref: &[StacksEpoch],
+    _max_epoch: &StacksEpoch,
+    check_epoch_id: StacksEpochId,
+) {
+    let check_epoch = epochs_ref
+        .iter()
+        .find(|epoch| epoch.epoch_id == check_epoch_id)
+        .unwrap_or_else(|| {
+            panic!(
+                "FATAL: no {:?} defined in epoch list, cannot validate PEER_NETWORK_EPOCH",
+                check_epoch_id
+            )
+        });
+    assert_eq!(
+        u32::from(check_epoch.network_epoch),
+        PEER_NETWORK_EPOCH,
+        "stacks-blockchain static network epoch should match {:?}'s network_epoch",
+        check_epoch_id
+    );
 }
