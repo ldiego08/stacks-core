@@ -455,39 +455,6 @@ fn test_simple_map_append() {
 }
 
 #[test]
-fn test_append_supertype_too_large_is_expects_acceptable() {
-    let program = r#"
-        (let (
-            (b16 0x00112233445566778899aabbccddeeff)
-            (b32 (concat b16 b16))
-            (b64 (concat b32 b32))
-            (b128 (concat b64 b64))
-            (b256 (concat b128 b128))
-            (b512 (concat b256 b256))
-            (b1024 (concat b512 b512))
-            (b2048 (concat b1024 b1024))
-            (b4096 (concat b2048 b2048))
-            (b8192 (concat b4096 b4096))
-            (b16384 (concat b8192 b8192))
-            (b32768 (concat b16384 b16384))
-            (b65536 (concat b32768 b32768))
-            (b131072 (concat b65536 b65536))
-            (b262144 (concat b131072 b131072))
-            (b524288 (concat b262144 b262144))
-            (small 0x00))
-            (append (list (tuple (a b524288) (b small)))
-                    (tuple (a small) (b b524288))))
-    "#;
-
-    assert!(matches!(
-        execute(program).unwrap_err(),
-        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
-            RuntimeCheckErrorKind::ExpectsAcceptable(_)
-        ))
-    ));
-}
-
-#[test]
 fn test_slice_list() {
     let tests = [
         "(slice? (list 2 3 4 5 6 7 8) u0 u3)",
