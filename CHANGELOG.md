@@ -13,6 +13,14 @@ and this project adheres to the versioning scheme outlined in the [README.md](RE
 - Implemented the updated behavior for `secp256r1-verify`, effective in Clarity 5, in which the `message-hash` is no longer hashed again. See SIP-035 for details.
 - Increased allowed stack depth from 64 to 128, effective in epoch 3.4
 
+### Fixed
+
+- Improved the cost-tracking for `from-consensus-buff?`, effective in epoch 3.4, so that when an empty buffer is passed, users will see a `none` result, rather than a confusing runtime error.
+
+### Fixed
+
+- Resolved several cases where a mock-miner would stop mining
+
 ## [3.3.0.0.5]
 
 ### Added
