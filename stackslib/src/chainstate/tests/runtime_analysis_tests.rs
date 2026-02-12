@@ -20,9 +20,8 @@ use std::collections::HashMap;
 use clarity::types::StacksEpochId;
 #[allow(unused_imports)]
 use clarity::vm::analysis::RuntimeCheckErrorKind;
-use clarity::vm::errors::{ClarityEvalError, VmExecutionError};
 use clarity::vm::types::{PrincipalData, QualifiedContractIdentifier, MAX_TYPE_DEPTH};
-use clarity::vm::{execute, ClarityVersion, Value as ClarityValue};
+use clarity::vm::{ClarityVersion, Value as ClarityValue};
 
 use crate::chainstate::tests::consensus::{
     contract_call_consensus_test, contract_deploy_consensus_test, ConsensusTest, ConsensusUtils,
@@ -167,41 +166,39 @@ fn runtime_supertype_too_large_program(inner: &str) -> String {
 /// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::SupertypeTooLarge`]
 /// Caused by: `append` computes the least supertype of two tuple shapes whose combined
 ///   buffer field maximum exceeds `MAX_VALUE_SIZE`.
-/// Outcome: runtime analysis fails with `SupertypeTooLarge`.
+/// Outcome: block accepted.
 #[test]
 fn runtime_check_error_kind_supertype_too_large_cdeploy() {
-    let program = runtime_supertype_too_large_program(
-        "(append (list (tuple (a b524288) (b small)))
-                 (tuple (a small) (b b524288)))",
+    contract_deploy_consensus_test!(
+        contract_name: "supertype-too-large",
+        contract_code: &runtime_supertype_too_large_program(
+            "(append (list (tuple (a b524288) (b small)))
+                     (tuple (a small) (b b524288)))",
+        ),
     );
-
-    let err = execute(&program).unwrap_err();
-    assert!(matches!(
-        err,
-        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
-            RuntimeCheckErrorKind::SupertypeTooLarge
-        ))
-    ));
 }
 
 /// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::SupertypeTooLarge`]
-/// Caused by: `is-eq` computes the least supertype across its arguments and the tuple
-///   supertype exceeds `MAX_VALUE_SIZE`.
-/// Outcome: runtime analysis fails with `SupertypeTooLarge`.
+/// Caused by: `append` computes the least supertype of two tuple shapes whose combined
+///   buffer field maximum exceeds `MAX_VALUE_SIZE`.
+/// Outcome: block accepted.
 #[test]
 fn runtime_check_error_kind_supertype_too_large_ccall() {
-    let program = runtime_supertype_too_large_program(
-        "(is-eq (tuple (a b524288) (b small))
-                (tuple (a small) (b b524288)))",
+    contract_call_consensus_test!(
+        contract_name: "supertype-too-large",
+        contract_code: &format!(
+            "
+            (define-public (trigger-error)
+                (ok {}))
+            ",
+            runtime_supertype_too_large_program(
+                "(append (list (tuple (a b524288) (b small)))
+                         (tuple (a small) (b b524288)))"
+            )
+        ),
+        function_name: "trigger-error",
+        function_args: &[],
     );
-
-    let err = execute(&program).unwrap_err();
-    assert!(matches!(
-        err,
-        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
-            RuntimeCheckErrorKind::SupertypeTooLarge
-        ))
-    ));
 }
 
 /// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::CostBalanceExceeded`]

@@ -1,0 +1,1906 @@
+---
+source: stackslib/src/chainstate/tests/runtime_analysis_tests.rs
+expression: result
+---
+[
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch20,
+    error: "Invalid Stacks block 5e91377f624b9d9c485c152857a183b6ca2c651c37db75f375d235bec612e33b: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch2_05,
+    error: "Invalid Stacks block 092a352013c1036e3dd8af95f5416f5c9182373dd9c3f42fb2959caf1626c9b6: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch21,
+    error: "Invalid Stacks block 9c342fb9bdf783873b0616c9a4a9e7130ea68eed44e38ab8f17f128ef3228526: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch21,
+    error: "Invalid Stacks block 23e0575bb64987b30c0b9a3c8308f8f69a7759df2f537618af087fe64794f2a8: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch22,
+    error: "Invalid Stacks block 8cbd260a0871a8a71ee4815f829b459e435ef6ef0dadf2af849add8bcbbafafa: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch22,
+    error: "Invalid Stacks block c214311f86def647f15e6828e2d3a9262e6094524b13cd4a7ea4e52d2df3be60: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch23,
+    error: "Invalid Stacks block 66e0e42da26edc9bb3dabb58bbb84b303b3c24cefed02ef78a57a79c4b427ad8: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch23,
+    error: "Invalid Stacks block 43892c5cb2cde7097f405cdd735c1c47f2407121b0bb61591408b026acc0c4ff: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch24,
+    error: "Invalid Stacks block b98970c710f412ab9f29c74f0cda146d782690cf9d59cfb277a05fb2809c8ec9: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch24,
+    error: "Invalid Stacks block ac8491ca561001d59d060eb1863f811e67ac4f04b934eacf3a7d2458ab7c8a0a: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch25,
+    error: "Invalid Stacks block e95c79d2110dc7567042936164b09b9907acb427a330a59b7e15c3451d75d754: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch25,
+    error: "Invalid Stacks block 7e688b80c2842e939e919c9722f6089207463d5164035678b346c66fe06e0804: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch30,
+    error: "Invalid Stacks block 249c54ac5f2df3f77b2fbee417d5a4f64fc3dc141cc2ed227b3dec9c2abec6ec: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch30,
+    error: "Invalid Stacks block 6e688c069d8603a56716b717cbad6547a4a8de9f599e805af3c036a831aa07eb: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch30,
+    error: "Invalid Stacks block 4f2e8abc2f683fc6308b39e7ce2abcfd476cfeaadbbe00d4e7078b26807034d9: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch31,
+    error: "Invalid Stacks block d95592651c8e024bc58847fdf47f4951449a0e31581526b0056be0d5aff64822: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch31,
+    error: "Invalid Stacks block 6e26dab2aa5cc29e1e1850eb644dc16856dc8432a8b52fa6e8ddf4a4d53f039b: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch31,
+    error: "Invalid Stacks block 239018738ab103b8902f35bdc3f6422ccf3c07165cf4be1ff1f0eb2e74c6c530: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch32,
+    error: "Invalid Stacks block 76a1822978aeb095d12a0e6e268ab2dbf3d2dfc6a6683797d753292277a1ee28: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch32,
+    error: "Invalid Stacks block c53d33239c1bc45c01fc67cde3da4ea10b5c12d23e35f38fd724913b789acde2: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch32,
+    error: "Invalid Stacks block 229c8e48bd4fd72ec9e0337ae612b5b8fc60c2c4b44f91edcaf6cd99bc51f1c2: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block 3f44503063fb5693c34a29f633efb403bfee2ba8a5f9624436e5604d562bcf5e: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block 19fbf4c34b878002f6b336099502f4e5a78c2865221160deca658d5c5e233621: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block ccadc58c8574b400489cd21d9e5f37701dc30e319a4934d816a984c52f097061: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block e050ebe507c03be7c448653a2435b65d51d566b4c1d83ff5cea049d98afa9eac: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 107 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 109 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 111 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 113 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 114 }]), id: 112 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 116 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 117 }]), id: 115 }]), id: 110 }]), id: 108 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 119 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 121 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 122 }]), id: 120 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 124 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 125 }]), id: 123 }]), id: 118 }]), id: 106 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "16df2a7cb33f08e43b64e0d626866d0ff03bd2904eb3ead41bee6800b9c99103",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_0-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_0-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "d9059e4f75e91d32eaf98b99b0da6046eec0d26bd700767f3740349597132e2d",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_05-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_05-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "afb1b1ac7666baed011fa886b4363832fb62894e9c8177e6f1c705066f63dfab",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_1-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_1-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "eae85c1a989a5f3eb413551927299b777aec6f1a495e297c31a7bd920775935e",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_1-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_1-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "8e839c106ae7ba5a81419ea205caae68b9273a7809e1dc568d832b86566b15dc",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_2-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_2-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "9b68c65febbdc3bad0c731a2a2ff2d31e86a00ae50ae02eb31a9049df839a420",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_2-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_2-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "5cfccd7770ac028cc1d7f98c56a844293db81e5d02415384c6b1d24d65c05136",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_3-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_3-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "2bb23accfddb34e45804e8b5ae50f416f778212fc0bb2f12d1284c929c2c3dbf",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_3-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_3-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "87510df7f5182321ea48d20be6d725f423766b95624d4c0cad785e29d5ab03b9",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_4-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_4-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "e70b580e6192c86e8b87c42f14d4cd6e6855c78eb2c49dbaa5edbfe38216844d",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_4-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_4-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "451927fffe2831af1cb86f15fe71ca03b9d43de39f6b5ce6d0472187cdf09a28",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_5-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_5-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "67144d6fa508c3a7e66528f4f9945d256dd08a921081131fd92ba305ad6443d2",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_5-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_5-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "b712169167cf009210a9505a5c804cb4a908f23da80185b60789ccf7f9c92a6b",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "04749259e127fcc3802770079d4f20b374979183c6336230f1682ec73245f24b",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "40ce326ac1e160bd5e7b5e8de4a76d254208a4dda1427d9e87a26a2dceb4b742",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "7b88862d36d822f56d7bbd918d142f6c80bc03bf5760074b9b217121210b84e5",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "6de43dd303251db71a1014943d1624e6ece82fe32e29295a4e72615e52e10a2f",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "0d59ca9ce3611dc3ab4c6f1f97af7688e1b07da55f72790a3f81be7f8dd0e34d",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "4af6a71b35c227d1611ec4d7081eefdc8ab9724db1b9f352efe70d4375e48c81",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "382b92963866c020960ab3e644e84a2e0d822260ae3af06ec8fabd13ba49641c",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "b193f04b9645771c9e2aa5d2385471535ade0ec0f3631d2e0fd97bba8bd63877",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "a38fa4b48287814eeb5408046c7fe30379683f28615eae4bf216832a096bac85",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "39f9b8fdc3a0293fd91c8b02179ddc3ab0453cfa72f024889cf90358e5dded07",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "1be318d710cb0b4f7068cc54f2fc4ef9b16f47badb12993b90f91231c6e9fd69",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "7918bf23140e0fff6206bcf3e89ad2ec2df4ded430eae51037cfeb15ce514cca",
+    evaluated_epoch: Epoch33,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity4, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity4\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "be31b726f6244dee5785b5bf97099d4a18c63c2055bdc5dcd11da0a217b0c291",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity1, code_body: [..], clarity_version: Some(Clarity1))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 126,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 38695,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 126,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 38695,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "22b674888a95b73c266d44a7701ee3c51c6e4cb1bb17233bbc97615fa66a63b7",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity2, code_body: [..], clarity_version: Some(Clarity2))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 126,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 38695,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 126,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 38695,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "609ccd32ee39ae0163de6b7276840bddfb4bc1481c61d5425e0a1a75bdbb6435",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity3, code_body: [..], clarity_version: Some(Clarity3))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 126,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 38695,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 126,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 38695,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "67fbeab468ae5cb67b68023eb80400d92cb7595644849448838bcca44df86d4f",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity4, code_body: [..], clarity_version: Some(Clarity4))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 126,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 38695,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 126,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 38695,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "45f9ecc60802b060bc0fc729edaf1f10cc760dd2e5989e9e506022cb6feb23f4",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity5, code_body: [..], clarity_version: Some(Clarity5))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 126,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 38695,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 126,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 38695,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "5e25cdab2501b00cdf6d289dcf118a08e5f51f183424f5c64958fc949489f57b",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_0-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_0-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "9cf5f7039bc867987d26ab0a8700334f3c9586ab7e824576147d4c205040bee2",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_05-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_05-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "ba22bf63bca311d08cb364706af30b3f095d95ca39c2ac77a27d42e8741f40c1",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_1-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_1-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "6c5c3af7a30cf567f0457c2a33bef83b81ca31a2fa1011a8337bfd9671b8a252",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_1-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_1-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "12fb72e56e59e6fe60d3c9552237e0ed820c028bd03eddf22558429813487db6",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_2-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_2-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "a8bb3877a3c63158814c0eaf437b2e42e565969f3256857f32f90d0d53a448c7",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_2-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_2-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "958016be09da262dbe16bb4b67f7797745819b01d3a1b2b0fba9659a576300c9",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_3-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_3-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "cf87015042004bc1e814fffcf1ac837045634b13f4b92edfb55acbc694be088e",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_3-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_3-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "08758997184ad4a88de7264b4fb345459032c591559047e146de4df756c9dfca",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_4-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_4-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "e1efc6cff3eeec46dcc8b4423c232f2442dd52a1f2a619b0aa72480fc8f43205",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_4-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_4-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "9423531f5d629b46851122daf47fca20f291a3e740d61b6cd67479b766089f30",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_5-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_5-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "0a62260d8050b8e8203b04ce16e4cde7157696101ecd54dcfd257f13b642f480",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch2_5-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch2_5-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "28d727f90d6256b692b9830ea373bfa019ab881e683b060b41e3d3d5188dcdc3",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "b4742dc5c568786682c32667b62ce5c40beb44bca692cefe7c9a42aab3041ed1",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "c030b0748d8af3b5794d538fbfc7ab329329e323e3feba3d5edaa0e04bfe479b",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_0-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_0-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "053bd6507acd6b0524cdd64593402254dc8a6c68d3d0563f32f83579e2106990",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "9205b440c0cc35316ed3908bc8b9169164057a8177346ded494f6c5ea45c2249",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "0362bf102015d2ff479574548d90c0fc3484e37cf8c0896dcf6439b209aa3865",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_1-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_1-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "8c55d1541df11a934c994472daff40301194158af5473e02226221a88f3b16fd",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "7499829d800e98819e0be624d74e80caabac95737a616fdb63c800aac240dcf2",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "e51cca1223cb6006e0837afa9a60dccbec0d17b8f047f20658a37b81a0921332",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_2-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_2-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "011876eb33e174999a99e6aba496bd819127c1a09bc9338d7351245e37ad0e00",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "d1128bf8454fd4d8c914663614cdd4920ed7bf6d9aff7cf7e68424143786b728",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "c02eb51c14466d80cf86c9d6ac38443557277238755179b65956c5a89302f526",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "fddb68e68751854e6c66f5169fda06526992519f3544bc4ced0dee8c30a296d6",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_3-Clarity4, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_3-Clarity4\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "27bbe411e3646c4ade34489841397bf69a7b8669164b5dbf5a29442e038d777b",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_4-Clarity1, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_4-Clarity1\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "155964868c1e00bd61f736ce35bcb2911aa66a86bc2055bb6ee47f0de174ed27",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_4-Clarity2, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_4-Clarity2\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "7cb9e29576d9440bf9d205e57ec333ad753e8984dafc2c02a52364e779a0e1fc",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_4-Clarity3, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_4-Clarity3\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "b371d86f97a348a88018e66a640d35e0c0fc7d62b65b86d9f43d4075ddb2710f",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_4-Clarity4, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_4-Clarity4\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "319ef7d46ad732e87dbedceedb4eee47f93697c5d72f81e345739abf4a182684",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "ContractCall(address: ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP, contract_name: supertype-too-large-Epoch3_4-Clarity5, function_name: trigger-error, function_args: [[]])",
+        vm_error: "Some(NoSuchContract(\"ST1AW6EKPGT61SQ9FNVDS17RKNWT8ZP582VF9HSCP.supertype-too-large-Epoch3_4-Clarity5\")) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 0,
+          write_count: 0,
+          read_length: 0,
+          read_count: 0,
+          runtime: 0,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 0,
+      write_count: 0,
+      read_length: 0,
+      read_count: 0,
+      runtime: 0,
+    ),
+  )),
+]

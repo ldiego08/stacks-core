@@ -1,0 +1,172 @@
+---
+source: stackslib/src/chainstate/tests/runtime_analysis_tests.rs
+expression: result
+---
+[
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block 28ae057867a450aa852a61cdeb9dcf12d53d068aca35753634061b52e2cbfd13: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 101 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 103 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 105 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 107 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 108 }]), id: 106 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 110 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 111 }]), id: 109 }]), id: 104 }]), id: 102 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 113 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 115 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 116 }]), id: 114 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 118 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 119 }]), id: 117 }]), id: 112 }]), id: 100 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block 36a903174a3a8d8aafb115d7308fc0082eaa8e081403247fd2fa4353c62b984d: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 101 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 103 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 105 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 107 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 108 }]), id: 106 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 110 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 111 }]), id: 109 }]), id: 104 }]), id: 102 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 113 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 115 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 116 }]), id: 114 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 118 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 119 }]), id: 117 }]), id: 112 }]), id: 100 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block 6d823caebf82a98b65de9666a8782491df08e1106f3943bacc5e29fb48ef6716: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 101 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 103 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 105 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 107 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 108 }]), id: 106 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 110 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 111 }]), id: 109 }]), id: 104 }]), id: 102 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 113 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 115 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 116 }]), id: 114 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 118 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 119 }]), id: 117 }]), id: 112 }]), id: 100 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Failure(ExpectedFailureOutput(
+    evaluated_epoch: Epoch33,
+    error: "Invalid Stacks block af67a874977b2f225815cf79a3e5b51969d58e687ae90f4659285cf6ea4198dd: ClarityError(StaticCheck(StaticCheckError { err: SupertypeTooLarge, expressions: Some([SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"append\")), id: 101 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"list\")), id: 103 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 105 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 107 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 108 }]), id: 106 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 110 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 111 }]), id: 109 }]), id: 104 }]), id: 102 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"tuple\")), id: 113 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"a\")), id: 115 }, SymbolicExpression { expr: Atom(ClarityName(\"small\")), id: 116 }]), id: 114 }, SymbolicExpression { expr: List([SymbolicExpression { expr: Atom(ClarityName(\"b\")), id: 118 }, SymbolicExpression { expr: Atom(ClarityName(\"b524288\")), id: 119 }]), id: 117 }]), id: 112 }]), id: 100 }]), diagnostic: Diagnostic { level: Error, message: \"supertype of two types is too large\", spans: [Span { start_line: 0, start_column: 0, end_line: 0, end_column: 0 }], suggestion: None } }))",
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "4a785f83d78c76894a9e60c37802f9cc4f1a53e36f1debe417e79f711814ee8d",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity1, code_body: [..], clarity_version: Some(Clarity1))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 120,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 36368,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 120,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 36368,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "fedc632e3f7473c890701df2562eacebe8d54e1f8d696039b239da8b406eaa2d",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity2, code_body: [..], clarity_version: Some(Clarity2))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 120,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 36368,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 120,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 36368,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "55f78317beef8b8977e623c82a9a021640de938ff8c1aa2f5da53d2740edddc9",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity3, code_body: [..], clarity_version: Some(Clarity3))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 120,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 36368,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 120,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 36368,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "675c78b3090fb6666a93694c31de039396e89182ce79a849aadc141e126ca94f",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity4, code_body: [..], clarity_version: Some(Clarity4))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 120,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 36368,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 120,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 36368,
+    ),
+  )),
+  Success(ExpectedBlockOutput(
+    marf_hash: "feccd8725dc0373c4e57262fc025a70c01e2cb2e1482024fad3008aebc634c65",
+    evaluated_epoch: Epoch34,
+    transactions: [
+      ExpectedTransactionOutput(
+        tx: "SmartContract(name: supertype-too-large-Epoch3_4-Clarity5, code_body: [..], clarity_version: Some(Clarity5))",
+        vm_error: "Some(:0:0: supertype of two types is too large) [NON-CONSENSUS BREAKING]",
+        return_type: Response(ResponseData(
+          committed: false,
+          data: Optional(OptionalData(
+            data: None,
+          )),
+        )),
+        cost: ExecutionCost(
+          write_length: 120,
+          write_count: 1,
+          read_length: 1,
+          read_count: 1,
+          runtime: 36368,
+        ),
+      ),
+    ],
+    total_block_cost: ExecutionCost(
+      write_length: 120,
+      write_count: 1,
+      read_length: 1,
+      read_count: 1,
+      runtime: 36368,
+    ),
+  )),
+]
