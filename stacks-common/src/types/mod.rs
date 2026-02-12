@@ -458,6 +458,11 @@ impl SIP031EmissionInterval {
 }
 
 impl StacksEpochId {
+    /// Highest epoch enabled in release builds.
+    /// Keep this in sync with `versions.toml` and `PEER_NETWORK_EPOCH`
+    /// (validated in tests and `validate_epochs()`)
+    pub const RELEASE_LATEST_EPOCH: StacksEpochId = StacksEpochId::Epoch33;
+
     #[cfg(any(test, feature = "testing"))]
     pub const fn latest() -> StacksEpochId {
         StacksEpochId::Epoch34
@@ -465,7 +470,7 @@ impl StacksEpochId {
 
     #[cfg(not(any(test, feature = "testing")))]
     pub const fn latest() -> StacksEpochId {
-        StacksEpochId::Epoch33
+        StacksEpochId::RELEASE_LATEST_EPOCH
     }
 
     /// In this epoch, how should the mempool perform garbage collection?
