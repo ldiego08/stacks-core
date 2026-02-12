@@ -2094,14 +2094,12 @@ fn test_trait_use_at_top_level_same_contract(
     env.initialize_contract(
         QualifiedContractIdentifier::local("c-foo").unwrap(),
         contract_foo,
-        ASTRules::PrecheckSize,
     )
     .unwrap();
 
     let contract_init_result = env.initialize_contract(
         QualifiedContractIdentifier::local("c-bar").unwrap(),
         contract_bar,
-        ASTRules::PrecheckSize,
     );
 
     if version.allows_local_trait_lookup() {
