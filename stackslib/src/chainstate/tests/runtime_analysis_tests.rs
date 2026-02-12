@@ -20,10 +20,9 @@ use std::collections::HashMap;
 use clarity::types::StacksEpochId;
 #[allow(unused_imports)]
 use clarity::vm::analysis::RuntimeCheckErrorKind;
-#[allow(unused_imports)]
-use clarity::vm::errors::RuntimeError;
+use clarity::vm::errors::{ClarityEvalError, VmExecutionError};
 use clarity::vm::types::{PrincipalData, QualifiedContractIdentifier, MAX_TYPE_DEPTH};
-use clarity::vm::{ClarityVersion, Value as ClarityValue};
+use clarity::vm::{execute, ClarityVersion, Value as ClarityValue};
 
 use crate::chainstate::tests::consensus::{
     contract_call_consensus_test, contract_deploy_consensus_test, ConsensusTest, ConsensusUtils,
@@ -88,6 +87,10 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             runtime_check_error_kind_type_signature_too_deep_cdeploy,
             runtime_check_error_kind_type_signature_too_deep_ccall
         ]),
+        SupertypeTooLarge => Tested(vec![
+            runtime_check_error_kind_supertype_too_large_cdeploy,
+            runtime_check_error_kind_supertype_too_large_ccall
+        ]),
         ExpectsAcceptable(_) => Unreachable_ExpectLike,
         ExpectsRejectable(_) => Unreachable_ExpectLike,
         ListTypesMustMatch => Tested(vec![runtime_check_error_kind_list_types_must_match_cdeploy]),
@@ -133,6 +136,72 @@ fn variant_coverage_report(variant: RuntimeCheckErrorKind) {
             Ignored("Only reachable via legacy v1 parsing paths")
         },
     };
+}
+
+fn runtime_supertype_too_large_program(inner: &str) -> String {
+    format!(
+        r#"
+        (let (
+            (b16 0x00112233445566778899aabbccddeeff)
+            (b32 (concat b16 b16))
+            (b64 (concat b32 b32))
+            (b128 (concat b64 b64))
+            (b256 (concat b128 b128))
+            (b512 (concat b256 b256))
+            (b1024 (concat b512 b512))
+            (b2048 (concat b1024 b1024))
+            (b4096 (concat b2048 b2048))
+            (b8192 (concat b4096 b4096))
+            (b16384 (concat b8192 b8192))
+            (b32768 (concat b16384 b16384))
+            (b65536 (concat b32768 b32768))
+            (b131072 (concat b65536 b65536))
+            (b262144 (concat b131072 b131072))
+            (b524288 (concat b262144 b262144))
+            (small 0x00))
+            {inner})
+        "#
+    )
+}
+
+/// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::SupertypeTooLarge`]
+/// Caused by: `append` computes the least supertype of two tuple shapes whose combined
+///   buffer field maximum exceeds `MAX_VALUE_SIZE`.
+/// Outcome: runtime analysis fails with `SupertypeTooLarge`.
+#[test]
+fn runtime_check_error_kind_supertype_too_large_cdeploy() {
+    let program = runtime_supertype_too_large_program(
+        "(append (list (tuple (a b524288) (b small)))
+                 (tuple (a small) (b b524288)))",
+    );
+
+    let err = execute(&program).unwrap_err();
+    assert!(matches!(
+        err,
+        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
+            RuntimeCheckErrorKind::SupertypeTooLarge
+        ))
+    ));
+}
+
+/// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::SupertypeTooLarge`]
+/// Caused by: `is-eq` computes the least supertype across its arguments and the tuple
+///   supertype exceeds `MAX_VALUE_SIZE`.
+/// Outcome: runtime analysis fails with `SupertypeTooLarge`.
+#[test]
+fn runtime_check_error_kind_supertype_too_large_ccall() {
+    let program = runtime_supertype_too_large_program(
+        "(is-eq (tuple (a b524288) (b small))
+                (tuple (a small) (b b524288)))",
+    );
+
+    let err = execute(&program).unwrap_err();
+    assert!(matches!(
+        err,
+        ClarityEvalError::Vm(VmExecutionError::RuntimeCheck(
+            RuntimeCheckErrorKind::SupertypeTooLarge
+        ))
+    ));
 }
 
 /// RuntimeCheckErrorKind: [`RuntimeCheckErrorKind::CostBalanceExceeded`]

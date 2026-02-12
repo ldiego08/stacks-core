@@ -195,6 +195,8 @@ pub enum CommonCheckErrorKind {
     TypeSignatureTooDeep,
     /// Expected a name (e.g., variable, function) but found an invalid or missing token.
     ExpectedName,
+    /// Supertype (i.e. common denominator between two types) exceeds the maximum allowed size or complexity.
+    SupertypeTooLarge,
 
     // Unexpected interpreter behavior
     /// Unexpected condition or failure in the type-checker, indicating a bug or invalid state.
@@ -283,7 +285,7 @@ pub enum StaticCheckErrorKind {
     TypeSignatureTooDeep,
     /// Expected a name (e.g., variable, function) but found an invalid or missing token.
     ExpectedName,
-    /// Supertype (e.g., trait or union) exceeds the maximum allowed size or complexity.
+    /// Supertype (i.e. common denominator between two types) exceeds the maximum allowed size or complexity.
     SupertypeTooLarge,
 
     // Unexpected interpreter behavior
@@ -596,7 +598,7 @@ pub enum RuntimeCheckErrorKind {
     ValueOutOfBounds,
     /// Type signature nesting depth exceeds the allowed limit during analysis.
     TypeSignatureTooDeep,
-    /// Supertype (e.g., trait or union) exceeds the maximum allowed size or complexity.
+    /// Supertype (i.e. common denominator between two types) exceeds the maximum allowed size or complexity.
     SupertypeTooLarge,
 
     // Unexpected interpreter behavior
@@ -875,6 +877,7 @@ impl From<ClarityTypeError> for CommonCheckErrorKind {
             ClarityTypeError::EmptyTuplesNotAllowed => Self::EmptyTuplesNotAllowed,
             ClarityTypeError::InvalidTypeDescription => Self::InvalidTypeDescription,
             ClarityTypeError::CouldNotDetermineType => Self::CouldNotDetermineType,
+            ClarityTypeError::SupertypeTooLarge => Self::SupertypeTooLarge,
             ClarityTypeError::ListTypeMismatch
             | ClarityTypeError::TypeMismatch(_, _)
             | ClarityTypeError::SequenceElementArityMismatch { .. }
@@ -894,8 +897,7 @@ impl From<ClarityTypeError> for CommonCheckErrorKind {
             | ClarityTypeError::ResponseTypeMismatch { .. } => Self::ExpectsAcceptable(format!(
                 "Unexpected but acceptable error type during analysis: {err}"
             )),
-            ClarityTypeError::SupertypeTooLarge
-            | ClarityTypeError::InvariantViolation(_)
+            ClarityTypeError::InvariantViolation(_)
             | ClarityTypeError::InvalidPrincipalVersion(_) => Self::ExpectsRejectable(format!(
                 "Unexpected and unacceptable error type during analysis: {err}"
             )),
@@ -1081,6 +1083,7 @@ impl From<CommonCheckErrorKind> for RuntimeCheckErrorKind {
             CommonCheckErrorKind::ExpectedName => {
                 RuntimeCheckErrorKind::ExpectsAcceptable("Expected name".to_string())
             }
+            CommonCheckErrorKind::SupertypeTooLarge => RuntimeCheckErrorKind::SupertypeTooLarge,
             CommonCheckErrorKind::DefineFunctionBadSignature => {
                 RuntimeCheckErrorKind::ExpectsAcceptable(
                     "Define function bad signature".to_string(),
@@ -1167,6 +1170,7 @@ impl From<CommonCheckErrorKind> for StaticCheckErrorKind {
             CommonCheckErrorKind::DefineFunctionBadSignature => {
                 StaticCheckErrorKind::DefineFunctionBadSignature
             }
+            CommonCheckErrorKind::SupertypeTooLarge => StaticCheckErrorKind::SupertypeTooLarge,
             CommonCheckErrorKind::ExpectedTraitIdentifier => {
                 StaticCheckErrorKind::ExpectedTraitIdentifier
             }
