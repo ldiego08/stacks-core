@@ -10874,7 +10874,7 @@ pub mod test {
         }
         assert_eq!(
             tx_receipt.vm_error,
-            Some("TraitReferenceUnknown(\"foo\")".to_string())
+            Some("ExpectsAcceptable(\"Trait reference unknown: foo\")".to_string())
         );
 
         conn.commit_block();
@@ -10936,7 +10936,7 @@ pub mod test {
         }
         assert_eq!(
             tx_receipt.vm_error,
-            Some("TraitReferenceUnknown(\"foo\")".to_string())
+            Some("ExpectsAcceptable(\"Trait reference unknown: foo\")".to_string())
         );
 
         conn.commit_block();

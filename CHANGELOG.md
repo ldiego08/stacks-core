@@ -13,6 +13,14 @@ and this project adheres to the versioning scheme outlined in the [README.md](RE
 - Implemented the updated behavior for `secp256r1-verify`, effective in Clarity 5, in which the `message-hash` is no longer hashed again. See SIP-035 for details.
 - Prepare for epoch 3.4's improved transaction inclusion, allowing transactions with certain errors to be included in blocks which would cause them to be rejected in earlier epochs.
 
+### Fixed
+
+- Improved the cost-tracking for `from-consensus-buff?`, effective in epoch 3.4, so that when an empty buffer is passed, users will see a `none` result, rather than a confusing runtime error.
+
+### Fixed
+
+- Resolved several cases where a mock-miner would stop mining
+
 ## [3.3.0.0.5]
 
 ### Added
