@@ -16,7 +16,6 @@
 
 use std::cmp;
 
-use clarity_types::errors::ClarityTypeError;
 use clarity_types::types::RetainValuesError;
 use stacks_common::types::StacksEpochId;
 
@@ -253,28 +252,17 @@ pub fn special_append(
                 assert_eq!(size, 0);
                 return Ok(Value::cons_list(vec![element], env.epoch())?);
             }
-            match TypeSignature::least_supertype(env.epoch(), &entry_type, &element_type) {
-                Ok(next_entry_type) => {
-                    let (element, _) =
-                        Value::sanitize_value(env.epoch(), &next_entry_type, element)
-                            .ok_or_else(|| RuntimeCheckErrorKind::ListTypesMustMatch)?;
+            let next_entry_type =
+                TypeSignature::least_supertype(env.epoch(), &entry_type, &element_type)?;
+            let (element, _) = Value::sanitize_value(env.epoch(), &next_entry_type, element)
+                .ok_or_else(|| RuntimeCheckErrorKind::ListTypesMustMatch)?;
 
-                    let next_type_signature = ListTypeData::new_list(next_entry_type, size + 1)?;
-                    data.push(element);
-                    Ok(Value::Sequence(SequenceData::List(ListData {
-                        type_signature: next_type_signature,
-                        data,
-                    })))
-                }
-                Err(err @ ClarityTypeError::SupertypeTooLarge) => {
-                    Err(RuntimeCheckErrorKind::from(err).into())
-                }
-                Err(_) => Err(RuntimeCheckErrorKind::TypeValueError(
-                    Box::new(entry_type),
-                    Box::new(element),
-                )
-                .into()),
-            }
+            let next_type_signature = ListTypeData::new_list(next_entry_type, size + 1)?;
+            data.push(element);
+            Ok(Value::Sequence(SequenceData::List(ListData {
+                type_signature: next_type_signature,
+                data,
+            })))
         }
         _ => Err(
             RuntimeCheckErrorKind::ExpectsAcceptable("Expected list application".to_string())
