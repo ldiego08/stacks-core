@@ -2088,9 +2088,9 @@ fn test_trait_use_at_top_level_same_contract(
             (unwrap-panic (contract-call? F foo)))
         (bar .c-foo)";
 
-    let mut placeholder_context =
+    let placeholder_context =
         ContractContext::new(QualifiedContractIdentifier::transient(), version);
-    let mut env = owned_env.get_exec_environment(None, None, &mut placeholder_context);
+    let mut env = owned_env.get_exec_environment(None, None, &placeholder_context);
 
     env.initialize_contract(
         QualifiedContractIdentifier::local("c-foo").unwrap(),
