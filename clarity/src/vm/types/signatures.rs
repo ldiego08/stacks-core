@@ -716,11 +716,16 @@ mod test {
         let bad_type_descriptions = [
             (
                 "(tuple)",
-                ExpectsAcceptable("Empty tuples not allowed".to_string()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: EmptyTuplesNotAllowed"
+                        .to_string(),
+                ),
             ),
             (
                 "(list int int)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
             ("(list 4294967296 int)", ValueTooLarge),
             (
@@ -729,16 +734,22 @@ mod test {
             ),
             (
                 "(buff)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
             ("(buff 4294967296)", ValueTooLarge),
             (
                 "(buff int)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
             (
                 "(response int)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
             (
                 "(optional bazel)",
@@ -756,16 +767,30 @@ mod test {
                 "bazel",
                 ExpectsAcceptable("Unknown type name: bazel".into()),
             ),
-            ("()", ExpectsAcceptable("Invalid type description".into())),
+            (
+                "()",
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
+            ),
             (
                 "(1234)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
             (
                 "(int 3 int)",
-                ExpectsAcceptable("Invalid type description".into()),
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
             ),
-            ("1234", ExpectsAcceptable("Invalid type description".into())),
+            (
+                "1234",
+                ExpectsAcceptable(
+                    "Unexpected error type during runtime analysis: InvalidTypeDescription".into(),
+                ),
+            ),
             ("(list 1 (buff 1048576))", ValueTooLarge),
             ("(list 4294967295 (buff 2))", ValueTooLarge),
             ("(list 2147483647 (buff 2))", ValueTooLarge),
